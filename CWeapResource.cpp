@@ -718,7 +718,7 @@ int CWeapResource::CloseAndSave(void)
 
 	m_iID = m_controls[0].GetInt();
 
-	strcpy(m_szName, m_controls[1].GetString());
+	strcpy_s(m_szName, m_controls[1].GetString());
 
 	m_iReload   = m_controls[2].GetInt();
 	m_iLifetime = m_controls[3].GetInt();

@@ -28,7 +28,6 @@ class CWindow;
 #include <string>
 #include <list>
 
-#include "CException.h"
 #include "Utils.h"
 
 ////////////////////////////////////////////////////////////////

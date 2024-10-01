@@ -581,21 +581,21 @@ int CGovtResource::CloseAndSave(void)
 
 	m_iSkillMultiplier = m_controls[25].GetInt();
 
-	strcpy(m_cScanMask, m_controls[26].GetString());
-	strcpy(m_cRequire,  m_controls[27].GetString());
+	strcpy_s(m_cScanMask, m_controls[26].GetString());
+	strcpy_s(m_cRequire,  m_controls[27].GetString());
 
 	m_iInherentJamming[0] = m_controls[28].GetInt();
 	m_iInherentJamming[1] = m_controls[29].GetInt();
 	m_iInherentJamming[2] = m_controls[30].GetInt();
 	m_iInherentJamming[3] = m_controls[31].GetInt();
 
-	strcpy(m_szMediumName, m_controls[32].GetString());
+	strcpy_s(m_szMediumName, m_controls[32].GetString());
 
 	m_iColor     = m_controls[33].GetInt();
 	m_iShipColor = m_controls[34].GetInt();
 
-	strcpy(m_szCommName,   m_controls[35].GetString());
-	strcpy(m_szTargetName, m_controls[36].GetString());
+	strcpy_s(m_szCommName,   m_controls[35].GetString());
+	strcpy_s(m_szTargetName, m_controls[36].GetString());
 
 	m_iFlags1 = 0x0000;
 	m_iFlags2 = 0x0000;
@@ -626,7 +626,7 @@ int CGovtResource::CloseAndSave(void)
 	m_iFlags2 |= m_controls[59].GetInt() << 6;
 	m_iFlags2 |= m_controls[60].GetInt() << 7;
 
-	strcpy(m_szName, m_controls[61].GetString());
+	strcpy_s(m_szName, m_controls[61].GetString());
 
 	int i;
 

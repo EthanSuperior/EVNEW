@@ -371,17 +371,17 @@ int CJunkResource::CloseAndSave(void)
 
 	memcpy(m_cScanMask, m_controls[18].GetString(), 2 * sizeof(char));
 
-	strcpy(m_szLowerCaseName, m_controls[19].GetString());
-	strcpy(m_szAbbreviation, m_controls[20].GetString());
-	strcpy(m_szBuyOn, m_controls[21].GetString());
-	strcpy(m_szSellOn, m_controls[22].GetString());
+	strcpy_s(m_szLowerCaseName, m_controls[19].GetString());
+	strcpy_s(m_szAbbreviation, m_controls[20].GetString());
+	strcpy_s(m_szBuyOn, m_controls[21].GetString());
+	strcpy_s(m_szSellOn, m_controls[22].GetString());
 
 	m_iFlags = 0x0000;
 
 	m_iFlags |= m_controls[23].GetInt() << 0;
 	m_iFlags |= m_controls[24].GetInt() << 1;
 
-	strcpy(m_szName, m_controls[25].GetString());
+	strcpy_s(m_szName, m_controls[25].GetString());
 
 	int i;
 

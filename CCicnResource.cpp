@@ -155,7 +155,7 @@ int CCicnResource::Save(char *pOutput)
 
 	// Save mask data
 
-	int i, j;
+	size_t i, j;
 
 	UCHAR ucPixel;
 
@@ -639,8 +639,8 @@ int CCicnResource::LoadFromTextEx(std::istream & input, std::string & szFilePath
 	char szIconFilename[256];
 	char szMaskFilename[256];
 
-	strcpy(szIconFilename, szFilePath.c_str());
-	strcpy(szMaskFilename, szFilePath.c_str());
+	strcpy_s(szIconFilename, szFilePath.c_str());
+	strcpy_s(szMaskFilename, szFilePath.c_str());
 
 	ReadTextField(input, szIconFilename + strlen(szIconFilename), 256 - strlen(szIconFilename));
 	ReadTextField(input, szMaskFilename + strlen(szMaskFilename), 256 - strlen(szMaskFilename));
@@ -856,7 +856,7 @@ int CCicnResource::CloseAndSave(void)
 
 	m_iID = m_controls[0].GetInt();
 
-	strcpy(m_szName, m_controls[1].GetString());
+	strcpy_s(m_szName, m_controls[1].GetString());
 
 	int i;
 
@@ -944,7 +944,7 @@ int CCicnResource::FileImport(int iIsIcon, const char *szFilename, int iShowErro
 
 	if(szFilename == NULL)
 	{
-		strcpy(szFilename2, "");
+		strcpy_s(szFilename2, "");
 
 		OPENFILENAME ofn;
 
@@ -966,7 +966,7 @@ int CCicnResource::FileImport(int iIsIcon, const char *szFilename, int iShowErro
 	}
 	else
 	{
-		strcpy(szFilename2, szFilename);
+		strcpy_s(szFilename2, szFilename);
 	}
 
 	std::ifstream filein;
@@ -1343,7 +1343,7 @@ int CCicnResource::FileExport(int iIsIcon, const char *szFilename, int iShowErro
 
 	if(szFilename == NULL)
 	{
-		strcpy(szFilename2, "");
+		strcpy_s(szFilename2, "");
 
 		OPENFILENAME ofn;
 
@@ -1365,7 +1365,7 @@ int CCicnResource::FileExport(int iIsIcon, const char *szFilename, int iShowErro
 	}
 	else
 	{
-		strcpy(szFilename2, szFilename);
+		strcpy_s(szFilename2, szFilename);
 	}
 
 	std::ofstream outfile;

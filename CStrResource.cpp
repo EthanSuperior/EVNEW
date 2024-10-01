@@ -174,9 +174,9 @@ int CStrResource::CloseAndSave(void)
 
 	m_iID = m_controls[0].GetInt();
 
-	strcpy(m_szName, m_controls[1].GetString());
+	strcpy_s(m_szName, m_controls[1].GetString());
 
-	strcpy(m_szString, m_controls[2].GetString());
+	strcpy_s(m_szString, m_controls[2].GetString());
 
 	int i;
 

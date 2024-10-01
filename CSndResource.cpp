@@ -233,7 +233,7 @@ int CSndResource::LoadFromTextEx(std::istream & input, std::string & szFilePath)
 {
 	char szFilename[MAX_PATH];
 
-	strcpy(szFilename, szFilePath.c_str());
+	strcpy_s(szFilename, szFilePath.c_str());
 
 	ReadTextField(input, szFilename + strlen(szFilename), MAX_PATH - strlen(szFilename));
 
@@ -313,7 +313,7 @@ int CSndResource::CloseAndSave(void)
 
 	m_iID = m_controls[0].GetInt();
 
-	strcpy(m_szName, m_controls[1].GetString());
+	strcpy_s(m_szName, m_controls[1].GetString());
 
 	if(m_iIsDirty)
 	{
@@ -423,7 +423,7 @@ int CSndResource::FileImport(const char *szFilename, int iShowErrorMessages)
 
 	if(szFilename == NULL)
 	{
-		strcpy(szFilename2, "");
+		strcpy_s(szFilename2, "");
 
 		OPENFILENAME ofn;
 
@@ -445,7 +445,7 @@ int CSndResource::FileImport(const char *szFilename, int iShowErrorMessages)
 	}
 	else
 	{
-		strcpy(szFilename2, szFilename);
+		strcpy_s(szFilename2, szFilename);
 	}
 
 	std::ifstream filein;
@@ -821,7 +821,7 @@ int CSndResource::FileExport(const char *szFilename, int iShowErrorMessages)
 
 	if(szFilename == NULL)
 	{
-		strcpy(szFilename2, "");
+		strcpy_s(szFilename2, "");
 
 		OPENFILENAME ofn;
 
@@ -843,7 +843,7 @@ int CSndResource::FileExport(const char *szFilename, int iShowErrorMessages)
 	}
 	else
 	{
-		strcpy(szFilename2, szFilename);
+		strcpy_s(szFilename2, szFilename);
 	}
 
 	std::ofstream outfile;

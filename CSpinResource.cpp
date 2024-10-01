@@ -207,7 +207,7 @@ int CSpinResource::CloseAndSave(void)
 	m_iXTiles    = m_controls[5].GetInt();
 	m_iYTiles    = m_controls[6].GetInt();
 
-	strcpy(m_szName, m_controls[7].GetString());
+	strcpy_s(m_szName, m_controls[7].GetString());
 
 	int i;
 

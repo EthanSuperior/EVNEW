@@ -86,7 +86,7 @@ int CStrlResource::Save(char *pOutput)
 
 	for(i = 0; i < m_vStrings.size(); i++)
 	{
-		strcpy(szBuffer, m_vStrings[i].c_str());
+		strcpy_s(szBuffer, m_vStrings[i].c_str());
 
 		szBuffer[255] = '\0';
 
@@ -215,7 +215,7 @@ int CStrlResource::Initialize(HWND hwnd)
 
 	char szString[16];
 
-	strcpy(szString, "");
+	strcpy_s(szString, "");
 
 	ListBox_AddString(hwndStringList, szString);
 
@@ -256,7 +256,7 @@ int CStrlResource::CloseAndSave(void)
 
 	m_iID = m_controls[0].GetInt();
 
-	strcpy(m_szName, m_controls[1].GetString());
+	strcpy_s(m_szName, m_controls[1].GetString());
 
 	HWND hwndStringList = GetDlgItem(m_pWindow->GetHWND(), IDC_EDIT_STRL_LIST1);
 
@@ -328,7 +328,7 @@ int CStrlResource::AddString(void)
 
 	char szString[16];
 
-	strcpy(szString, "");
+	strcpy_s(szString, "");
 
 	ListBox_InsertString(hwndStringList, iSelection, szString);
 
@@ -356,7 +356,7 @@ int CStrlResource::EditString(void)
 	{
 		char szString[16];
 
-		strcpy(szString, "");
+		strcpy_s(szString, "");
 
 		ListBox_InsertString(hwndStringList, iSelection, szString);
 

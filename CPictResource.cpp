@@ -173,7 +173,7 @@ int CPictResource::LoadFromTextEx(std::istream & input, std::string & szFilePath
 
 	input.ignore(1);
 
-	strcpy(szFilename, szFilePath.c_str());
+	strcpy_s(szFilename, szFilePath.c_str());
 
 	ReadTextField(input, szFilename + strlen(szFilename), MAX_PATH - strlen(szFilename));
 
@@ -381,7 +381,7 @@ int CPictResource::CloseAndSave(void)
 
 	m_iID = m_controls[0].GetInt();
 
-	strcpy(m_szName, m_controls[1].GetString());
+	strcpy_s(m_szName, m_controls[1].GetString());
 
 	if(m_hTempPicture != NULL)
 	{
@@ -490,7 +490,7 @@ int CPictResource::FileImport(char *szFilename, int iShowErrorMessages)
 
 	if(szFilename == NULL)
 	{
-		strcpy(szFilename2, "");
+		strcpy_s(szFilename2, "");
 
 		memset(&ofn, 0, sizeof(OPENFILENAME));
 
@@ -510,7 +510,7 @@ int CPictResource::FileImport(char *szFilename, int iShowErrorMessages)
 	}
 	else
 	{
-		strcpy(szFilename2, szFilename);
+		strcpy_s(szFilename2, szFilename);
 	}
 
 	char *pExtension = strrchr(szFilename2, '.');
@@ -608,7 +608,7 @@ int CPictResource::FileImport(char *szFilename, int iShowErrorMessages)
 
 	char szTempFilename[MAX_PATH];
 
-	strcpy(szTempFilename, "PICT");
+	strcpy_s(szTempFilename, "PICT");
 
 //	szTempFilename = _tempnam(pEditor->GetTempFileDirectory(), "PICT");
 
@@ -909,7 +909,7 @@ int CPictResource::FileExport(const char *szFilename, int iImageType, int iShowE
 
 	if(szFilename == NULL)
 	{
-		strcpy(szFilename2, "");
+		strcpy_s(szFilename2, "");
 
 		memset(&ofn, 0, sizeof(OPENFILENAME));
 
@@ -931,7 +931,7 @@ int CPictResource::FileExport(const char *szFilename, int iImageType, int iShowE
 	}
 	else
 	{
-		strcpy(szFilename2, szFilename);
+		strcpy_s(szFilename2, szFilename);
 	}
 
 	if(iImageType == 3)

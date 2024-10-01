@@ -498,7 +498,7 @@ int CDudeResource::CloseAndSave(void)
 	m_iInfoTypes |= m_controls[46].GetInt() << 14;
 	m_iInfoTypes |= m_controls[47].GetInt() << 15;
 
-	strcpy(m_szName, m_controls[48].GetString());
+	strcpy_s(m_szName, m_controls[48].GetString());
 
 	int i;
 

@@ -1018,7 +1018,7 @@ int CShanResource::CloseAndSave(void)
 	m_iFlags |= m_controls[92].GetInt() << 7;
 	m_iFlags |= m_controls[93].GetInt() << 8;
 
-	strcpy(m_szName, m_controls[94].GetString());
+	strcpy_s(m_szName, m_controls[94].GetString());
 
 	int i;
 

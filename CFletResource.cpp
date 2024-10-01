@@ -327,7 +327,7 @@ int CFletResource::CloseAndSave(void)
 
 	m_iSystem = m_controls[15].GetInt();
 
-	strcpy(m_szAppearOn, m_controls[16].GetString());
+	strcpy_s(m_szAppearOn, m_controls[16].GetString());
 
 	m_iQuote = m_controls[17].GetInt();
 
@@ -335,7 +335,7 @@ int CFletResource::CloseAndSave(void)
 
 	m_iFlags |= m_controls[18].GetInt() << 0;
 
-	strcpy(m_szName, m_controls[19].GetString());
+	strcpy_s(m_szName, m_controls[19].GetString());
 
 	int i;
 

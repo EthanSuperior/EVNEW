@@ -17,7 +17,6 @@ class CNovaResource;
 //////////////////////////	INCLUDES  //////////////////////////
 ////////////////////////////////////////////////////////////////
 
-#include <iostream>
 #include <string>
 #include <windows.h>
 
@@ -67,9 +66,9 @@ const std::string g_szResourceTypes[] = {"boom", "char", "cicn", "colr", "cron",
 										 "junk", "misn", "nebu", "oops", "outf", "pers", "pict", "rank", "rle8", "rleD",
 										 "roid", "shan", "ship", "snd",  "spin", "spob", "str",  "str#", "syst", "weap"};
 
-const std::string g_szMacResourceTypes[] = {"bööm", "chär", "cicn", "cölr", "crön", "dësc", "düde", "flët", "gövt", "ïntf",
-											"jünk", "mïsn", "nëbu", "öops", "oütf", "përs", "PICT", "ränk", "rlë8", "rlëD",
-											"röid", "shän", "shïp", "snd ", "spïn", "spöb", "STR ", "STR#", "sÿst", "wëap"};
+const std::string g_szMacResourceTypes[] = {"b≈°≈°m", "ch≈†r", "cicn", "c≈°lr", "cr≈°n", "d‚Äòsc", "d≈∏de", "fl‚Äòt", "g≈°vt", "‚Ä¢ntf",
+											"j≈∏nk", "m‚Ä¢sn", "n‚Äòbu", "≈°ops", "o≈∏tf", "p‚Äòrs", "PICT", "r≈†nk", "rl‚Äò8", "rl‚ÄòD",
+											"r≈°id", "sh≈†n", "sh‚Ä¢p", "snd ", "sp‚Ä¢n", "sp≈°b", "STR ", "STR#", "s√òst", "w‚Äòap"};
 
 const int g_iResourceCanLoadSaveText[] = {1, 1, 0, 1, 1, 1, 1, 1, 1, 1,
 										  1, 1, 1, 1, 1, 1, 0, 1, 0, 0,

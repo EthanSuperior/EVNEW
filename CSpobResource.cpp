@@ -643,7 +643,7 @@ int CSpobResource::CloseAndSave(void)
 
 	m_iID = m_controls[0].GetInt();
 
-	strcpy(m_szName, m_controls[1].GetString());
+	strcpy_s(m_szName, m_controls[1].GetString());
 
 	m_iXPosition = m_controls[2].GetInt();
 	m_iYPosition = m_controls[3].GetInt();
@@ -684,8 +684,8 @@ int CSpobResource::CloseAndSave(void)
 	m_iHyperlinks[6] = m_controls[29].GetInt();
 	m_iHyperlinks[7] = m_controls[30].GetInt();
 
-	strcpy(m_szOnDominate, m_controls[31].GetString());
-	strcpy(m_szOnRelease,  m_controls[32].GetString());
+	strcpy_s(m_szOnDominate, m_controls[31].GetString());
+	strcpy_s(m_szOnRelease,  m_controls[32].GetString());
 
 	m_iLandingFee = m_controls[33].GetInt();
 
@@ -698,8 +698,8 @@ int CSpobResource::CloseAndSave(void)
 
 	m_iExplosionType = m_controls[39].GetInt();
 
-	strcpy(m_szOnDestroy,    m_controls[40].GetString());
-	strcpy(m_szOnRegenerate, m_controls[41].GetString());
+	strcpy_s(m_szOnDestroy,    m_controls[40].GetString());
+	strcpy_s(m_szOnRegenerate, m_controls[41].GetString());
 
 	m_iFlags1 = 0x00000000;
 	m_iFlags2 = 0x0000;

@@ -177,8 +177,8 @@ int CRLEResource::LoadFromTextEx(std::istream & input, std::string & szFilePath)
 	char szImageFilename[256];
 	char szMaskFilename[256];
 
-	strcpy(szImageFilename, szFilePath.c_str());
-	strcpy(szMaskFilename,  szFilePath.c_str());
+	strcpy_s(szImageFilename, szFilePath.c_str());
+	strcpy_s(szMaskFilename,  szFilePath.c_str());
 
 	ReadTextField(input, szImageFilename + strlen(szImageFilename), 256 - strlen(szImageFilename));
 	ReadTextField(input, szMaskFilename  + strlen(szMaskFilename),  256 - strlen(szMaskFilename));
@@ -855,7 +855,7 @@ int CRLEResource::CloseAndSave(void)
 
 	m_iID = m_controls[0].GetInt();
 
-	strcpy(m_szName, m_controls[1].GetString());
+	strcpy_s(m_szName, m_controls[1].GetString());
 
 	m_iFramesPerRow    = m_controls[2].GetInt();
 	m_iFramesPerColumn = m_controls[3].GetInt();
@@ -1009,7 +1009,7 @@ int CRLEResource::DoImportBrowse(void)
 {
 	char szFilename[MAX_PATH];
 
-	strcpy(szFilename, "");
+	strcpy_s(szFilename, "");
 
 	OPENFILENAME ofn;
 
@@ -1040,7 +1040,7 @@ int CRLEResource::DoExportBrowse(void)
 {
 	char szFilename[MAX_PATH];
 
-	strcpy(szFilename, "");
+	strcpy_s(szFilename, "");
 
 	OPENFILENAME ofn;
 
@@ -1191,7 +1191,7 @@ int CRLEResource::DoImport(const char *szFilename, int iIsImage, int iNumFramesT
 
 	char szTempFilename[MAX_PATH];
 
-	strcpy(szTempFilename, "RLE");
+	strcpy_s(szTempFilename, "RLE");
 
 //	szTempFilename = _tempnam(pEditor->GetTempFileDirectory(), "RLE");
 
@@ -1470,7 +1470,7 @@ int CRLEResource::DoExport(const char *szFilename, int iIsImage, int iNumFramesT
 
 	char szTempFilename[MAX_PATH];
 
-	strcpy(szTempFilename, "RLE");
+	strcpy_s(szTempFilename, "RLE");
 
 	std::ofstream outfile;
 

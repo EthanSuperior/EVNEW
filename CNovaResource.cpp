@@ -46,7 +46,7 @@ short CNovaResource::GetID(void)
 
 int CNovaResource::SetName(const char *szName)
 {
-	strcpy(m_szName, szName);
+	strcpy_s(m_szName, szName);
 
 	return 1;
 }
