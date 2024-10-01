@@ -75,9 +75,7 @@ CGovtResource::CGovtResource(void)
 }
 
 CGovtResource::~CGovtResource(void)
-{
-
-}
+= default;
 
 int CGovtResource::GetType(void)
 {

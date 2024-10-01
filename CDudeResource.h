@@ -28,9 +28,9 @@ class CDudeResource;
 //////////////////////////  CONSTANTS  /////////////////////////
 ////////////////////////////////////////////////////////////////
 
-const int NUM_DUDE_CONTROLS = 49;
+constexpr int NUM_DUDE_CONTROLS = 49;
 
-const int NUM_DUDE_FIELDS = 36;
+constexpr int NUM_DUDE_FIELDS = 36;
 
 const std::string g_szDudeFields[NUM_DUDE_FIELDS] =
 	{"AI Type", "Government", "Ship 1", "Ship 2", "Ship 3", "Ship 4",
@@ -52,27 +52,27 @@ class CDudeResource : public CNovaResource
 public:
 
 	CDudeResource(void);
-	~CDudeResource(void);
+	~CDudeResource(void) override;
 
-	int GetType(void);
-	int GetSize(void);
+	int GetType(void) override;
+	int GetSize(void) override;
 
-	int GetDialogID(void);
-	DLGPROCNOCALLBACK GetDialogProc(void);
+	int GetDialogID(void) override;
+	DLGPROCNOCALLBACK GetDialogProc(void) override;
 
-	int GetNumFields(void);
-	const std::string * GetFieldNames(void);
+	int GetNumFields(void) override;
+	const std::string * GetFieldNames(void) override;
 
-	int Initialize(HWND hwnd);
+	int Initialize(HWND hwnd) override;
 
-	int CloseAndSave(void);
-	int CloseAndDontSave(void);
+	int CloseAndSave(void) override;
+	int CloseAndDontSave(void) override;
 
-	int Save(char *pOutput);
-	int Load(char *pInput, int iSize);
+	int Save(char *pOutput) override;
+	int Load(char *pInput, int iSize) override;
 
-	int SaveToText(std::ostream & output);
-	int LoadFromText(std::istream & input);
+	int SaveToText(std::ostream & output) override;
+	int LoadFromText(std::istream & input) override;
 
 	static BOOL DudeDlgProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
 

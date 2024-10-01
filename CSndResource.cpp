@@ -37,9 +37,7 @@ CSndResource::CSndResource(void)
 }
 
 CSndResource::~CSndResource(void)
-{
-
-}
+= default;
 
 int CSndResource::GetType(void)
 {
@@ -266,7 +264,7 @@ int CSndResource::Initialize(HWND hwnd)
 		HWND hwndTextDataSize   = GetDlgItem(hwnd, IDC_EDIT_SND_TEXT4);
 
 		std::string szText = "Sample rate: ";
-		szText += ToString((double)m_pSndInfo->sampleRate / 65536.0);
+		szText += ToString(static_cast<double>(m_pSndInfo->sampleRate) / 65536.0);
 		szText += " Hz";
 		Static_SetText(hwndTextSampleRate, szText.c_str());
 
@@ -650,7 +648,7 @@ int CSndResource::FileImport(const char *szFilename, int iShowErrorMessages)
 
 				iTemp /= wChannels;
 
-				m_vData2[iResourceOffset + i / wChannels] = (UCHAR)iTemp;
+				m_vData2[iResourceOffset + i / wChannels] = static_cast<UCHAR>(iTemp);
 			}
 		}
 	}
@@ -669,7 +667,7 @@ int CSndResource::FileImport(const char *szFilename, int iShowErrorMessages)
 
 			iTemp += 0x80;
 
-			m_vData2[iResourceOffset + i / wChannels] = (UCHAR)iTemp;
+			m_vData2[iResourceOffset + i / wChannels] = static_cast<UCHAR>(iTemp);
 		}
 	}
 	else if(wBitsPerSample == 24)
@@ -679,7 +677,7 @@ int CSndResource::FileImport(const char *szFilename, int iShowErrorMessages)
 			iTemp = 0;
 
 			for(j = 0; j < wChannels; j++)
-				iTemp += (int)(vData[(i + j) * 3]) | (int)(vData[(i + j) * 3 + 1] << 8) | (int)(vData[(i + j) * 3 + 2] << 16);
+				iTemp += static_cast<int>(vData[(i + j) * 3]) | (int)(vData[(i + j) * 3 + 1] << 8) | (int)(vData[(i + j) * 3 + 2] << 16);
 
 			iTemp /= wChannels;
 
@@ -687,7 +685,7 @@ int CSndResource::FileImport(const char *szFilename, int iShowErrorMessages)
 
 			iTemp += 0x80;
 
-			m_vData2[iResourceOffset + i / wChannels] = (UCHAR)iTemp;
+			m_vData2[iResourceOffset + i / wChannels] = static_cast<UCHAR>(iTemp);
 		}
 	}
 	else if(wBitsPerSample == 32)
@@ -705,7 +703,7 @@ int CSndResource::FileImport(const char *szFilename, int iShowErrorMessages)
 
 			iTemp64 += 0x80;
 
-			m_vData2[iResourceOffset + i / wChannels] = (UCHAR)iTemp64;
+			m_vData2[iResourceOffset + i / wChannels] = static_cast<UCHAR>(iTemp64);
 		}
 	}
 	else
@@ -766,7 +764,7 @@ int CSndResource::FileImport(const char *szFilename, int iShowErrorMessages)
 		HWND hwndTextDataSize   = GetDlgItem(m_pWindow->GetHWND(), IDC_EDIT_SND_TEXT4);
 
 		std::string szText = "Sample rate: ";
-		szText += ToString((double)m_pSndInfo->sampleRate / 65536.0);
+		szText += ToString(static_cast<double>(m_pSndInfo->sampleRate) / 65536.0);
 		szText += " Hz";
 		Static_SetText(hwndTextSampleRate, szText.c_str());
 

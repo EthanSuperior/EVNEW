@@ -121,9 +121,7 @@ CShipResource::CShipResource(void)
 }
 
 CShipResource::~CShipResource(void)
-{
-
-}
+= default;
 
 int CShipResource::GetType(void)
 {

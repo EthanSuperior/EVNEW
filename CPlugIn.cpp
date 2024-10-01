@@ -30,6 +30,7 @@
 #include "CCronResource.h"
 #include "CDescResource.h"
 #include "CDudeResource.h"
+#include "CException.h"
 #include "CFletResource.h"
 #include "CGovtResource.h"
 #include "CIntfResource.h"
@@ -357,7 +358,7 @@ int CPlugIn::Load(char *szFilename, CWindow *pWndParent)
 				filein >> iNumResources;
 
 				if(iNumResources > 0)
-					SendMessage(hwndProgressBar, PBM_SETRANGE, 0, MAKELPARAM(0, (short)iNumResources - 1));
+					SendMessage(hwndProgressBar, PBM_SETRANGE, 0, MAKELPARAM(0, static_cast<short>(iNumResources) - 1));
 
 				c = filein.get();
 
@@ -589,7 +590,7 @@ int CPlugIn::Load(char *szFilename, CWindow *pWndParent)
 			hwndLoadingText = GetDlgItem(m_wndLoading.GetHWND(), IDC_LOADING_TEXT1);
 			hwndProgressBar = GetDlgItem(m_wndLoading.GetHWND(), IDC_LOADING_PROGRESS1);
 
-			SendMessage(hwndProgressBar, PBM_SETRANGE, 0, MAKELPARAM(0, (short)iNumResources - 1));
+			SendMessage(hwndProgressBar, PBM_SETRANGE, 0, MAKELPARAM(0, static_cast<short>(iNumResources) - 1));
 		}
 
 		for(i = 0; i < iNumResourceTypes; i++)
@@ -681,7 +682,7 @@ int CPlugIn::Load(char *szFilename, CWindow *pWndParent)
 						break;
 					}
 
-					((CUnkResource *)m_vResources[CNR_TYPE_UNK][m_vResources[CNR_TYPE_UNK].size() - 1])->SetTypeCode(vResourceTypes[i].c_str());
+					static_cast<CUnkResource*>(m_vResources[CNR_TYPE_UNK][m_vResources[CNR_TYPE_UNK].size() - 1])->SetTypeCode(vResourceTypes[i].c_str());
 				}
 
 				if(iError)
@@ -921,7 +922,7 @@ int CPlugIn::Save(CWindow *pWndParent)
 
 	if((pWndParent != NULL) && (m_iShowProgressBar))
 	{
-		SendMessage(hwndProgressBar, PBM_SETRANGE, 0, MAKELPARAM(0, (short)iNumResources - 1));
+		SendMessage(hwndProgressBar, PBM_SETRANGE, 0, MAKELPARAM(0, static_cast<short>(iNumResources) - 1));
 	}
 
 	int iCurIndex = 0;
@@ -1094,7 +1095,7 @@ int CPlugIn::Save(CWindow *pWndParent)
 		{
 			for(j = 1; j < m_vResources[i].size(); j++)
 			{
-				if(strcmp(((CUnkResource *)m_vResources[i][j])->GetTypeCode(), ((CUnkResource *)m_vResources[i][j - 1])->GetTypeCode()) != 0)
+				if(strcmp(static_cast<CUnkResource*>(m_vResources[i][j])->GetTypeCode(), static_cast<CUnkResource*>(m_vResources[i][j - 1])->GetTypeCode()) != 0)
 					iNumResourceTypes++;
 			}
 		}
@@ -1204,7 +1205,7 @@ int CPlugIn::Save(CWindow *pWndParent)
 		{
 			for(j = 1; j < m_vResources[i].size(); j++)
 			{
-				if(strcmp(((CUnkResource *)m_vResources[i][j])->GetTypeCode(), ((CUnkResource *)m_vResources[i][j - 1])->GetTypeCode()) != 0)
+				if(strcmp(static_cast<CUnkResource*>(m_vResources[i][j])->GetTypeCode(), static_cast<CUnkResource*>(m_vResources[i][j - 1])->GetTypeCode()) != 0)
 					iMapOffset += 12;
 			}
 		}
@@ -1230,7 +1231,7 @@ int CPlugIn::Save(CWindow *pWndParent)
 		{
 			if(m_vResources[i].size() > 0)
 			{
-				fileout.write(((CUnkResource *)m_vResources[i][0])->GetTypeCode(), 4 * sizeof(char));
+				fileout.write(static_cast<CUnkResource*>(m_vResources[i][0])->GetTypeCode(), 4 * sizeof(char));
 
 				iTemp = SwapEndianInt(iMapOffset); fileout.write((char *)&iTemp, sizeof(int));
 
@@ -1238,7 +1239,7 @@ int CPlugIn::Save(CWindow *pWndParent)
 
 				for(j = 1; j < m_vResources[i].size(); j++)
 				{
-					if(strcmp(((CUnkResource *)m_vResources[i][j])->GetTypeCode(), ((CUnkResource *)m_vResources[i][j - 1])->GetTypeCode()) != 0)
+					if(strcmp(static_cast<CUnkResource*>(m_vResources[i][j])->GetTypeCode(), static_cast<CUnkResource*>(m_vResources[i][j - 1])->GetTypeCode()) != 0)
 					{
 						iTemp = SwapEndianInt(iCount); fileout.write((char *)&iTemp, sizeof(int));
 
@@ -1246,7 +1247,7 @@ int CPlugIn::Save(CWindow *pWndParent)
 
 						iCurIndex += m_vResources[i].size();
 
-						fileout.write(((CUnkResource *)m_vResources[i][j])->GetTypeCode(), 4 * sizeof(char));
+						fileout.write(static_cast<CUnkResource*>(m_vResources[i][j])->GetTypeCode(), 4 * sizeof(char));
 
 						iTemp = SwapEndianInt(iMapOffset); fileout.write((char *)&iTemp, sizeof(int));
 
@@ -1280,7 +1281,7 @@ int CPlugIn::Save(CWindow *pWndParent)
 			if(i != CNR_TYPE_UNK)
 				fileout.write(g_szMacResourceTypes[i].c_str(), 4 * sizeof(char));
 			else
-				fileout.write(((CUnkResource *)m_vResources[i][j])->GetTypeCode(), 4 * sizeof(char));
+				fileout.write(static_cast<CUnkResource*>(m_vResources[i][j])->GetTypeCode(), 4 * sizeof(char));
 
 			iID = SwapEndianShort(m_vResources[i][j]->GetID()); fileout.write((char *)&iID, sizeof(short));
 
@@ -1346,13 +1347,13 @@ CNovaResource * CPlugIn::AllocateResource(int iType)
 	{
 		pResource = new CRLEResource;
 
-		((CRLEResource *)pResource)->SetBPP(8);
+		static_cast<CRLEResource*>(pResource)->SetBPP(8);
 	}
 	else if(iType == CNR_TYPE_RLED)
 	{
 		pResource = new CRLEResource;
 
-		((CRLEResource *)pResource)->SetBPP(16);
+		static_cast<CRLEResource*>(pResource)->SetBPP(16);
 	}
 	else if(iType == CNR_TYPE_ROID)
 		pResource = new CRoidResource;

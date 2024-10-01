@@ -356,7 +356,7 @@ int CRLEResource::CompileImage(void)
 
 		iCount = *(int *)pInput; pInput += sizeof(int); iCount = SwapEndianInt(iCount);
 
-		cOpCode = (char)((iCount & 0xFF000000) >> 24);
+		cOpCode = static_cast<char>((iCount & 0xFF000000) >> 24);
 
 		iCount &= 0x00FFFFFF;
 
@@ -406,9 +406,9 @@ int CRLEResource::CompileImage(void)
 				{
 					iPixel = *(USHORT *)pInput; pInput += sizeof(USHORT); iPixel = SwapEndianShort(iPixel);
 
-					m_vData2[iCurFrame][iCurOffset    ] = (UCHAR)((iPixel & 0x001F) << 3);
-					m_vData2[iCurFrame][iCurOffset + 1] = (UCHAR)((iPixel & 0x03E0) >> 2);
-					m_vData2[iCurFrame][iCurOffset + 2] = (UCHAR)((iPixel & 0x7C00) >> 7);
+					m_vData2[iCurFrame][iCurOffset    ] = static_cast<UCHAR>((iPixel & 0x001F) << 3);
+					m_vData2[iCurFrame][iCurOffset + 1] = static_cast<UCHAR>((iPixel & 0x03E0) >> 2);
+					m_vData2[iCurFrame][iCurOffset + 2] = static_cast<UCHAR>((iPixel & 0x7C00) >> 7);
 
 					m_vData3[iCurFrame][iCurOffset    ] = 0xFF;
 					m_vData3[iCurFrame][iCurOffset + 1] = 0xFF;
@@ -435,7 +435,7 @@ int CRLEResource::CompileImage(void)
 				{
 					for(j = 0; (j < 4) && (i + j < iCount); j++)
 					{
-						ucPixel = (UCHAR)((iPixelRun >> ((3 - j) << 3)) & 0x000000FF);
+						ucPixel = static_cast<UCHAR>((iPixelRun >> ((3 - j) << 3)) & 0x000000FF);
 
 						m_vData2[iCurFrame][iCurOffset]     = ucPixel;
 						m_vData2[iCurFrame][iCurOffset + 1] = ucPixel;
@@ -453,9 +453,9 @@ int CRLEResource::CompileImage(void)
 			{
 				for(i = 0; i < iCount; i += 4)
 				{
-					m_vData2[iCurFrame][iCurOffset    ] = (UCHAR)((iPixelRun & 0x001F0000) >> 13);
-					m_vData2[iCurFrame][iCurOffset + 1] = (UCHAR)((iPixelRun & 0x03E00000) >> 18);
-					m_vData2[iCurFrame][iCurOffset + 2] = (UCHAR)((iPixelRun & 0x7C000000) >> 23);
+					m_vData2[iCurFrame][iCurOffset    ] = static_cast<UCHAR>((iPixelRun & 0x001F0000) >> 13);
+					m_vData2[iCurFrame][iCurOffset + 1] = static_cast<UCHAR>((iPixelRun & 0x03E00000) >> 18);
+					m_vData2[iCurFrame][iCurOffset + 2] = static_cast<UCHAR>((iPixelRun & 0x7C000000) >> 23);
 
 					m_vData3[iCurFrame][iCurOffset    ] = 0xFF;
 					m_vData3[iCurFrame][iCurOffset + 1] = 0xFF;
@@ -465,9 +465,9 @@ int CRLEResource::CompileImage(void)
 
 					if(i + 2 < iCount)
 					{
-						m_vData2[iCurFrame][iCurOffset    ] = (UCHAR)((iPixelRun & 0x0000001F) << 3);
-						m_vData2[iCurFrame][iCurOffset + 1] = (UCHAR)((iPixelRun & 0x000003E0) >> 2);
-						m_vData2[iCurFrame][iCurOffset + 2] = (UCHAR)((iPixelRun & 0x00007C00) >> 7);
+						m_vData2[iCurFrame][iCurOffset    ] = static_cast<UCHAR>((iPixelRun & 0x0000001F) << 3);
+						m_vData2[iCurFrame][iCurOffset + 1] = static_cast<UCHAR>((iPixelRun & 0x000003E0) >> 2);
+						m_vData2[iCurFrame][iCurOffset + 2] = static_cast<UCHAR>((iPixelRun & 0x00007C00) >> 7);
 
 						m_vData3[iCurFrame][iCurOffset    ] = 0xFF;
 						m_vData3[iCurFrame][iCurOffset + 1] = 0xFF;
@@ -558,7 +558,7 @@ int CRLEResource::DecompileImage(void)
 					}
 					else if(iRunState == RLE_OPCODE_PIXELDATA)		// End pixel run, start transparent run
 					{
-						*(int *)pToken = SwapEndianInt(((int)RLE_OPCODE_PIXELDATA << 24) | iRunCount);
+						*(int *)pToken = SwapEndianInt((static_cast<int>(RLE_OPCODE_PIXELDATA) << 24) | iRunCount);
 
 						if(iRunCount & 0x03)
 						{
@@ -598,7 +598,7 @@ int CRLEResource::DecompileImage(void)
 					}
 					else if(iRunState == RLE_OPCODE_TRANSPARENTRUN)		// End transparent run, start pixel run
 					{
-						*(int *)pToken = SwapEndianInt(((int)RLE_OPCODE_TRANSPARENTRUN << 24) | iRunCount);
+						*(int *)pToken = SwapEndianInt((static_cast<int>(RLE_OPCODE_TRANSPARENTRUN) << 24) | iRunCount);
 
 						pToken = pOutput; pOutput += sizeof(int);
 
@@ -626,7 +626,7 @@ int CRLEResource::DecompileImage(void)
 
 			if(iRunState == RLE_OPCODE_PIXELDATA)		// End pixel run
 			{
-				*(int *)pToken = SwapEndianInt(((int)RLE_OPCODE_PIXELDATA << 24) | iRunCount);
+				*(int *)pToken = SwapEndianInt((static_cast<int>(RLE_OPCODE_PIXELDATA) << 24) | iRunCount);
 
 				if(iRunCount & 0x03)
 				{
@@ -642,10 +642,10 @@ int CRLEResource::DecompileImage(void)
 				pOutput = pToken;
 			}
 
-			*(int *)pLineStart = SwapEndianInt(((int)RLE_OPCODE_LINESTART << 24) | (pOutput - pLineStart - 4));	// End scanline
+			*(int *)pLineStart = SwapEndianInt((static_cast<int>(RLE_OPCODE_LINESTART) << 24) | (pOutput - pLineStart - 4));	// End scanline
 		}
 
-		*(int *)pOutput = SwapEndianInt((int)RLE_OPCODE_ENDOFFRAME << 24); pOutput += sizeof(int);	// End frame
+		*(int *)pOutput = SwapEndianInt(static_cast<int>(RLE_OPCODE_ENDOFFRAME) << 24); pOutput += sizeof(int);	// End frame
 
 		iSize += sizeof(int);
 	}
@@ -1320,9 +1320,9 @@ int CRLEResource::DoImport(const char *szFilename, int iIsImage, int iNumFramesT
 			{
 				for(k = 0; k < m_iWidth; k++)
 				{
-					ucGrey = (UCHAR)(((int)m_vData2[i][(j * m_iWidth + k) * 3]     +
-									  (int)m_vData2[i][(j * m_iWidth + k) * 3 + 1] +
-									  (int)m_vData2[i][(j * m_iWidth + k) * 3 + 2]) / 3);
+					ucGrey = static_cast<UCHAR>(((int)m_vData2[i][(j * m_iWidth + k) * 3] +
+						(int)m_vData2[i][(j * m_iWidth + k) * 3 + 1] +
+						(int)m_vData2[i][(j * m_iWidth + k) * 3 + 2]) / 3);
 
 					m_vData2[i][(j * m_iWidth + k) * 3]     = ucGrey;
 					m_vData2[i][(j * m_iWidth + k) * 3 + 1] = ucGrey;

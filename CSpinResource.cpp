@@ -34,9 +34,7 @@ CSpinResource::CSpinResource(void)
 }
 
 CSpinResource::~CSpinResource(void)
-{
-
-}
+= default;
 
 int CSpinResource::GetType(void)
 {

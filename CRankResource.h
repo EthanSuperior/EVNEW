@@ -29,9 +29,9 @@ class CRankResource;
 //////////////////////////  CONSTANTS  /////////////////////////
 ////////////////////////////////////////////////////////////////
 
-const int NUM_RANK_CONTROLS = 21;
+constexpr int NUM_RANK_CONTROLS = 21;
 
-const int NUM_RANK_FIELDS = 9;
+constexpr int NUM_RANK_FIELDS = 9;
 
 const std::string g_szRankFields[NUM_RANK_FIELDS] =
 	{"Weight", "Government", "Salary", "Salary Cap", "Price Mod",
@@ -46,27 +46,27 @@ class CRankResource : public CNovaResource
 public:
 
 	CRankResource(void);
-	~CRankResource(void);
+	~CRankResource(void) override;
 
-	int GetType(void);
-	int GetSize(void);
+	int GetType(void) override;
+	int GetSize(void) override;
 
-	int GetDialogID(void);
-	DLGPROCNOCALLBACK GetDialogProc(void);
+	int GetDialogID(void) override;
+	DLGPROCNOCALLBACK GetDialogProc(void) override;
 
-	int GetNumFields(void);
-	const std::string * GetFieldNames(void);
+	int GetNumFields(void) override;
+	const std::string * GetFieldNames(void) override;
 
-	int Initialize(HWND hwnd);
+	int Initialize(HWND hwnd) override;
 
-	int CloseAndSave(void);
-	int CloseAndDontSave(void);
+	int CloseAndSave(void) override;
+	int CloseAndDontSave(void) override;
 
-	int Save(char *pOutput);
-	int Load(char *pInput, int iSize);
+	int Save(char *pOutput) override;
+	int Load(char *pInput, int iSize) override;
 
-	int SaveToText(std::ostream & output);
-	int LoadFromText(std::istream & input);
+	int SaveToText(std::ostream & output) override;
+	int LoadFromText(std::istream & input) override;
 
 	static BOOL RankDlgProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
 

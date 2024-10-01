@@ -29,9 +29,7 @@ CUnkResource::CUnkResource(void)
 }
 
 CUnkResource::~CUnkResource(void)
-{
-
-}
+= default;
 
 int CUnkResource::GetType(void)
 {

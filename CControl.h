@@ -25,25 +25,25 @@ class CControl;
 //////////////////////////  CONSTANTS  /////////////////////////
 ////////////////////////////////////////////////////////////////
 
-const int CCONTROL_TYPE_NULL     = 0;
-const int CCONTROL_TYPE_INT      = 1;
-const int CCONTROL_TYPE_HEXINT16 = 2;
-const int CCONTROL_TYPE_HEXINT32 = 3;
-const int CCONTROL_TYPE_HEXINT64 = 4;
-const int CCONTROL_TYPE_STR8     = 5;
-const int CCONTROL_TYPE_STR16    = 6;
-const int CCONTROL_TYPE_STR32    = 7;
-const int CCONTROL_TYPE_STR33    = 8;
-const int CCONTROL_TYPE_STR64    = 9;
-const int CCONTROL_TYPE_STR65    = 10;
-const int CCONTROL_TYPE_STR128   = 11;
-const int CCONTROL_TYPE_STR255   = 12;
-const int CCONTROL_TYPE_STR256   = 13;
-const int CCONTROL_TYPE_STR1024  = 14;
-const int CCONTROL_TYPE_STRARB   = 15;
-const int CCONTROL_TYPE_CHECK    = 16;
-const int CCONTROL_TYPE_COLOR    = 17;
-const int CCONTROL_TYPE_COMBOBOX = 18;
+constexpr int CCONTROL_TYPE_NULL     = 0;
+constexpr int CCONTROL_TYPE_INT      = 1;
+constexpr int CCONTROL_TYPE_HEXINT16 = 2;
+constexpr int CCONTROL_TYPE_HEXINT32 = 3;
+constexpr int CCONTROL_TYPE_HEXINT64 = 4;
+constexpr int CCONTROL_TYPE_STR8     = 5;
+constexpr int CCONTROL_TYPE_STR16    = 6;
+constexpr int CCONTROL_TYPE_STR32    = 7;
+constexpr int CCONTROL_TYPE_STR33    = 8;
+constexpr int CCONTROL_TYPE_STR64    = 9;
+constexpr int CCONTROL_TYPE_STR65    = 10;
+constexpr int CCONTROL_TYPE_STR128   = 11;
+constexpr int CCONTROL_TYPE_STR255   = 12;
+constexpr int CCONTROL_TYPE_STR256   = 13;
+constexpr int CCONTROL_TYPE_STR1024  = 14;
+constexpr int CCONTROL_TYPE_STRARB   = 15;
+constexpr int CCONTROL_TYPE_CHECK    = 16;
+constexpr int CCONTROL_TYPE_COLOR    = 17;
+constexpr int CCONTROL_TYPE_COMBOBOX = 18;
 
 ////////////////////////////////////////////////////////////////
 ///////////////////////////  CLASSES  //////////////////////////

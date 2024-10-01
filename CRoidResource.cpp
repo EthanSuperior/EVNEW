@@ -44,9 +44,7 @@ CRoidResource::CRoidResource(void)
 }
 
 CRoidResource::~CRoidResource(void)
-{
-
-}
+= default;
 
 int CRoidResource::GetType(void)
 {

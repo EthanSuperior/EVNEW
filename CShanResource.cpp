@@ -100,9 +100,7 @@ CShanResource::CShanResource(void)
 }
 
 CShanResource::~CShanResource(void)
-{
-
-}
+= default;
 
 int CShanResource::GetType(void)
 {

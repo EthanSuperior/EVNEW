@@ -39,9 +39,9 @@ namespace qt
 //////////////////////////  CONSTANTS  /////////////////////////
 ////////////////////////////////////////////////////////////////
 
-const int NUM_PICT_CONTROLS = 2;
+constexpr int NUM_PICT_CONTROLS = 2;
 
-const int NUM_PICT_FIELDS = 3;
+constexpr int NUM_PICT_FIELDS = 3;
 
 const std::string g_szPictFields[NUM_PICT_FIELDS] =
 	{"Width", "Height", "Filename"};
@@ -55,31 +55,31 @@ class CPictResource : public CNovaResource
 public:
 
 	CPictResource(void);
-	~CPictResource(void);
+	~CPictResource(void) override;
 
-	int GetType(void);
-	int GetSize(void);
+	int GetType(void) override;
+	int GetSize(void) override;
 
-	int GetDialogID(void);
-	DLGPROCNOCALLBACK GetDialogProc(void);
+	int GetDialogID(void) override;
+	DLGPROCNOCALLBACK GetDialogProc(void) override;
 
-	int GetNumFields(void);
-	const std::string * GetFieldNames(void);
+	int GetNumFields(void) override;
+	const std::string * GetFieldNames(void) override;
 
-	int Initialize(HWND hwnd);
+	int Initialize(HWND hwnd) override;
 
-	int CloseAndSave(void);
-	int CloseAndDontSave(void);
+	int CloseAndSave(void) override;
+	int CloseAndDontSave(void) override;
 
-	int Save(char *pOutput);
-	int Load(char *pInput, int iSize);
+	int Save(char *pOutput) override;
+	int Load(char *pInput, int iSize) override;
 
-	int SaveToTextEx(std::ostream & output, std::string & szFilePath, std::string & szFilename1, std::string & szFilename2, int iParam);
-	int LoadFromTextEx(std::istream & input, std::string & szFilePath);
+	int SaveToTextEx(std::ostream & output, std::string & szFilePath, std::string & szFilename1, std::string & szFilename2, int iParam) override;
+	int LoadFromTextEx(std::istream & input, std::string & szFilePath) override;
 
-	int ShouldLoadDirect(void);
-	int SaveDirect(std::ostream & output);
-	int LoadDirect(std::istream & input, int iSize);
+	int ShouldLoadDirect(void) override;
+	int SaveDirect(std::ostream & output) override;
+	int LoadDirect(std::istream & input, int iSize) override;
 
 	static BOOL PictDlgProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
 

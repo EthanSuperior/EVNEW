@@ -44,6 +44,8 @@
 
 #include <algorithm>
 
+#include "CException.h"
+
 namespace qt
 {
 #include <QTML.h>
@@ -104,14 +106,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hprevinstance, LPSTR lpcmdline
 ////////////////////////////////////////////////////////////////
 
 CEditor::CEditor(void)
-{
-
-}
+= default;
 
 CEditor::~CEditor(void)
-{
-
-}
+= default;
 
 int CEditor::Init(HINSTANCE hInstance)
 {
@@ -1040,7 +1038,7 @@ int CEditor::EditCopy(void)
 		return 0;
 	}
 
-	char *pGlobalMem = (char *)GlobalLock(hGlobalMem);
+	char *pGlobalMem = static_cast<char*>(GlobalLock(hGlobalMem));
 
 	if(pGlobalMem == NULL)
 	{
@@ -1095,7 +1093,7 @@ int CEditor::EditPaste(int iOverwrite)
 		return 0;
 	}
 
-	char *pGlobalMem = (char *)GlobalLock(hGlobalMem);
+	char *pGlobalMem = static_cast<char*>(GlobalLock(hGlobalMem));
 
 	if(pGlobalMem == NULL)
 	{

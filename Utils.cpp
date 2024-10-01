@@ -182,7 +182,7 @@ int GetIntegerField(HWND hwndEdit)
 
 	Edit_GetText(hwndEdit, szBuffer, 1024);
 
-	return (FromString<int>((std::string)szBuffer));
+	return (FromString<int>(static_cast<std::string>(szBuffer)));
 }
 
 int DoColorChooser(CWindow *pWindow, UINT *piColor)
@@ -215,12 +215,12 @@ UINT SwapColorRedBlue(UINT iColor)
 
 USHORT Color24To15(UINT iColor)
 {
-	return (USHORT)(((iColor & 0x00F80000) >> 9) | ((iColor & 0x0000F800) >> 6) | ((iColor & 0x000000F8) >> 3));
+	return static_cast<USHORT>(((iColor & 0x00F80000) >> 9) | ((iColor & 0x0000F800) >> 6) | ((iColor & 0x000000F8) >> 3));
 }
 
 UINT Color15To24(USHORT iColor)
 {
-	return (UINT)((((UINT)iColor & 0x7C00) << 9) | (((UINT)iColor & 0x7000) << 4) | (((UINT)iColor & 0x03E0) << 6) | (((UINT)iColor & 0x0380) << 1) | (((UINT)iColor & 0x001F) << 3) | (((UINT)iColor & 0x001C) >> 2));
+	return (UINT)(((static_cast<UINT>(iColor) & 0x7C00) << 9) | ((static_cast<UINT>(iColor) & 0x7000) << 4) | ((static_cast<UINT>(iColor) & 0x03E0) << 6) | ((static_cast<UINT>(iColor) & 0x0380) << 1) | ((static_cast<UINT>(iColor) & 0x001F) << 3) | ((static_cast<UINT>(iColor) & 0x001C) >> 2));
 }
 
 int ToMacString(char *szStr)
@@ -230,7 +230,7 @@ int ToMacString(char *szStr)
 	int iLength = strlen(szStr);
 
 	for(i = 0; i < iLength; i++)
-		szStr[i] = g_cWinToMacCharMap[(UCHAR)szStr[i]];
+		szStr[i] = g_cWinToMacCharMap[static_cast<UCHAR>(szStr[i])];
 
 	return 1;
 }
@@ -240,7 +240,7 @@ int ToMacString(std::string & szStr)
 	int i;
 
 	for(i = 0; i < szStr.size(); i++)
-		szStr[i] = g_cWinToMacCharMap[(UCHAR)szStr[i]];
+		szStr[i] = g_cWinToMacCharMap[static_cast<UCHAR>(szStr[i])];
 
 	return 1;
 }
@@ -252,7 +252,7 @@ int ToWinString(char *szStr)
 	int iLength = strlen(szStr);
 
 	for(i = 0; i < iLength; i++)
-		szStr[i] = g_cMacToWinCharMap[(UCHAR)szStr[i]];
+		szStr[i] = g_cMacToWinCharMap[static_cast<UCHAR>(szStr[i])];
 
 	return 1;
 }
@@ -262,7 +262,7 @@ int ToWinString(std::string & szStr)
 	int i;
 
 	for(i = 0; i < szStr.size(); i++)
-		szStr[i] = g_cMacToWinCharMap[(UCHAR)szStr[i]];
+		szStr[i] = g_cMacToWinCharMap[static_cast<UCHAR>(szStr[i])];
 
 	return 1;
 }
@@ -419,7 +419,7 @@ int PrintHex16Field(std::ostream & output, const char *pData, char cDelim)
 
 	int i;
 
-	static const char s_cHexChars[16] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
+	static constexpr char s_cHexChars[16] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
 
 	for(i = 1; i >= 0; i--)
 		output << s_cHexChars[(pData[i] >> 4) & 0x0F] << s_cHexChars[pData[i] & 0x0F];
@@ -498,7 +498,7 @@ int PrintHex32Field(std::ostream & output, const char *pData, char cDelim)
 
 	int i;
 
-	static const char s_cHexChars[16] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
+	static constexpr char s_cHexChars[16] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
 
 	for(i = 3; i >= 0; i--)
 		output << s_cHexChars[(pData[i] >> 4) & 0x0F] << s_cHexChars[pData[i] & 0x0F];
@@ -585,7 +585,7 @@ int PrintHex64Field(std::ostream & output, const char *pData, char cDelim)
 
 	int i;
 
-	static const char s_cHexChars[16] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
+	static constexpr char s_cHexChars[16] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
 
 	for(i = 0; i < 8; i++)
 		output << s_cHexChars[(pData[i] >> 4) & 0x0F] << s_cHexChars[pData[i] & 0x0F];

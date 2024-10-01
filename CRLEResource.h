@@ -38,18 +38,18 @@ namespace qt
 //////////////////////////  CONSTANTS  /////////////////////////
 ////////////////////////////////////////////////////////////////
 
-const int NUM_RLE_CONTROLS = 4;
+constexpr int NUM_RLE_CONTROLS = 4;
 
-const int NUM_RLE_IMPORT_CONTROLS = 9;
-const int NUM_RLE_EXPORT_CONTROLS = 7;
+constexpr int NUM_RLE_IMPORT_CONTROLS = 9;
+constexpr int NUM_RLE_EXPORT_CONTROLS = 7;
 
-const char RLE_OPCODE_ENDOFFRAME     = 0x00;
-const char RLE_OPCODE_LINESTART      = 0x01;
-const char RLE_OPCODE_PIXELDATA      = 0x02;
-const char RLE_OPCODE_TRANSPARENTRUN = 0x03;
-const char RLE_OPCODE_PIXELRUN       = 0x04;
+constexpr char RLE_OPCODE_ENDOFFRAME     = 0x00;
+constexpr char RLE_OPCODE_LINESTART      = 0x01;
+constexpr char RLE_OPCODE_PIXELDATA      = 0x02;
+constexpr char RLE_OPCODE_TRANSPARENTRUN = 0x03;
+constexpr char RLE_OPCODE_PIXELRUN       = 0x04;
 
-const int NUM_RLE_FIELDS = 6;
+constexpr int NUM_RLE_FIELDS = 6;
 
 const std::string g_szRleFields[NUM_RLE_FIELDS] =
 	{"Width", "Height", "Frames", "X Frames", "Image Filename", "Mask Filename"};
@@ -63,34 +63,34 @@ class CRLEResource : public CNovaResource
 public:
 
 	CRLEResource(void);
-	~CRLEResource(void);
+	~CRLEResource(void) override;
 
-	int GetType(void);
-	int GetSize(void);
+	int GetType(void) override;
+	int GetSize(void) override;
 
-	int GetDialogID(void);
-	DLGPROCNOCALLBACK GetDialogProc(void);
+	int GetDialogID(void) override;
+	DLGPROCNOCALLBACK GetDialogProc(void) override;
 
-	int GetNumFields(void);
-	const std::string * GetFieldNames(void);
+	int GetNumFields(void) override;
+	const std::string * GetFieldNames(void) override;
 
-	int Initialize(HWND hwnd);
+	int Initialize(HWND hwnd) override;
 
-	int CloseAndSave(void);
-	int CloseAndDontSave(void);
+	int CloseAndSave(void) override;
+	int CloseAndDontSave(void) override;
 
 	int SetBPP(short iBPP);
 	short GetBPP(void);
 
-	int Save(char *pOutput);
-	int Load(char *pInput, int iSize);
+	int Save(char *pOutput) override;
+	int Load(char *pInput, int iSize) override;
 
-	int ShouldLoadDirect(void);
-	int SaveDirect(std::ostream & output);
-	int LoadDirect(std::istream & input, int iSize);
+	int ShouldLoadDirect(void) override;
+	int SaveDirect(std::ostream & output) override;
+	int LoadDirect(std::istream & input, int iSize) override;
 
-	int SaveToTextEx(std::ostream & output, std::string & szFilePath, std::string & szFilename1, std::string & szFilename2, int iParam);
-	int LoadFromTextEx(std::istream & input, std::string & szFilePath);
+	int SaveToTextEx(std::ostream & output, std::string & szFilePath, std::string & szFilename1, std::string & szFilename2, int iParam) override;
+	int LoadFromTextEx(std::istream & input, std::string & szFilePath) override;
 
 	static BOOL RLEDlgProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
 

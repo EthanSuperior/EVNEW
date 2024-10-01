@@ -66,9 +66,7 @@ CCronResource::CCronResource(void)
 }
 
 CCronResource::~CCronResource(void)
-{
-
-}
+= default;
 
 int CCronResource::GetType(void)
 {

@@ -48,9 +48,7 @@ CFletResource::CFletResource(void)
 }
 
 CFletResource::~CFletResource(void)
-{
-
-}
+= default;
 
 int CFletResource::GetType(void)
 {

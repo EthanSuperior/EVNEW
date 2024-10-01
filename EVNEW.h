@@ -35,14 +35,14 @@ class CEditor;
 //////////////////////////  CONSTANTS  /////////////////////////
 ////////////////////////////////////////////////////////////////
 
-const int NUM_PREFERENCE_CONTROLS = 3;
+constexpr int NUM_PREFERENCE_CONTROLS = 3;
 
-const int NUM_CICN_EXPORT_FORMAT_CONTROLS = 4;
-const int NUM_PICT_EXPORT_FORMAT_CONTROLS = 3;
-const int NUM_RLE_EXPORT2_FORMAT_CONTROLS = 7;
-const int NUM_SND_EXPORT_FORMAT_CONTROLS  = 2;
+constexpr int NUM_CICN_EXPORT_FORMAT_CONTROLS = 4;
+constexpr int NUM_PICT_EXPORT_FORMAT_CONTROLS = 3;
+constexpr int NUM_RLE_EXPORT2_FORMAT_CONTROLS = 7;
+constexpr int NUM_SND_EXPORT_FORMAT_CONTROLS  = 2;
 
-const int NUM_IMAGE_TYPE_CHOICES = 6;
+constexpr int NUM_IMAGE_TYPE_CHOICES = 6;
 
 const std::string g_szImageTypeChoices[NUM_IMAGE_TYPE_CHOICES] =
 	{"Bitmap (*.bmp)", "Portable Network Graphics (*.png)", "JPEG (*.jpg)", "Mac PICT (*.pic)",
@@ -51,7 +51,7 @@ const std::string g_szImageTypeChoices[NUM_IMAGE_TYPE_CHOICES] =
 const std::string g_szImageTypeExtensions[NUM_IMAGE_TYPE_CHOICES] =
 	{".bmp", ".png", ".jpg", ".pic", ".tiff", ".tga"};
 
-const int NUM_RLE_IMAGE_TYPE_CHOICES = 4;
+constexpr int NUM_RLE_IMAGE_TYPE_CHOICES = 4;
 
 const std::string g_szRleImageTypeChoices[NUM_RLE_IMAGE_TYPE_CHOICES] =
 	{"Bitmap (*.bmp)", "Portable Network Graphics (*.png)", "JPEG (*.jpg)", "TIFF (*.tiff)"};

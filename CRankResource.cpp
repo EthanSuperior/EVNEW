@@ -45,9 +45,7 @@ CRankResource::CRankResource(void)
 }
 
 CRankResource::~CRankResource(void)
-{
-
-}
+= default;
 
 int CRankResource::GetType(void)
 {

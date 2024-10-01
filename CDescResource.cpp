@@ -35,9 +35,7 @@ CDescResource::CDescResource(void)
 }
 
 CDescResource::~CDescResource(void)
-{
-
-}
+= default;
 
 int CDescResource::GetType(void)
 {

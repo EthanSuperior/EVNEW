@@ -28,14 +28,14 @@ class CPersResource;
 //////////////////////////  CONSTANTS  /////////////////////////
 ////////////////////////////////////////////////////////////////
 
-const int NUM_PERS_CONTROLS = 49;
+constexpr int NUM_PERS_CONTROLS = 49;
 
-const int NUM_PERS_AGGRESSION_CHOICES = 3;
+constexpr int NUM_PERS_AGGRESSION_CHOICES = 3;
 
 const std::string g_szPersAggressionChoices[NUM_PERS_AGGRESSION_CHOICES] =
 	{"Close", "Average", "Far"};
 
-const int NUM_PERS_FIELDS = 32;
+constexpr int NUM_PERS_FIELDS = 32;
 
 const std::string g_szPersFields[NUM_PERS_FIELDS] =
 	{"System", "Government", "AI Type", "Aggression", "Cowardice", "Ship Type",
@@ -55,27 +55,27 @@ class CPersResource : public CNovaResource
 public:
 
 	CPersResource(void);
-	~CPersResource(void);
+	~CPersResource(void) override;
 
-	int GetType(void);
-	int GetSize(void);
+	int GetType(void) override;
+	int GetSize(void) override;
 
-	int GetDialogID(void);
-	DLGPROCNOCALLBACK GetDialogProc(void);
+	int GetDialogID(void) override;
+	DLGPROCNOCALLBACK GetDialogProc(void) override;
 
-	int GetNumFields(void);
-	const std::string * GetFieldNames(void);
+	int GetNumFields(void) override;
+	const std::string * GetFieldNames(void) override;
 
-	int Initialize(HWND hwnd);
+	int Initialize(HWND hwnd) override;
 
-	int CloseAndSave(void);
-	int CloseAndDontSave(void);
+	int CloseAndSave(void) override;
+	int CloseAndDontSave(void) override;
 
-	int Save(char *pOutput);
-	int Load(char *pInput, int iSize);
+	int Save(char *pOutput) override;
+	int Load(char *pInput, int iSize) override;
 
-	int SaveToText(std::ostream & output);
-	int LoadFromText(std::istream & input);
+	int SaveToText(std::ostream & output) override;
+	int LoadFromText(std::istream & input) override;
 
 	static BOOL PersDlgProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
 

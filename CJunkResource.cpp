@@ -48,9 +48,7 @@ CJunkResource::CJunkResource(void)
 }
 
 CJunkResource::~CJunkResource(void)
-{
-
-}
+= default;
 
 int CJunkResource::GetType(void)
 {

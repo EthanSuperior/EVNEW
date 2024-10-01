@@ -28,9 +28,9 @@ class CSpinResource;
 //////////////////////////  CONSTANTS  /////////////////////////
 ////////////////////////////////////////////////////////////////
 
-const int NUM_SPIN_CONTROLS = 8;
+constexpr int NUM_SPIN_CONTROLS = 8;
 
-const int NUM_SPIN_FIELDS = 6;
+constexpr int NUM_SPIN_FIELDS = 6;
 
 const std::string g_szSpinFields[NUM_SPIN_FIELDS] =
 	{"Sprite", "Mask", "X Size", "Y Size", "X Tiles", "Y Tiles"};
@@ -44,27 +44,27 @@ class CSpinResource : public CNovaResource
 public:
 
 	CSpinResource(void);
-	~CSpinResource(void);
+	~CSpinResource(void) override;
 
-	int GetType(void);
-	int GetSize(void);
+	int GetType(void) override;
+	int GetSize(void) override;
 
-	int GetDialogID(void);
-	DLGPROCNOCALLBACK GetDialogProc(void);
+	int GetDialogID(void) override;
+	DLGPROCNOCALLBACK GetDialogProc(void) override;
 
-	int GetNumFields(void);
-	const std::string * GetFieldNames(void);
+	int GetNumFields(void) override;
+	const std::string * GetFieldNames(void) override;
 
-	int Initialize(HWND hwnd);
+	int Initialize(HWND hwnd) override;
 
-	int CloseAndSave(void);
-	int CloseAndDontSave(void);
+	int CloseAndSave(void) override;
+	int CloseAndDontSave(void) override;
 
-	int Save(char *pOutput);
-	int Load(char *pInput, int iSize);
+	int Save(char *pOutput) override;
+	int Load(char *pInput, int iSize) override;
 
-	int SaveToText(std::ostream & output);
-	int LoadFromText(std::istream & input);
+	int SaveToText(std::ostream & output) override;
+	int LoadFromText(std::istream & input) override;
 
 	static BOOL SpinDlgProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
 

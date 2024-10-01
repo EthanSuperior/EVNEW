@@ -28,9 +28,9 @@ class CColrResource;
 //////////////////////////  CONSTANTS  /////////////////////////
 ////////////////////////////////////////////////////////////////
 
-const int NUM_COLR_CONTROLS = 47;
+constexpr int NUM_COLR_CONTROLS = 47;
 
-const int NUM_COLR_FIELDS = 45;
+constexpr int NUM_COLR_FIELDS = 45;
 
 const std::string g_szColrFields[NUM_COLR_FIELDS] =
 	{"Button Up", "Button Down", "Button Grey", "Menu Font",
@@ -56,27 +56,27 @@ class CColrResource : public CNovaResource
 public:
 
 	CColrResource(void);
-	~CColrResource(void);
+	~CColrResource(void) override;
 
-	int GetType(void);
-	int GetSize(void);
+	int GetType(void) override;
+	int GetSize(void) override;
 
-	int GetDialogID(void);
-	DLGPROCNOCALLBACK GetDialogProc(void);
+	int GetDialogID(void) override;
+	DLGPROCNOCALLBACK GetDialogProc(void) override;
 
-	int GetNumFields(void);
-	const std::string * GetFieldNames(void);
+	int GetNumFields(void) override;
+	const std::string * GetFieldNames(void) override;
 
-	int Initialize(HWND hwnd);
+	int Initialize(HWND hwnd) override;
 
-	int CloseAndSave(void);
-	int CloseAndDontSave(void);
+	int CloseAndSave(void) override;
+	int CloseAndDontSave(void) override;
 
-	int Save(char *pOutput);
-	int Load(char *pInput, int iSize);
+	int Save(char *pOutput) override;
+	int Load(char *pInput, int iSize) override;
 
-	int SaveToText(std::ostream & output);
-	int LoadFromText(std::istream & input);
+	int SaveToText(std::ostream & output) override;
+	int LoadFromText(std::istream & input) override;
 
 	static BOOL ColrDlgProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
 

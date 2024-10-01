@@ -29,9 +29,9 @@ class CJunkResource;
 //////////////////////////  CONSTANTS  /////////////////////////
 ////////////////////////////////////////////////////////////////
 
-const int NUM_JUNK_CONTROLS = 26;
+constexpr int NUM_JUNK_CONTROLS = 26;
 
-const int NUM_JUNK_FIELDS = 23;
+constexpr int NUM_JUNK_FIELDS = 23;
 
 const std::string g_szJunkFields[NUM_JUNK_FIELDS] =
 	{"Sold At 1", "Sold At 2", "Sold At 3", "Sold At 4", "Sold At 5",
@@ -49,27 +49,27 @@ class CJunkResource : public CNovaResource
 public:
 
 	CJunkResource(void);
-	~CJunkResource(void);
+	~CJunkResource(void) override;
 
-	int GetType(void);
-	int GetSize(void);
+	int GetType(void) override;
+	int GetSize(void) override;
 
-	int GetDialogID(void);
-	DLGPROCNOCALLBACK GetDialogProc(void);
+	int GetDialogID(void) override;
+	DLGPROCNOCALLBACK GetDialogProc(void) override;
 
-	int GetNumFields(void);
-	const std::string * GetFieldNames(void);
+	int GetNumFields(void) override;
+	const std::string * GetFieldNames(void) override;
 
-	int Initialize(HWND hwnd);
+	int Initialize(HWND hwnd) override;
 
-	int CloseAndSave(void);
-	int CloseAndDontSave(void);
+	int CloseAndSave(void) override;
+	int CloseAndDontSave(void) override;
 
-	int Save(char *pOutput);
-	int Load(char *pInput, int iSize);
+	int Save(char *pOutput) override;
+	int Load(char *pInput, int iSize) override;
 
-	int SaveToText(std::ostream & output);
-	int LoadFromText(std::istream & input);
+	int SaveToText(std::ostream & output) override;
+	int LoadFromText(std::istream & input) override;
 
 	static BOOL JunkDlgProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
 

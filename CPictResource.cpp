@@ -293,7 +293,7 @@ int CPictResource::InitializePicture(HWND hwnd)
 
 	if(iWidth > iScreenWidth)
 	{
-		fZoom *= (double)(iScreenWidth - 96) / (iWidth - 96);
+		fZoom *= static_cast<double>(iScreenWidth - 96) / (iWidth - 96);
 
 		if(m_iTempWidth == 0)
 		{
@@ -313,7 +313,7 @@ int CPictResource::InitializePicture(HWND hwnd)
 
 	if(iHeight + 232 > iScreenHeight)
 	{
-		fZoom *= (double)(iScreenHeight - 232) / iHeight;
+		fZoom *= static_cast<double>(iScreenHeight - 232) / iHeight;
 
 		if(m_iTempWidth == 0)
 		{
@@ -331,7 +331,7 @@ int CPictResource::InitializePicture(HWND hwnd)
 		iHeight = iScreenHeight - 232;
 	}
 
-	fZoom = (double)(int)(fZoom * 10.0) / 10.0;
+	fZoom = static_cast<double>((int)(fZoom * 10.0)) / 10.0;
 
 	std::string szZoom = "Zoom: ";
 	szZoom += ToString(fZoom);
@@ -838,9 +838,9 @@ int CPictResource::FileImport(char *szFilename, int iShowErrorMessages)
 			}
 
 			if(iRowBytes <= 250)
-				*pRowSize = (UCHAR)(pOutput - pRowSize - 1);
+				*pRowSize = static_cast<UCHAR>(pOutput - pRowSize - 1);
 			else
-				*(USHORT *)pRowSize = SwapEndianShort((USHORT)(pOutput - pRowSize - 2));
+				*(USHORT *)pRowSize = SwapEndianShort(static_cast<USHORT>(pOutput - pRowSize - 2));
 		}
 	}
 
@@ -855,7 +855,7 @@ int CPictResource::FileImport(char *szFilename, int iShowErrorMessages)
 
 	int iPictSize = pOutput - (UCHAR *)*m_hTempPicture;
 
-	*(USHORT *)pPictSize = SwapEndianShort((USHORT)iPictSize);
+	*(USHORT *)pPictSize = SwapEndianShort(static_cast<USHORT>(iPictSize));
 
 	qt::SetHandleSize(m_hTempPicture, iPictSize);
 

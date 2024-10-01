@@ -28,9 +28,9 @@ class CRoidResource;
 //////////////////////////  CONSTANTS  /////////////////////////
 ////////////////////////////////////////////////////////////////
 
-const int NUM_ROID_CONTROLS = 13;
+constexpr int NUM_ROID_CONTROLS = 13;
 
-const int NUM_ROID_FIELDS = 11;
+constexpr int NUM_ROID_FIELDS = 11;
 
 const std::string g_szRoidFields[NUM_ROID_FIELDS] =
 	{"Strength", "Spin Rate", "Yield Type", "Yield Amount", "Particle Count",
@@ -46,27 +46,27 @@ class CRoidResource : public CNovaResource
 public:
 
 	CRoidResource(void);
-	~CRoidResource(void);
+	~CRoidResource(void) override;
 
-	int GetType(void);
-	int GetSize(void);
+	int GetType(void) override;
+	int GetSize(void) override;
 
-	int GetDialogID(void);
-	DLGPROCNOCALLBACK GetDialogProc(void);
+	int GetDialogID(void) override;
+	DLGPROCNOCALLBACK GetDialogProc(void) override;
 
-	int GetNumFields(void);
-	const std::string * GetFieldNames(void);
+	int GetNumFields(void) override;
+	const std::string * GetFieldNames(void) override;
 
-	int Initialize(HWND hwnd);
+	int Initialize(HWND hwnd) override;
 
-	int CloseAndSave(void);
-	int CloseAndDontSave(void);
+	int CloseAndSave(void) override;
+	int CloseAndDontSave(void) override;
 
-	int Save(char *pOutput);
-	int Load(char *pInput, int iSize);
+	int Save(char *pOutput) override;
+	int Load(char *pInput, int iSize) override;
 
-	int SaveToText(std::ostream & output);
-	int LoadFromText(std::istream & input);
+	int SaveToText(std::ostream & output) override;
+	int LoadFromText(std::istream & input) override;
 
 	static BOOL RoidDlgProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
 

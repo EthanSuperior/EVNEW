@@ -10,6 +10,7 @@
 
 #include "CWindow.h"
 #include "CErrorLog.h"
+#include "CException.h"
 
 ////////////////////////////////////////////////////////////////
 ///////////////////  CLASS MEMBER FUNCTIONS  ///////////////////
@@ -24,7 +25,7 @@ CWindow::CWindow(void)
 
 	m_szTitle = "Game";
 
-	m_szClassName = (std::string)"CWindow" + ToString(ms_iCount);
+	m_szClassName = static_cast<std::string>("CWindow") + ToString(ms_iCount);
 
 	m_iWidth         = 0;
 	m_iHeight        = 0;
@@ -497,7 +498,7 @@ LRESULT CALLBACK CWindow::CWindowWndProc(HWND hwnd, UINT msg, WPARAM wparam, LPA
 
 			case WM_NCCALCSIZE:
 			{
-				if((BOOL)wparam == TRUE)
+				if(static_cast<BOOL>(wparam) == TRUE)
 				{
 					NCCALCSIZE_PARAMS *pParms = (NCCALCSIZE_PARAMS *)lparam;
 
@@ -708,7 +709,7 @@ BOOL CALLBACK CWindow::CWindowDlgProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM
 
 			case WM_NCCALCSIZE:
 			{
-				if((BOOL)wparam == TRUE)
+				if(static_cast<BOOL>(wparam) == TRUE)
 				{
 					NCCALCSIZE_PARAMS *pParms = (NCCALCSIZE_PARAMS *)lparam;
 

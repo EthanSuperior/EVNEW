@@ -87,9 +87,7 @@ CIntfResource::CIntfResource(void)
 }
 
 CIntfResource::~CIntfResource(void)
-{
-
-}
+= default;
 
 int CIntfResource::GetType(void)
 {

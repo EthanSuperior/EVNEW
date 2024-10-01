@@ -70,9 +70,7 @@ CPersResource::CPersResource(void)
 }
 
 CPersResource::~CPersResource(void)
-{
-
-}
+= default;
 
 int CPersResource::GetType(void)
 {

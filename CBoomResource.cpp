@@ -31,9 +31,7 @@ CBoomResource::CBoomResource(void)
 }
 
 CBoomResource::~CBoomResource(void)
-{
-
-}
+= default;
 
 int CBoomResource::GetType(void)
 {

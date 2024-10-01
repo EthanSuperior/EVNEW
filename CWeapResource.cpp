@@ -106,9 +106,7 @@ CWeapResource::CWeapResource(void)
 }
 
 CWeapResource::~CWeapResource(void)
-{
-
-}
+= default;
 
 int CWeapResource::GetType(void)
 {

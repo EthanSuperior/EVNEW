@@ -36,9 +36,7 @@ CNebuResource::CNebuResource(void)
 }
 
 CNebuResource::~CNebuResource(void)
-{
-
-}
+= default;
 
 int CNebuResource::GetType(void)
 {

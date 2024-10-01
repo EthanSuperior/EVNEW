@@ -13,6 +13,8 @@
 
 #include <commctrl.h>
 
+#include "CException.h"
+
 ////////////////////////////////////////////////////////////////
 ///////////////////  CLASS MEMBER FUNCTIONS  ///////////////////
 ////////////////////////////////////////////////////////////////
@@ -149,7 +151,7 @@ int CControl::ProcessMessage(int iNotifyCode)
 
 			Edit_GetText(m_hwndControl, szBuffer, 1024);
 
-			m_iIntValue = FromString<int>((std::string)szBuffer);
+			m_iIntValue = FromString<int>(static_cast<std::string>(szBuffer));
 
 			m_szStringValue = szBuffer;
 		}
@@ -531,7 +533,7 @@ int CControl::SetString(const char *szValue)
 		{
 			for(i = 0; i < 2; i++)
 			{
-				if(((UCHAR)szValue[i] & 0xF0) <= 0x90)
+				if((static_cast<UCHAR>(szValue[i]) & 0xF0) <= 0x90)
 					szBuffer[2 * i] = ((szValue[i] & 0xF0) >> 4) + '0';
 				else
 					szBuffer[2 * i] = ((szValue[i] & 0xF0) >> 4) + 'A' - 10;
@@ -548,7 +550,7 @@ int CControl::SetString(const char *szValue)
 		{
 			for(i = 0; i < 4; i++)
 			{
-				if(((UCHAR)szValue[i] & 0xF0) <= 0x90)
+				if((static_cast<UCHAR>(szValue[i]) & 0xF0) <= 0x90)
 					szBuffer[2 * i] = ((szValue[i] & 0xF0) >> 4) + '0';
 				else
 					szBuffer[2 * i] = ((szValue[i] & 0xF0) >> 4) + 'A' - 10;
@@ -565,7 +567,7 @@ int CControl::SetString(const char *szValue)
 		{
 			for(i = 0; i < 8; i++)
 			{
-				if(((UCHAR)szValue[i] & 0xF0) <= 0x90)
+				if((static_cast<UCHAR>(szValue[i]) & 0xF0) <= 0x90)
 					szBuffer[2 * i] = ((szValue[i] & 0xF0) >> 4) + '0';
 				else
 					szBuffer[2 * i] = ((szValue[i] & 0xF0) >> 4) + 'A' - 10;
@@ -621,7 +623,7 @@ int CControl::CreateBitmap(int iColor)
 
 	SelectObject(hdcMemory, m_hbmColor);
 
-	hbrColor = CreateSolidBrush(SwapColorRedBlue((UINT)iColor));
+	hbrColor = CreateSolidBrush(SwapColorRedBlue(static_cast<UINT>(iColor)));
 
 	FillRect(hdcMemory, &rectButton, hbrColor);
 

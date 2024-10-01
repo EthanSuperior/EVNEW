@@ -28,9 +28,7 @@ CNovaResource::CNovaResource(void)
 }
 
 CNovaResource::~CNovaResource(void)
-{
-
-}
+= default;
 
 int CNovaResource::SetID(short iID)
 {
@@ -126,9 +124,7 @@ int CNovaResource::LoadFromTextEx(std::istream & input, std::string & szFilePath
 }
 
 SNovaResourceCompare::SNovaResourceCompare(void)
-{
-
-}
+= default;
 
 bool SNovaResourceCompare::operator () (const CNovaResource *pResource1, const CNovaResource *pResource2)
 {

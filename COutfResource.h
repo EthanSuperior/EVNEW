@@ -29,9 +29,9 @@ class COutfResource;
 //////////////////////////  CONSTANTS  /////////////////////////
 ////////////////////////////////////////////////////////////////
 
-const int NUM_OUTF_CONTROLS = 44;
+constexpr int NUM_OUTF_CONTROLS = 44;
 
-const int NUM_OUTF_MODTYPE_CHOICES = 49;
+constexpr int NUM_OUTF_MODTYPE_CHOICES = 49;
 
 const std::string g_szOutfModTypeChoices[NUM_OUTF_MODTYPE_CHOICES] =
 	{"Unused", "Weapon", "More cargo space", "Ammunition", "More shield capacity",
@@ -69,7 +69,7 @@ const std::string g_szOutfModValueTexts[NUM_OUTF_MODTYPE_CHOICES] =
 	 "Desc ID to show when destroyed", "Government class", "(Ignored)",
 	 "Boom ID to display"};
 
-const int NUM_OUTF_FIELDS = 26;
+constexpr int NUM_OUTF_FIELDS = 26;
 
 const std::string g_szOutfFields[NUM_OUTF_FIELDS] =
 	{"Display Weight", "Mass", "Tech Level", "Mod Type 1", "Mod Value 1",
@@ -79,10 +79,10 @@ const std::string g_szOutfFields[NUM_OUTF_FIELDS] =
 	 "Short Name", "Lower Case Name", "Lower Case Plural Name",
 	 "Requirments Government", "Flags"};
 
-const int NUM_OUTF_MODTYPE17_CONTROLS = 7;
-const int NUM_OUTF_MODTYPE30_CONTROLS = 4;
+constexpr int NUM_OUTF_MODTYPE17_CONTROLS = 7;
+constexpr int NUM_OUTF_MODTYPE30_CONTROLS = 4;
 
-const int NUM_OUTF_MODTYPE17_FUELSHIELDDRAIN_CHOICES = 16;
+constexpr int NUM_OUTF_MODTYPE17_FUELSHIELDDRAIN_CHOICES = 16;
 
 const std::string g_szOutfModType17FuelShieldDrainChoices[NUM_OUTF_MODTYPE17_FUELSHIELDDRAIN_CHOICES] =
 	{"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15"};
@@ -96,27 +96,27 @@ class COutfResource : public CNovaResource
 public:
 
 	COutfResource(void);
-	~COutfResource(void);
+	~COutfResource(void) override;
 
-	int GetType(void);
-	int GetSize(void);
+	int GetType(void) override;
+	int GetSize(void) override;
 
-	int GetDialogID(void);
-	DLGPROCNOCALLBACK GetDialogProc(void);
+	int GetDialogID(void) override;
+	DLGPROCNOCALLBACK GetDialogProc(void) override;
 
-	int GetNumFields(void);
-	const std::string * GetFieldNames(void);
+	int GetNumFields(void) override;
+	const std::string * GetFieldNames(void) override;
 
-	int Initialize(HWND hwnd);
+	int Initialize(HWND hwnd) override;
 
-	int CloseAndSave(void);
-	int CloseAndDontSave(void);
+	int CloseAndSave(void) override;
+	int CloseAndDontSave(void) override;
 
-	int Save(char *pOutput);
-	int Load(char *pInput, int iSize);
+	int Save(char *pOutput) override;
+	int Load(char *pInput, int iSize) override;
 
-	int SaveToText(std::ostream & output);
-	int LoadFromText(std::istream & input);
+	int SaveToText(std::ostream & output) override;
+	int LoadFromText(std::istream & input) override;
 
 	static BOOL OutfDlgProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
 

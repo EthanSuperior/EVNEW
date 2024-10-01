@@ -102,9 +102,7 @@ CMisnResource::CMisnResource(void)
 }
 
 CMisnResource::~CMisnResource(void)
-{
-
-}
+= default;
 
 int CMisnResource::GetType(void)
 {

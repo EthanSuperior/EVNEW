@@ -35,9 +35,7 @@ COopsResource::COopsResource(void)
 }
 
 COopsResource::~COopsResource(void)
-{
-
-}
+= default;
 
 int COopsResource::GetType(void)
 {

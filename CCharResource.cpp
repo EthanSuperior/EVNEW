@@ -68,9 +68,7 @@ CCharResource::CCharResource(void)
 }
 
 CCharResource::~CCharResource(void)
-{
-
-}
+= default;
 
 int CCharResource::GetType(void)
 {

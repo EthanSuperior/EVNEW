@@ -29,42 +29,42 @@ class CMisnResource;
 //////////////////////////  CONSTANTS  /////////////////////////
 ////////////////////////////////////////////////////////////////
 
-const int NUM_MISN_CONTROLS = 69;
+constexpr int NUM_MISN_CONTROLS = 69;
 
-const int NUM_MISN_AVAILLOCATION_CHOICES = 7;
+constexpr int NUM_MISN_AVAILLOCATION_CHOICES = 7;
 
 const std::string g_szMisnAvailLocationChoices[NUM_MISN_AVAILLOCATION_CHOICES] =
 	{"Mission computer", "Bar", "Offered from ship", "Main spaceport", "Commodity exchange", "Shipyard", "Outfitter"};
 
-const int NUM_MISN_CARGOPICKUPMODE_CHOICES = 4;
+constexpr int NUM_MISN_CARGOPICKUPMODE_CHOICES = 4;
 
 const std::string g_szMisnCargoPickupModeChoices[NUM_MISN_CARGOPICKUPMODE_CHOICES] =
 	{"No cargo", "Mission start", "At Travel Stellar", "When boarding special ship"};
 
-const int NUM_MISN_CARGODROPOFFMODE_CHOICES = 3;
+constexpr int NUM_MISN_CARGODROPOFFMODE_CHOICES = 3;
 
 const std::string g_szMisnCargoDropoffModeChoices[NUM_MISN_CARGODROPOFFMODE_CHOICES] =
 	{"No cargo", "At Travel Stellar", "Mission end"};
 
-const int NUM_MISN_SHIPGOAL_CHOICES = 8;
+constexpr int NUM_MISN_SHIPGOAL_CHOICES = 8;
 
 const std::string g_szMisnShipGoalChoices[NUM_MISN_SHIPGOAL_CHOICES] =
 	{"No goal", "Destroy all ships", "Disable but don't destroy them", "Board them",
 	 "Escort them", "Observe them", "Rescue them", "Chase them off"};
 
-const int NUM_MISN_SHIPBEHAVIOR_CHOICES = 4;
+constexpr int NUM_MISN_SHIPBEHAVIOR_CHOICES = 4;
 
 const std::string g_szMisnShipBehaviorChoices[NUM_MISN_SHIPBEHAVIOR_CHOICES] =
 	{"Normal behavior", "Always attack player", "Protect player", "Destroy enemy stellars"};
 
-const int NUM_MISN_SHIPSTART_CHOICES = 7;
+constexpr int NUM_MISN_SHIPSTART_CHOICES = 7;
 
 const std::string g_szMisnShipStartChoices[NUM_MISN_SHIPSTART_CHOICES] =
 	{"On top of Nav Default 4", "On top of Nav Default 3", "On top of Nav Default 2",
 	 "On top of Nav Default 1", "Appear randomly in system", "Jump in after short delay",
 	 "Appear randomly, cloaked"};
 
-const int NUM_MISN_FIELDS = 51;
+constexpr int NUM_MISN_FIELDS = 51;
 
 const std::string g_szMisnFields[NUM_MISN_FIELDS] =
 	{"Available Stellar", "Available Location", "Available Record", "Available Rating",
@@ -88,27 +88,27 @@ class CMisnResource : public CNovaResource
 public:
 
 	CMisnResource(void);
-	~CMisnResource(void);
+	~CMisnResource(void) override;
 
-	int GetType(void);
-	int GetSize(void);
+	int GetType(void) override;
+	int GetSize(void) override;
 
-	int GetDialogID(void);
-	DLGPROCNOCALLBACK GetDialogProc(void);
+	int GetDialogID(void) override;
+	DLGPROCNOCALLBACK GetDialogProc(void) override;
 
-	int GetNumFields(void);
-	const std::string * GetFieldNames(void);
+	int GetNumFields(void) override;
+	const std::string * GetFieldNames(void) override;
 
-	int Initialize(HWND hwnd);
+	int Initialize(HWND hwnd) override;
 
-	int CloseAndSave(void);
-	int CloseAndDontSave(void);
+	int CloseAndSave(void) override;
+	int CloseAndDontSave(void) override;
 
-	int Save(char *pOutput);
-	int Load(char *pInput, int iSize);
+	int Save(char *pOutput) override;
+	int Load(char *pInput, int iSize) override;
 
-	int SaveToText(std::ostream & output);
-	int LoadFromText(std::istream & input);
+	int SaveToText(std::ostream & output) override;
+	int LoadFromText(std::istream & input) override;
 
 	static BOOL MisnDlgProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
 

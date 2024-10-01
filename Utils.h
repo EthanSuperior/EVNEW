@@ -24,8 +24,8 @@
 //////////////////////////  CONSTANTS  /////////////////////////
 ////////////////////////////////////////////////////////////////
 
-const double EPSILON = 0.000001;
-const float EPSILONF = 0.000001f;
+constexpr double EPSILON = 0.000001;
+constexpr float EPSILONF = 0.000001f;
 
 extern const char g_cWinToMacCharMap[];
 extern const char g_cMacToWinCharMap[];
@@ -116,7 +116,7 @@ template <class T>
 T FromString(std::string & str)
 {
 	std::stringstream ss;
-	T obj = (T)0;
+	T obj = static_cast<T>(0);
 
 	ss.unsetf(std::ios::skipws);
 
@@ -134,12 +134,12 @@ T FromString(std::string & str)
 
 inline int SwapEndianInt(UINT x)
 {
-	return (int)((x >> 24) | ((x >> 8) & 0x0000FF00) | ((x << 8) & 0x00FF0000) | (x << 24));
+	return static_cast<int>((x >> 24) | ((x >> 8) & 0x0000FF00) | ((x << 8) & 0x00FF0000) | (x << 24));
 }
 
 inline short SwapEndianShort(USHORT x)
 {
-	return (short)((x >> 8) | (x << 8));
+	return static_cast<short>((x >> 8) | (x << 8));
 }
 
 inline void SwapEndian64(char *pData)

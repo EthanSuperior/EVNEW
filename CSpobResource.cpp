@@ -76,9 +76,7 @@ CSpobResource::CSpobResource(void)
 }
 
 CSpobResource::~CSpobResource(void)
-{
-
-}
+= default;
 
 int CSpobResource::GetType(void)
 {

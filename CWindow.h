@@ -34,14 +34,14 @@ class CWindow;
 //////////////////////////  CONSTANTS  /////////////////////////
 ////////////////////////////////////////////////////////////////
 
-const int CWINDOW_STATE_NULL       = 0x00;
-const int CWINDOW_STATE_REGISTERED = 0x01;
-const int CWINDOW_STATE_CREATING   = 0x02;
-const int CWINDOW_STATE_CREATED    = 0x04;
-const int CWINDOW_STATE_DIALOG     = 0x08;
-const int CWINDOW_STATE_MODAL      = 0x10;
+constexpr int CWINDOW_STATE_NULL       = 0x00;
+constexpr int CWINDOW_STATE_REGISTERED = 0x01;
+constexpr int CWINDOW_STATE_CREATING   = 0x02;
+constexpr int CWINDOW_STATE_CREATED    = 0x04;
+constexpr int CWINDOW_STATE_DIALOG     = 0x08;
+constexpr int CWINDOW_STATE_MODAL      = 0x10;
 
-const int CWINDOW_MAX_EXTRA_DATA = 8;
+constexpr int CWINDOW_MAX_EXTRA_DATA = 8;
 
 ////////////////////////////////////////////////////////////////
 ///////////////////////////  CLASSES  //////////////////////////

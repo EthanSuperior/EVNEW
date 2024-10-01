@@ -80,9 +80,7 @@ CColrResource::CColrResource(void)
 }
 
 CColrResource::~CColrResource(void)
-{
-
-}
+= default;
 
 int CColrResource::GetType(void)
 {

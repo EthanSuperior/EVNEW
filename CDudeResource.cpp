@@ -41,9 +41,7 @@ CDudeResource::CDudeResource(void)
 }
 
 CDudeResource::~CDudeResource(void)
-{
-
-}
+= default;
 
 int CDudeResource::GetType(void)
 {

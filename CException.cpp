@@ -49,9 +49,7 @@ CException::CException(const CException & exception)
 }
 
 CException::~CException(void)
-{
-
-}
+= default;
 
 std::string CException::GetExceptionString(void)
 {

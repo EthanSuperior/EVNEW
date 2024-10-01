@@ -71,9 +71,7 @@ CSystResource::CSystResource(void)
 }
 
 CSystResource::~CSystResource(void)
-{
-
-}
+= default;
 
 int CSystResource::GetType(void)
 {
