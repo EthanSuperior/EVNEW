@@ -220,7 +220,7 @@ int CSndResource::SaveToTextEx(std::ostream & output, std::string & szFilePath, 
 {
 	PrintTextField(output, szFilename1.c_str(), '\t');
 
-	std::string szFilename = szFilePath + szFilename1;
+	const std::string szFilename = szFilePath + szFilename1;
 
 	FileExport(szFilename.c_str(), 0);
 
@@ -242,9 +242,7 @@ int CSndResource::LoadFromTextEx(std::istream & input, std::string & szFilePath)
 
 int CSndResource::Initialize(HWND hwnd)
 {
-	std::string szTitle;
-
-	szTitle = "snd ";
+	std::string szTitle = "snd ";
 	szTitle += ToString(m_iID);
 	szTitle += " (";
 	szTitle += m_szName;
@@ -260,8 +258,8 @@ int CSndResource::Initialize(HWND hwnd)
 
 	if(m_vData.size() > 0)
 	{
-		HWND hwndTextSampleRate = GetDlgItem(hwnd, IDC_EDIT_SND_TEXT3);
-		HWND hwndTextDataSize   = GetDlgItem(hwnd, IDC_EDIT_SND_TEXT4);
+		const HWND hwndTextSampleRate = GetDlgItem(hwnd, IDC_EDIT_SND_TEXT3);
+		const HWND hwndTextDataSize   = GetDlgItem(hwnd, IDC_EDIT_SND_TEXT4);
 
 		std::string szText = "Sample rate: ";
 		szText += ToString(static_cast<double>(m_pSndInfo->sampleRate) / 65536.0);
@@ -294,7 +292,7 @@ int CSndResource::CloseAndSave(void)
 
 		return 0;
 	}
-	else if((m_controls[0].GetInt() < 128) || (m_controls[0].GetInt() > 32767))
+	if((m_controls[0].GetInt() < 128) || (m_controls[0].GetInt() > 32767))
 	{
 		szError = ToString(m_controls[0].GetInt());
 		szError += " is not a valid ID.  Please enter an ID between 128 and 32767 inclusive.";
@@ -346,9 +344,7 @@ int CSndResource::CloseAndSave(void)
 		CEditor::GetCurrentEditor()->SetDirty();
 	}
 
-	int i;
-
-	for(i = 0; i < NUM_SND_CONTROLS; i++)
+	for(int i = 0; i < NUM_SND_CONTROLS; i++)
 		m_controls[i].Destroy();
 
 	m_iIsNew = 0;
@@ -380,9 +376,7 @@ int CSndResource::CloseAndDontSave(void)
 		m_iIsDirty = 0;
 	}
 
-	int i;
-
-	for(i = 0; i < NUM_SND_CONTROLS; i++)
+	for(int i = 0; i < NUM_SND_CONTROLS; i++)
 		m_controls[i].Destroy();
 
 	CEditor::GetCurrentEditor()->RemoveEditDialog(m_pWindow, 0);
@@ -392,7 +386,7 @@ int CSndResource::CloseAndDontSave(void)
 
 int CSndResource::PlaySound(void)
 {
-	HWND hwndPlayButton = GetDlgItem(m_pWindow->GetHWND(), IDC_EDIT_SND_BUTTON1);
+	const HWND hwndPlayButton = GetDlgItem(m_pWindow->GetHWND(), IDC_EDIT_SND_BUTTON1);
 
 	Button_SetText(hwndPlayButton, "Playing...");
 
@@ -403,9 +397,7 @@ int CSndResource::PlaySound(void)
 	else
 		pSoundResource = &m_vData2[0];
 
-	qt::OSErr qtErr;
-
-	qtErr = qt::SndPlay(nil, (qt::SndListResource **)&pSoundResource, FALSE);
+	qt::OSErr qtErr = qt::SndPlay(nil, (qt::SndListResource**)&pSoundResource, FALSE);
 
 	Button_SetText(hwndPlayButton, "Play");
 
@@ -516,102 +508,96 @@ int CSndResource::FileImport(const char *szFilename, int iShowErrorMessages)
 
 				return 0;
 			}
-			else
+			iNext = 1;
+
+			filein.read(szRiffType, 4);
+
+			szRiffType[4] = '\0';
+
+			if(strcmp(szRiffType, "WAVE") != 0)
 			{
-				iNext = 1;
+				if(pEditor->PrefGenerateLogFile())
+					*pLog << "Error: Sound file \"" << szFilename2 << "\" contains unsupported RIFF format \"" << szRiffType << "\"!" << CErrorLog::endl;
 
-				filein.read(szRiffType, 4);
+				std::string szError = "Unable to load file \"";
 
-				szRiffType[4] = '\0';
+				szError += szFilename2;
+				szError += "\"!";
 
-				if(strcmp(szRiffType, "WAVE") != 0)
-				{
-					if(pEditor->PrefGenerateLogFile())
-						*pLog << "Error: Sound file \"" << szFilename2 << "\" contains unsupported RIFF format \"" << szRiffType << "\"!" << CErrorLog::endl;
+				if(pEditor->PrefGenerateLogFile())
+					szError += "  Consult log.txt for details.";
 
-					std::string szError = "Unable to load file \"";
+				if(iShowErrorMessages)
+					MessageBox(m_pWindow->GetHWND(), szError.c_str(), "Error", MB_OK | MB_ICONEXCLAMATION);
 
-					szError += szFilename2;
-					szError += "\"!";
-
-					if(pEditor->PrefGenerateLogFile())
-						szError += "  Consult log.txt for details.";
-
-					if(iShowErrorMessages)
-						MessageBox(m_pWindow->GetHWND(), szError.c_str(), "Error", MB_OK | MB_ICONEXCLAMATION);
-
-					return 0;
-				}
-
-				continue;
+				return 0;
 			}
+
+			continue;
+		}
+		if(strcmp(szChunk, "fmt ") == 0)
+		{
+			filein.read((char *)&wFormatTag,       sizeof(short));
+			filein.read((char *)&wChannels,        sizeof(USHORT));
+			filein.read((char *)&dwSamplesPerSec,  sizeof(UINT));
+			filein.read((char *)&dwAvgBytesPerSec, sizeof(UINT));
+			filein.read((char *)&wBlockAlign,      sizeof(USHORT));
+			filein.read((char *)&wBitsPerSample,   sizeof(USHORT));
+
+			if(wFormatTag != 0x0001)
+			{
+				if(pEditor->PrefGenerateLogFile())
+					*pLog << "Error: Sound file \"" << szFilename2 << "\" contains unsupported compression format (" << wFormatTag << ")!" << CErrorLog::endl;
+
+				std::string szError = "Unable to load file \"";
+
+				szError += szFilename2;
+				szError += "\"!";
+
+				if(pEditor->PrefGenerateLogFile())
+					szError += "  Consult log.txt for details.";
+
+				if(iShowErrorMessages)
+					MessageBox(m_pWindow->GetHWND(), szError.c_str(), "Error", MB_OK | MB_ICONEXCLAMATION);
+
+				return 0;
+			}
+
+			iNext = 2;
+
+			filein.seekg(iChunkSize - 16, std::ios::cur);
+		}
+		else if(strcmp(szChunk, "data") == 0)
+		{
+			if(iNext != 2)
+			{
+				if(pEditor->PrefGenerateLogFile())
+					*pLog << "Error: Sound file \"" << szFilename2 << "\" contains data chunk before format chunk!" << CErrorLog::endl;
+
+				std::string szError = "Unable to load file \"";
+
+				szError += szFilename2;
+				szError += "\"!";
+
+				if(pEditor->PrefGenerateLogFile())
+					szError += "  Consult log.txt for details.";
+
+				if(iShowErrorMessages)
+					MessageBox(m_pWindow->GetHWND(), szError.c_str(), "Error", MB_OK | MB_ICONEXCLAMATION);
+
+				return 0;
+			}
+
+			vData.resize(iChunkSize);
+
+			filein.read((char *)&vData[0], iChunkSize);
 		}
 		else
 		{
-			if(strcmp(szChunk, "fmt ") == 0)
-			{
-				filein.read((char *)&wFormatTag,       sizeof(short));
-				filein.read((char *)&wChannels,        sizeof(USHORT));
-				filein.read((char *)&dwSamplesPerSec,  sizeof(UINT));
-				filein.read((char *)&dwAvgBytesPerSec, sizeof(UINT));
-				filein.read((char *)&wBlockAlign,      sizeof(USHORT));
-				filein.read((char *)&wBitsPerSample,   sizeof(USHORT));
+			if(pEditor->PrefGenerateLogFile())
+				*pLog << "Warning: Sound file \"" << szFilename2 << "\" contains unsupported chunk.  Skipping." << CErrorLog::endl;
 
-				if(wFormatTag != 0x0001)
-				{
-					if(pEditor->PrefGenerateLogFile())
-						*pLog << "Error: Sound file \"" << szFilename2 << "\" contains unsupported compression format (" << wFormatTag << ")!" << CErrorLog::endl;
-
-					std::string szError = "Unable to load file \"";
-
-					szError += szFilename2;
-					szError += "\"!";
-
-					if(pEditor->PrefGenerateLogFile())
-						szError += "  Consult log.txt for details.";
-
-					if(iShowErrorMessages)
-						MessageBox(m_pWindow->GetHWND(), szError.c_str(), "Error", MB_OK | MB_ICONEXCLAMATION);
-
-					return 0;
-				}
-
-				iNext = 2;
-
-				filein.seekg(iChunkSize - 16, std::ios::cur);
-			}
-			else if(strcmp(szChunk, "data") == 0)
-			{
-				if(iNext != 2)
-				{
-					if(pEditor->PrefGenerateLogFile())
-						*pLog << "Error: Sound file \"" << szFilename2 << "\" contains data chunk before format chunk!" << CErrorLog::endl;
-
-					std::string szError = "Unable to load file \"";
-
-					szError += szFilename2;
-					szError += "\"!";
-
-					if(pEditor->PrefGenerateLogFile())
-						szError += "  Consult log.txt for details.";
-
-					if(iShowErrorMessages)
-						MessageBox(m_pWindow->GetHWND(), szError.c_str(), "Error", MB_OK | MB_ICONEXCLAMATION);
-
-					return 0;
-				}
-
-				vData.resize(iChunkSize);
-
-				filein.read((char *)&vData[0], iChunkSize);
-			}
-			else
-			{
-				if(pEditor->PrefGenerateLogFile())
-					*pLog << "Warning: Sound file \"" << szFilename2 << "\" contains unsupported chunk.  Skipping." << CErrorLog::endl;
-
-				filein.seekg(iChunkSize, std::ios::cur);
-			}
+			filein.seekg(iChunkSize, std::ios::cur);
 		}
 	}
 
@@ -628,9 +614,7 @@ int CSndResource::FileImport(const char *szFilename, int iShowErrorMessages)
 #else
 	long long iTemp64;
 #endif
-
-	int i, j;
-
+	
 	if(wBitsPerSample == 8)
 	{
 		if(wChannels == 1)
@@ -639,11 +623,11 @@ int CSndResource::FileImport(const char *szFilename, int iShowErrorMessages)
 		}
 		else
 		{
-			for(i = 0; i < vData.size(); i += wChannels)
+			for(auto i = 0; i < vData.size(); i += wChannels)
 			{
 				iTemp = 0;
 
-				for(j = 0; j < wChannels; j++)
+				for(auto j = 0; j < wChannels; j++)
 					iTemp += vData[i + j];
 
 				iTemp /= wChannels;
@@ -654,11 +638,11 @@ int CSndResource::FileImport(const char *szFilename, int iShowErrorMessages)
 	}
 	else if(wBitsPerSample == 16)
 	{
-		for(i = 0; i < vData.size() / 2; i += wChannels)
+		for(auto i = 0; i < vData.size() / 2; i += wChannels)
 		{
 			iTemp = 0;
 
-			for(j = 0; j < wChannels; j++)
+			for(auto j = 0; j < wChannels; j++)
 				iTemp += *(short *)&vData[(i + j) * 2];
 
 			iTemp /= wChannels;
@@ -672,11 +656,11 @@ int CSndResource::FileImport(const char *szFilename, int iShowErrorMessages)
 	}
 	else if(wBitsPerSample == 24)
 	{
-		for(i = 0; i < vData.size() / 3; i += wChannels)
+		for(auto i = 0; i < vData.size() / 3; i += wChannels)
 		{
 			iTemp = 0;
 
-			for(j = 0; j < wChannels; j++)
+			for(auto j = 0; j < wChannels; j++)
 				iTemp += static_cast<int>(vData[(i + j) * 3]) | (int)(vData[(i + j) * 3 + 1] << 8) | (int)(vData[(i + j) * 3 + 2] << 16);
 
 			iTemp /= wChannels;
@@ -690,11 +674,11 @@ int CSndResource::FileImport(const char *szFilename, int iShowErrorMessages)
 	}
 	else if(wBitsPerSample == 32)
 	{
-		for(i = 0; i < vData.size() / 4; i += wChannels)
+		for(auto i = 0; i < vData.size() / 4; i += wChannels)
 		{
 			iTemp64 = 0;
 
-			for(j = 0; j < wChannels; j++)
+			for(auto j = 0; j < wChannels; j++)
 				iTemp64 += *(int *)vData[(i + j) * 4];
 
 			iTemp64 /= wChannels;
@@ -1054,15 +1038,12 @@ int CSndResource::FileExport(const char *szFilename, int iShowErrorMessages)
 
 BOOL CSndResource::SndDlgProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 {
-	CWindow *pWindow;
 	CSndResource *pResource;
 
-	pWindow = CWindow::GetWindow(hwnd, 1);
+	CWindow* pWindow = CWindow::GetWindow(hwnd, 1);
 
 	if(pWindow != NULL)
 		pResource = (CSndResource *)pWindow->GetExtraData(2);
-
-	int i;
 
 	switch(msg)
 	{
@@ -1089,8 +1070,8 @@ BOOL CSndResource::SndDlgProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 
 		case WM_COMMAND:
 		{
-			int iNotifyCode = HIWORD(wparam);
-			int iControlID  = LOWORD(wparam);
+			const int iNotifyCode = HIWORD(wparam);
+			const int iControlID  = LOWORD(wparam);
 
 			if(iControlID == IDC_EDIT_SND_CANCEL)
 			{
@@ -1122,7 +1103,7 @@ BOOL CSndResource::SndDlgProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 			}
 			else
 			{
-				for(i = 0; i < NUM_SND_CONTROLS; i++)
+				for(int i = 0; i < NUM_SND_CONTROLS; i++)
 				{
 					if(iControlID == pResource->m_controls[i].GetControlID())
 					{

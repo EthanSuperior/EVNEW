@@ -1417,13 +1417,13 @@ int CRLEResource::DoExport(const char *szFilename, int iIsImage, int iNumFramesT
 	{
 		pExtension++;
 
-		if(stricmp(pExtension, "bmp") == 0)
+		if(_stricmp(pExtension, "bmp") == 0)
 			m_iExportFilter  = 1;
-		else if(stricmp(pExtension, "png") == 0)
+		else if(_stricmp(pExtension, "png") == 0)
 			m_iExportFilter = 2;
-		else if((stricmp(pExtension, "jpg") == 0) || (stricmp(pExtension, "jpeg") == 0))
+		else if((_stricmp(pExtension, "jpg") == 0) || (_stricmp(pExtension, "jpeg") == 0))
 			m_iExportFilter = 3;
-		else if(stricmp(pExtension, "tiff") == 0)
+		else if(_stricmp(pExtension, "tiff") == 0)
 			m_iExportFilter = 4;
 		else
 		{
