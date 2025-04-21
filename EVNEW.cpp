@@ -1204,6 +1204,11 @@ int CEditor::EditPreferences(void)
 	return 1;
 }
 
+void CEditor::EditLoadLibrary(std::string path)
+{
+	NovaLib::Get().AddFolder(path, &m_dialogMain);
+}
+
 int CEditor::ResourceNew(void)
 {
 	CNovaResource *pNovaResource = NULL;
@@ -1851,6 +1856,9 @@ BOOL CEditor::MainDialogProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 			{
 				pEditor->EditPreferences();
 			}
+			//else if (iControlID == IDM_EDIT_LOADLIBRARY) {
+				//pEditor->EditLoadLibrary("C:\\Users\\User\\Desktop\\EVNova\\TC\\Base\\Nova Files");
+			//}
 			else if(iControlID == IDM_RESOURCE_NEW)
 			{
 				pEditor->ResourceNew();

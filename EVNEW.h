@@ -31,6 +31,8 @@ class CEditor;
 
 #include "CControl.h"
 
+#include "NovaLib.h"
+
 ////////////////////////////////////////////////////////////////
 //////////////////////////  CONSTANTS  /////////////////////////
 ////////////////////////////////////////////////////////////////
@@ -122,6 +124,7 @@ private:
 	int EditPaste(int iOverwrite);
 	int EditDelete(void);
 	int EditPreferences(void);
+	void EditLoadLibrary(std::string path);
 
 	int ResourceNew(void);
 	int ResourceEdit(void);

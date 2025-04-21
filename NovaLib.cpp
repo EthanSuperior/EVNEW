@@ -1,0 +1,84 @@
+#include "NovaLib.h"
+
+NovaLib* NovaLib::instance = NULL;
+
+NovaLib& NovaLib::Get()
+{
+	if (instance == NULL) instance = new NovaLib();
+	return *instance;
+}
+
+CNovaResource* NovaLib::At(int type, int id) {
+	if (type < 0 || type >= NUM_RESOURCE_TYPES) return NULL;
+	auto it = Get().rez[type].find(id);
+	if (it != Get().rez[type].end()) return it->second;
+	return NULL;
+}
+
+char* NovaLib::RezName(int type, int id) {
+	CNovaResource* ptr = At(type, id);
+	if (ptr == NULL) return "None";
+	return ptr->GetName();
+}
+
+
+NovaLib::~NovaLib(){ Clear(); }
+
+void NovaLib::AddFolder(std::string path, CWindow* pWndParent) {
+	for (const auto& entry : std::filesystem::directory_iterator(path)) {
+		if (entry.is_regular_file() && entry.path().extension() == ".rez")
+			AddRezFile(entry.path().string(), pWndParent);
+	}
+}
+
+void NovaLib::AddRezFile(std::string filename, CWindow* pWndParent)
+{
+	CPlugIn* lib = new CPlugIn();
+	lib->Load((char*)filename.c_str(), pWndParent);
+	short id;
+	std::string line, name;
+
+	for (int i = 0; i < NUM_RESOURCE_TYPES; i++) {
+		for (int j = 0; j < lib->m_vResources[i].size(); j++) {
+			if (lib->m_vResources[i][j] == NULL) continue;
+			rez[i][lib->m_vResources[i][j]->GetID()] = lib->m_vResources[i][j];
+			//lib.m_vResources[i][j] = NULL;
+		}
+	}
+	std::ofstream outputFile(filename + ".txt");
+	outputFile << filename << std::endl;
+	for (int i = 0; i < NUM_RESOURCE_TYPES; i++) outputFile << lib->m_vResources[i].size() << "\t";
+	outputFile << std::endl;
+	plugins.push_back(lib);
+}
+/*
+TODO LINKERS:
+-- Template
+-Cron: Govt Names
+-Dude: Ship Name
+-Flet: Ship&Govt Names;System
+-Misn: sytems;dude
+-Outf:WeapName
+-Pers: ship
+-Ship: Cost; weaps;outf; <Temp> should make shan,Ship,shipyad desc,escort desc,
+-Shob tech lvls?
+-Syst: Links; spobs;dudes;pers;reinfoce
+-Weap: ammo;jam names;
+*/
+
+void NovaLib::Clear()
+{
+	if (instance == NULL) return;
+	for (int i = 0; i < NUM_RESOURCE_TYPES; ++i) {
+		for (auto& [id, ptr] : rez[i]) delete ptr;
+		rez[i].clear();
+	}
+	plugins.clear();
+	delete instance;
+	instance = NULL;
+}
+
+//CBoomResource* NovaLib::Boom(int id) { 
+//	return nullptr;
+//	//return *((CBoomResource*)rez[CNR_TYPE_BOOM][id]); 
+//}

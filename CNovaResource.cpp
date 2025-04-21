@@ -11,6 +11,7 @@
 #include <string.h>
 
 #include "CNovaResource.h"
+#include "CControl.h"
 
 ////////////////////////////////////////////////////////////////
 ///////////////////  CLASS MEMBER FUNCTIONS  ///////////////////
@@ -123,6 +124,20 @@ int CNovaResource::LoadFromText(std::istream & input)
 int CNovaResource::LoadFromTextEx(std::istream & input, std::string & szFilePath)
 {
 	return 1;
+}
+
+void CNovaResource::SetIfDefaultInt(CControl* m_controls, short controlID, short oldV, short newV, short offset) {
+	if (m_controls[controlID].GetInt() >= 0 && m_controls[controlID].GetInt() != oldV + offset) return;
+	m_controls[controlID].SetInt(newV + offset);
+}
+
+void CNovaResource::SetIfDefaultStr(CControl* m_controls, short controlID, short oldBit, short newBit) {
+	std::string oldBitStr = std::to_string(oldBit);
+	std::string bitsStr = m_controls[controlID].GetString();
+	if (bitsStr.find(oldBitStr) == std::string::npos) return;
+	std::string newBitStr = std::to_string(newBit);
+	bitsStr.replace(bitsStr.find(oldBitStr), oldBitStr.length(), newBitStr);
+	m_controls[controlID].SetString(bitsStr.c_str());
 }
 
 SNovaResourceCompare::SNovaResourceCompare(void)

@@ -22,6 +22,7 @@ class CNovaResource;
 #include <windows.h>
 
 #include "CWindow.h"
+#include "CControl.h"
 
 ////////////////////////////////////////////////////////////////
 //////////////////////////  CONSTANTS  /////////////////////////
@@ -129,6 +130,9 @@ public:
 
 	virtual int Save(char *pOutput) = 0;
 	virtual int Load(char *pInput, int iSize) = 0;
+
+	static void SetIfDefaultInt(CControl* m_controls, short controlID, short oldV, short newV, short offset = 0);
+	static void SetIfDefaultStr(CControl* m_controls, short controlID, short oldBit, short newBit);
 
 	friend struct SNovaResourceCompare;
 

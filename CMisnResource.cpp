@@ -620,6 +620,10 @@ int CMisnResource::Initialize(HWND hwnd)
 	m_controls[67].SetInt(m_iFlags2 & 0x0004);
 	m_controls[68].Create(hwnd, IDC_EDIT_MISN_EDIT51, CCONTROL_TYPE_STR256, IDS_STRING468);
 	m_controls[68].SetString(m_szName);
+	//m_controls[69].Create(hwnd, IDC_EDIT_MISN_TEXT52, CCONTROL_TYPE_STR128, IDS_STRING401);
+	//m_controls[69].SetString("");
+
+	UpdateDynamicDefaults(m_controls, -1, m_iID);
 
 	std::string szText = "Introduction Text:\t";
 	szText += ToString(m_iID + 4000 - 128);
@@ -865,13 +869,23 @@ BOOL CMisnResource::MisnDlgProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lpara
 			{
 				if((pResource->m_controls[0].GetInt() >= 128) && (pResource->m_controls[0].GetInt() < 1128))
 				{
+					char* inStr = new char[255];
+					Static_GetText(GetDlgItem(hwnd, IDC_EDIT_MISN_TEXT32), inStr, 255);
+					short oldV = (strcmp(inStr, "Introduction Text:") != 0) ? std::stoi(inStr + 19) - 4000 + 128 : -1;
+
+					short newId = pResource->m_controls[0].GetInt();
+					UpdateDynamicDefaults(pResource->m_controls, oldV, newId);
 					std::string szText = "Introduction Text:\t";
-					szText += ToString(pResource->m_controls[0].GetInt() + 4000 - 128);
+					szText += ToString(newId + 4000 - 128);
 
 					Static_SetText(GetDlgItem(hwnd, IDC_EDIT_MISN_TEXT32), szText.c_str());
 				}
 			}
+			//else if (iControlID == IDC_EDIT_MISN_EDIT2) {
+				//int stellarId = pResource->m_controls[1].GetInt();
 
+				//pResource->m_controls[69].SetString(NovaLib::RezName(CNR_TYPE_SPOB, stellarId));
+			//}
 			return TRUE;
 
 			break;
@@ -884,4 +898,24 @@ BOOL CMisnResource::MisnDlgProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lpara
 	}
 
 	return FALSE;
+}
+
+
+void CMisnResource::UpdateDynamicDefaults(CControl* controls, short oldId, short newId)
+{
+	SetIfDefaultInt(controls, 24, oldId, newId, 5000 - 128);
+	SetIfDefaultInt(controls, 25, oldId, newId, 6000 - 128);
+	SetIfDefaultInt(controls, 26, oldId, newId, 7000 - 128);
+	SetIfDefaultInt(controls, 27, oldId, newId, 8000 - 128);
+	SetIfDefaultInt(controls, 28, oldId, newId, 9000 - 128);
+	SetIfDefaultInt(controls, 29, oldId, newId, 15000 - 128);
+	SetIfDefaultInt(controls, 30, oldId, newId, 16000 - 128);
+	SetIfDefaultInt(controls, 37, oldId, newId, 17000 - 128);
+	SetIfDefaultStr(controls, 38, oldId + 1100, newId + 1100);
+	SetIfDefaultStr(controls, 41, oldId + 1100, newId + 1100);
+	if (oldId != -1) return;
+
+	controls[1].SetInt(162);
+	controls[38].SetString(("!b" + std::to_string(newId + 1100)).c_str());
+	controls[41].SetString(("b" + std::to_string(newId + 1100)).c_str());
 }

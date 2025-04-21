@@ -112,6 +112,7 @@ public:
 	int LoadFromText(std::istream & input);
 
 	static BOOL MisnDlgProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
+	static void UpdateDynamicDefaults(CControl* controls, short oldId, short newId);
 
 private:
 
