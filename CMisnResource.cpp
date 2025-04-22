@@ -862,53 +862,36 @@ BOOL CMisnResource::MisnDlgProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lpara
 					}
 				}
 			}
-
-			if ((iControlID == IDC_EDIT_DESC_BTN1)) {
-				short id = pResource->m_controls[0].GetInt() + 4000 - 128;
-				CEditor::GetCurrentEditor()->ResourceExtra(id, std::string("OFFER: ") + pResource->m_controls[68].GetString());
-			}
-			else if ((iControlID == IDC_EDIT_DESC_BTN2)) {
-				short id = pResource->m_controls[0].GetInt() + 5000 - 128;
-				CEditor::GetCurrentEditor()->ResourceExtra(id, std::string("BREIF: ") + pResource->m_controls[68].GetString());
-			}
-			else if ((iControlID == IDC_EDIT_DESC_BTN3)) {
-				short id = pResource->m_controls[0].GetInt() + 6000 - 128;
-				CEditor::GetCurrentEditor()->ResourceExtra(id, std::string("QUICK: ") + pResource->m_controls[68].GetString());
-			}
-			else if ((iControlID == IDC_EDIT_DESC_BTN4)) {
-				short id = pResource->m_controls[0].GetInt() + 7000 - 128;
-				CEditor::GetCurrentEditor()->ResourceExtra(id, std::string("LOAD: ") + pResource->m_controls[68].GetString());
-			}
-			else if ((iControlID == IDC_EDIT_DESC_BTN5)) {
-				short id = pResource->m_controls[0].GetInt() + 8000 - 128;
-				CEditor::GetCurrentEditor()->ResourceExtra(id, std::string("DROP: ") + pResource->m_controls[68].GetString());
-			}
-			else if ((iControlID == IDC_EDIT_DESC_BTN6)) {
-				short id = pResource->m_controls[0].GetInt() + 9000 - 128;
-				CEditor::GetCurrentEditor()->ResourceExtra(id, std::string("DONE: ") + pResource->m_controls[68].GetString());
-			}
-			else if ((iControlID == IDC_EDIT_DESC_BTN7)) {
-				short id = pResource->m_controls[0].GetInt() + 15000 - 128;
-				CEditor::GetCurrentEditor()->ResourceExtra(id, std::string("FAIL: ") + pResource->m_controls[68].GetString());
-			}
-			else if ((iControlID == IDC_EDIT_DESC_BTN8)) {
-				short id = pResource->m_controls[0].GetInt() + 16000 - 128;
-				CEditor::GetCurrentEditor()->ResourceExtra(id, std::string("SHIP: ") + pResource->m_controls[68].GetString());
-			}
-			else if ((iControlID == IDC_EDIT_DESC_BTN9)) {
-				short id = pResource->m_controls[0].GetInt() + 17000 - 128;
-				CEditor::GetCurrentEditor()->ResourceExtra(id, std::string("RJCT: ") + pResource->m_controls[68].GetString());
-			}
+			short id = pResource->m_controls[0].GetInt();
+			std::string name = pResource->m_controls[68].GetString();
+			if ((iControlID == IDC_EDIT_DESC_BTN1))
+				CEditor::GetCurrentEditor()->ResourceExtra(id + 4000 - 128, "OFFER: " + name);
+			else if ((iControlID == IDC_EDIT_DESC_BTN2))
+				CEditor::GetCurrentEditor()->ResourceExtra(id + 5000 - 128, "BREIF: " + name);
+			else if ((iControlID == IDC_EDIT_DESC_BTN3))
+				CEditor::GetCurrentEditor()->ResourceExtra(id + 6000 - 128, "QUICK: " + name);
+			else if ((iControlID == IDC_EDIT_DESC_BTN4))
+				CEditor::GetCurrentEditor()->ResourceExtra(id + 7000 - 128, "LOAD: " + name);
+			else if ((iControlID == IDC_EDIT_DESC_BTN5))
+				CEditor::GetCurrentEditor()->ResourceExtra(id + 8000 - 128, "DROP: " + name);
+			else if ((iControlID == IDC_EDIT_DESC_BTN6))
+				CEditor::GetCurrentEditor()->ResourceExtra(id + 9000 - 128, "DONE: " + name);
+			else if ((iControlID == IDC_EDIT_DESC_BTN7))
+				CEditor::GetCurrentEditor()->ResourceExtra(id + 15000 - 128, "FAIL: " + name);
+			else if ((iControlID == IDC_EDIT_DESC_BTN8))
+				CEditor::GetCurrentEditor()->ResourceExtra(id + 16000 - 128, "SHIP: " + name);
+			else if ((iControlID == IDC_EDIT_DESC_BTN9))
+				CEditor::GetCurrentEditor()->ResourceExtra(id + 17000 - 128, "RJCT: " + name);
 
 			if((iControlID == IDC_EDIT_MISN_EDIT1) && (iNotifyCode == EN_CHANGE))
 			{
-				if((pResource->m_controls[0].GetInt() >= 128) && (pResource->m_controls[0].GetInt() < 1128))
+				if((id >= 128) && (id < 1128))
 				{
 					char* inStr = new char[255];
 					Static_GetText(GetDlgItem(hwnd, IDC_EDIT_MISN_TEXT32), inStr, 255);
 					short oldV = (strcmp(inStr, "Introduction Text:") != 0) ? std::stoi(inStr + 19) - 4000 + 128 : -1;
 
-					short newId = pResource->m_controls[0].GetInt();
+					short newId = id;
 					UpdateDynamicDefaults(pResource->m_controls, oldV, newId);
 					std::string szText = "Introduction Text:\t";
 					szText += ToString(newId + 4000 - 128);
@@ -917,15 +900,10 @@ BOOL CMisnResource::MisnDlgProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lpara
 				}
 			}
 			else if (iControlID == IDC_EDIT_MISN_EDIT2 ) {
-				//ID = IDC_EDIT_MISN_EDIT2; Txt=IDC_EDIT_MISN_TEXT52
-//"Which stellars the mission is available from.  Possible values are:\r\n-1: Any stellar\r\n128-2175: ID of a specific stellar\r\n5000-7047: Stellar in a system adjacent to a specific system\r\n10000-10255: Any stellar belonging to this government\r\n15000-15255: Any stellar belonging to an ally of this government\r\n20000-20255: Any stellar not belonging to this government\r\n25000-25255: Any stellar belonging to an enemy of this government\r\n30000-30255: Any stellar belonging to this government or any of its classmates\r\n31000-31255: Any stellar not of this government nor any of its classmates"
-
 				int id = pResource->m_controls[1].GetInt();
-				//std::ofstream outputFile("log.txt", std::ios_base::app);
-				//outputFile << inStr << std::endl;
-				std::string rezName = "None";
-				if (id == -1) rezName = "Any Stellar";
-				else if (id >= 128 && id <= 2175) rezName = NovaLib::RezStr(CNR_TYPE_SPOB, id);
+				std::string rezName = "Any Stellar";
+				
+				if (id >= 128 && id <= 2175) rezName = NovaLib::RezStr(CNR_TYPE_SPOB, id);
 				else if (id >= 5000 && id <= 7047)
 					rezName = "AdjTo" + NovaLib::RezStr(CNR_TYPE_SYST, id - 5000, true);
 				else if (id >= 10000 && id <= 10255)
