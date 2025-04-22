@@ -78,17 +78,18 @@ int CControl::Create(HWND hwndDialog, int iControlID, int iType, int iHelpString
 
 		RECT rectControl;
 
-		hwndTooltip = CreateWindowEx(WS_EX_TOPMOST, TOOLTIPS_CLASS, NULL, WS_POPUP | TTS_NOPREFIX | TTS_ALWAYSTIP, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, m_hwndControl, NULL, hInstance, NULL);
+		hwndTooltip = CreateWindowEx(WS_EX_TOPMOST, TOOLTIPS_CLASS, NULL, WS_POPUP | TTS_NOPREFIX | TTS_ALWAYSTIP,
+			CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, hwndDialog, NULL, hInstance, NULL);
 
 		SetWindowPos(hwndTooltip, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
 
 		GetClientRect(m_hwndControl, &rectControl);
 
 		toolInfo.cbSize   = sizeof(TOOLINFO);
-		toolInfo.uFlags   = TTF_SUBCLASS;
+		toolInfo.uFlags = TTF_SUBCLASS | TTF_IDISHWND | TTF_TRANSPARENT;
 		toolInfo.hwnd     = m_hwndControl;
 		toolInfo.hinst    = hInstance;
-		toolInfo.uId      = iTooltipID;
+		toolInfo.uId      = (UINT_PTR) m_hwndControl;
 		toolInfo.lpszText = szBuffer;
 
 		toolInfo.rect.left   = rectControl.left;    

@@ -3,9 +3,7 @@
 // (c) 2003 All Rights Reserved
 
 // File EVNEW.h
-
-#ifndef EVNEW_H_INCLUDED	// Prevent multiple inclusions
-#define EVNEW_H_INCLUDED
+#pragma once
 
 ////////////////////////////////////////////////////////////////
 ///////////////////////  CLASS FORWARDS  ///////////////////////
@@ -21,6 +19,7 @@ class CEditor;
 
 #include <vector>
 #include <string>
+#include <commdlg.h>
 
 #include "CWindow.h"
 #include "CErrorLog.h"
@@ -93,7 +92,11 @@ public:
 
 	int RemoveEditDialog(CWindow *pWindow, int iIDOrNameChanged);
 
-	int IsUniqueResourceID(CNovaResource *pResource, short iID);
+	int IsUniqueResourceID(CNovaResource* pResource, short iID);
+
+	CNovaResource* Find(int rezType, short iID);
+	
+	void ResourceExtra(short id, std::string dfltName, int type = CNR_TYPE_DESC);
 
 	int SetDirty(void);
 
@@ -238,6 +241,3 @@ private:
 
 	static CEditor * ms_pCurrentEditor;
 };
-
-#endif		// #ifndef EVNEW_H_INCLUDED
-

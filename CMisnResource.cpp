@@ -26,7 +26,7 @@
 CMisnResource::CMisnResource(void)
 {
 	m_iAvailableStellar  =  -1;
-	m_iAvailableLocation =   0;
+	m_iAvailableLocation =   1;
 	m_iAvailableRecord   =   0;
 	m_iAvailableRating   =  -1;
 	m_iAvailableRandom   = 100;
@@ -54,8 +54,8 @@ CMisnResource::CMisnResource(void)
 	m_iShipName     = -1;
 	m_iShipStart    =  0;
 
-	m_iCompletionGovernment = -1;
-	m_iCompletionReward     =  0;
+	m_iCompletionGovernment = 196;
+	m_iCompletionReward     =  1;
 
 	m_iShipSubtitle = -1;
 
@@ -620,8 +620,6 @@ int CMisnResource::Initialize(HWND hwnd)
 	m_controls[67].SetInt(m_iFlags2 & 0x0004);
 	m_controls[68].Create(hwnd, IDC_EDIT_MISN_EDIT51, CCONTROL_TYPE_STR256, IDS_STRING468);
 	m_controls[68].SetString(m_szName);
-	//m_controls[69].Create(hwnd, IDC_EDIT_MISN_TEXT52, CCONTROL_TYPE_STR128, IDS_STRING401);
-	//m_controls[69].SetString("");
 
 	UpdateDynamicDefaults(m_controls, -1, m_iID);
 
@@ -865,6 +863,43 @@ BOOL CMisnResource::MisnDlgProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lpara
 				}
 			}
 
+			if ((iControlID == IDC_EDIT_DESC_BTN1)) {
+				short id = pResource->m_controls[0].GetInt() + 4000 - 128;
+				CEditor::GetCurrentEditor()->ResourceExtra(id, std::string("OFFER: ") + pResource->m_controls[68].GetString());
+			}
+			else if ((iControlID == IDC_EDIT_DESC_BTN2)) {
+				short id = pResource->m_controls[0].GetInt() + 5000 - 128;
+				CEditor::GetCurrentEditor()->ResourceExtra(id, std::string("BREIF: ") + pResource->m_controls[68].GetString());
+			}
+			else if ((iControlID == IDC_EDIT_DESC_BTN3)) {
+				short id = pResource->m_controls[0].GetInt() + 6000 - 128;
+				CEditor::GetCurrentEditor()->ResourceExtra(id, std::string("QUICK: ") + pResource->m_controls[68].GetString());
+			}
+			else if ((iControlID == IDC_EDIT_DESC_BTN4)) {
+				short id = pResource->m_controls[0].GetInt() + 7000 - 128;
+				CEditor::GetCurrentEditor()->ResourceExtra(id, std::string("LOAD: ") + pResource->m_controls[68].GetString());
+			}
+			else if ((iControlID == IDC_EDIT_DESC_BTN5)) {
+				short id = pResource->m_controls[0].GetInt() + 8000 - 128;
+				CEditor::GetCurrentEditor()->ResourceExtra(id, std::string("DROP: ") + pResource->m_controls[68].GetString());
+			}
+			else if ((iControlID == IDC_EDIT_DESC_BTN6)) {
+				short id = pResource->m_controls[0].GetInt() + 9000 - 128;
+				CEditor::GetCurrentEditor()->ResourceExtra(id, std::string("DONE: ") + pResource->m_controls[68].GetString());
+			}
+			else if ((iControlID == IDC_EDIT_DESC_BTN7)) {
+				short id = pResource->m_controls[0].GetInt() + 15000 - 128;
+				CEditor::GetCurrentEditor()->ResourceExtra(id, std::string("FAIL: ") + pResource->m_controls[68].GetString());
+			}
+			else if ((iControlID == IDC_EDIT_DESC_BTN8)) {
+				short id = pResource->m_controls[0].GetInt() + 16000 - 128;
+				CEditor::GetCurrentEditor()->ResourceExtra(id, std::string("SHIP: ") + pResource->m_controls[68].GetString());
+			}
+			else if ((iControlID == IDC_EDIT_DESC_BTN9)) {
+				short id = pResource->m_controls[0].GetInt() + 17000 - 128;
+				CEditor::GetCurrentEditor()->ResourceExtra(id, std::string("RJCT: ") + pResource->m_controls[68].GetString());
+			}
+
 			if((iControlID == IDC_EDIT_MISN_EDIT1) && (iNotifyCode == EN_CHANGE))
 			{
 				if((pResource->m_controls[0].GetInt() >= 128) && (pResource->m_controls[0].GetInt() < 1128))
@@ -881,11 +916,151 @@ BOOL CMisnResource::MisnDlgProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lpara
 					Static_SetText(GetDlgItem(hwnd, IDC_EDIT_MISN_TEXT32), szText.c_str());
 				}
 			}
-			//else if (iControlID == IDC_EDIT_MISN_EDIT2) {
-				//int stellarId = pResource->m_controls[1].GetInt();
+			else if (iControlID == IDC_EDIT_MISN_EDIT2 ) {
+				//ID = IDC_EDIT_MISN_EDIT2; Txt=IDC_EDIT_MISN_TEXT52
+//"Which stellars the mission is available from.  Possible values are:\r\n-1: Any stellar\r\n128-2175: ID of a specific stellar\r\n5000-7047: Stellar in a system adjacent to a specific system\r\n10000-10255: Any stellar belonging to this government\r\n15000-15255: Any stellar belonging to an ally of this government\r\n20000-20255: Any stellar not belonging to this government\r\n25000-25255: Any stellar belonging to an enemy of this government\r\n30000-30255: Any stellar belonging to this government or any of its classmates\r\n31000-31255: Any stellar not of this government nor any of its classmates"
 
-				//pResource->m_controls[69].SetString(NovaLib::RezName(CNR_TYPE_SPOB, stellarId));
-			//}
+				int id = pResource->m_controls[1].GetInt();
+				//std::ofstream outputFile("log.txt", std::ios_base::app);
+				//outputFile << inStr << std::endl;
+				std::string rezName = "None";
+				if (id == -1) rezName = "Any Stellar";
+				else if (id >= 128 && id <= 2175) rezName = NovaLib::RezStr(CNR_TYPE_SPOB, id);
+				else if (id >= 5000 && id <= 7047)
+					rezName = "AdjTo" + NovaLib::RezStr(CNR_TYPE_SYST, id - 5000, true);
+				else if (id >= 10000 && id <= 10255)
+					rezName = NovaLib::RezStr(CNR_TYPE_GOVT, id - 10000, true);
+				else if (id >= 15000 && id <= 15255)
+					rezName = "AllyOf" + NovaLib::RezStr(CNR_TYPE_GOVT, id - 15000);
+				else if (id >= 20000 && id <= 20255)
+					rezName = "Not" + NovaLib::RezStr(CNR_TYPE_GOVT, id - 20000);
+				else if (id >= 25000 && id <= 25255)
+					rezName = "EnemyOf" + NovaLib::RezStr(CNR_TYPE_GOVT, id - 25000);
+				else if (id >= 30000 && id <= 30255)
+					rezName = "ClassOf" + NovaLib::RezStr(CNR_TYPE_GOVT, id - 30000);
+				else if (id >= 31000 && id <= 31255)
+					rezName = "!ClassOf" + NovaLib::RezStr(CNR_TYPE_GOVT, id - 31000);
+
+				Static_SetText(GetDlgItem(hwnd, IDC_EDIT_MISN_TEXT52), rezName.c_str());
+			} 
+			else if (iControlID == IDC_EDIT_MISN_EDIT7) {
+				int id = pResource->m_controls[6].GetInt();
+				std::string rezName = "None";
+
+				if (id == -2) rezName = "Rand Inhabited";
+				else if (id == -3) rezName = "Rand Uninhabited";
+				else if (id >= 128 && id <= 2175) rezName = NovaLib::RezStr(CNR_TYPE_SPOB, id);
+				else if (id >= 10000 && id <= 10255)
+					rezName = "Rand " + NovaLib::RezStr(CNR_TYPE_GOVT, id - 10000);
+				else if (id >= 15000 && id <= 15255)
+					rezName = "Random AllyOf " + NovaLib::RezStr(CNR_TYPE_GOVT, id - 15000);
+				else if (id >= 20000 && id <= 20255)
+					rezName = "Random Not " + NovaLib::RezStr(CNR_TYPE_GOVT, id - 20000);
+				else if (id >= 25000 && id <= 25255)
+					rezName = "Random EnemyOf " + NovaLib::RezStr(CNR_TYPE_GOVT, id - 25000);
+				else if (id >= 30000 && id <= 30255)
+					rezName = "Random ClassOf " + NovaLib::RezStr(CNR_TYPE_GOVT, id - 30000);
+				else if (id >= 31000 && id <= 31255)
+					rezName = "Random !ClassOf " + NovaLib::RezStr(CNR_TYPE_GOVT, id - 31000);
+
+				Static_SetText(GetDlgItem(hwnd, IDC_EDIT_MISN_TEXT56), rezName.c_str());
+			}
+			else if (iControlID == IDC_EDIT_MISN_EDIT8) {
+				int id = pResource->m_controls[7].GetInt();
+				std::string rezName = "None";
+
+				if (id == -2) rezName = "Rand Inhabited";
+				else if (id == -3) rezName = "Rand Uninhabited";
+				else if (id == -4) rezName = "Initial Stellar";
+				else if (id >= 128 && id <= 2175) rezName = NovaLib::RezStr(CNR_TYPE_SPOB, id);
+				else if (id >= 10000 && id <= 10255)
+					rezName = "Random " + NovaLib::RezStr(CNR_TYPE_GOVT, id - 10000, true);
+				else if (id >= 15000 && id <= 15255)
+					rezName = "Random AllyOf " + NovaLib::RezStr(CNR_TYPE_GOVT, id - 15000);
+				else if (id >= 20000 && id <= 20255)
+					rezName = "Random Not " + NovaLib::RezStr(CNR_TYPE_GOVT, id - 20000);
+				else if (id >= 25000 && id <= 25255)
+					rezName = "Random EnemyOf " + NovaLib::RezStr(CNR_TYPE_GOVT, id - 25000);
+				else if (id >= 30000 && id <= 30255)
+					rezName = "Random ClassOf " + NovaLib::RezStr(CNR_TYPE_GOVT, id - 30000);
+				else if (id >= 31000 && id <= 31255)
+					rezName = "Random !ClassOf " + NovaLib::RezStr(CNR_TYPE_GOVT, id - 31000);
+
+				Static_SetText(GetDlgItem(hwnd, IDC_EDIT_MISN_TEXT57), rezName.c_str());
+			}
+			else if (iControlID == IDC_EDIT_MISN_EDIT9) {
+				int id = pResource->m_controls[8].GetInt();
+				std::string rezName = "None";
+
+				if (id == 1000) rezName = "Random Cargo";
+				else if (id >= 0 && id <= 255) rezName = NovaLib::RezStr(CNR_TYPE_JUNK, id);
+
+				Static_SetText(GetDlgItem(hwnd, IDC_EDIT_MISN_TEXT58), rezName.c_str());
+			}
+			else if (iControlID == IDC_EDIT_MISN_EDIT16) {
+				int id = pResource->m_controls[15].GetInt();
+				std::string rezName = "Initial";
+
+				if (id == -2) rezName = "Rand System";
+				else if (id == -3) rezName = "Travel Stellar";
+				else if (id == -4) rezName = "Return Stellar";
+				else if (id == -5) rezName = "Adjacent System";
+				else if (id == -6) rezName = "Follow Player";
+				else if (id >= 128 && id <= 2175) rezName = NovaLib::RezStr(CNR_TYPE_SYST, id);
+				else if (id >= 10000 && id <= 10255)
+					rezName = "Random " + NovaLib::RezStr(CNR_TYPE_GOVT, id - 10000, true);
+				else if (id >= 15000 && id <= 15255)
+					rezName = "Random AllyOf " + NovaLib::RezStr(CNR_TYPE_GOVT, id - 15000);
+				else if (id >= 20000 && id <= 20255)
+					rezName = "Random Not " + NovaLib::RezStr(CNR_TYPE_GOVT, id - 20000);
+				else if (id >= 25000 && id <= 25255)
+					rezName = "Random EnemyOf " + NovaLib::RezStr(CNR_TYPE_GOVT, id - 25000);
+				else if (id >= 30000 && id <= 30255)
+					rezName = "Random ClassOf " + NovaLib::RezStr(CNR_TYPE_GOVT, id - 30000);
+				else if (id >= 31000 && id <= 31255)
+					rezName = "Random !ClassOf " + NovaLib::RezStr(CNR_TYPE_GOVT, id - 31000);
+
+				Static_SetText(GetDlgItem(hwnd, IDC_EDIT_MISN_TEXT62), rezName.c_str());
+			}
+			else if (iControlID == IDC_EDIT_MISN_EDIT17) {
+				int id = pResource->m_controls[16].GetInt();
+				std::string rezName = "None";
+
+				if (id >= 128 && id <= 639) rezName = NovaLib::RezStr(CNR_TYPE_DUDE, id);
+
+				Static_SetText(GetDlgItem(hwnd, IDC_EDIT_MISN_TEXT63), rezName.c_str());
+			}
+			else if (iControlID == IDC_EDIT_MISN_EDIT36) {
+				int id = pResource->m_controls[35].GetInt();
+				std::string rezName = "None";
+
+				if (id >= 128 && id <= 639) rezName = NovaLib::RezStr(CNR_TYPE_DUDE, id);
+
+				Static_SetText(GetDlgItem(hwnd, IDC_EDIT_MISN_TEXT68), rezName.c_str());
+			}
+			else if (iControlID == IDC_EDIT_MISN_EDIT37) {
+				int id = pResource->m_controls[37].GetInt();
+				std::string rezName = "Follow Player";
+
+				if (id == -2) rezName = "Travel System";
+				else if (id == -3) rezName = "Return System";
+				else if (id >= 128 && id <= 2175) rezName = NovaLib::RezStr(CNR_TYPE_SYST, id);
+				else if (id >= 10000 && id <= 10255)
+					rezName = "Rand " + NovaLib::RezStr(CNR_TYPE_GOVT, id - 10000, true);
+				else if (id >= 15000 && id <= 15255)
+					rezName = "Rand AllyOf " + NovaLib::RezStr(CNR_TYPE_GOVT, id - 15000);
+				else if (id >= 20000 && id <= 20255)
+					rezName = "Rand Not " + NovaLib::RezStr(CNR_TYPE_GOVT, id - 20000);
+				else if (id >= 25000 && id <= 25255)
+					rezName = "Rand EnemyOf " + NovaLib::RezStr(CNR_TYPE_GOVT, id - 25000);
+				else if (id >= 30000 && id <= 30255)
+					rezName = "Rand ClassOf " + NovaLib::RezStr(CNR_TYPE_GOVT, id - 30000);
+				else if (id >= 31000 && id <= 31255)
+					rezName = "Rand !ClassOf " + NovaLib::RezStr(CNR_TYPE_GOVT, id - 31000);
+
+				Static_SetText(GetDlgItem(hwnd, IDC_EDIT_MISN_TEXT69), rezName.c_str());
+			}
+			
 			return TRUE;
 
 			break;
@@ -917,5 +1092,6 @@ void CMisnResource::UpdateDynamicDefaults(CControl* controls, short oldId, short
 
 	controls[1].SetInt(162);
 	controls[38].SetString(("!b" + std::to_string(newId + 1100)).c_str());
-	controls[41].SetString(("b" + std::to_string(newId + 1100)).c_str());
-}
+	controls[41].SetString(("b" + std::to_string(newId + 1100)+ " o368").c_str());
+	controls[68].SetString("New Name; $¢ M");
+} 

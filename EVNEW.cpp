@@ -334,6 +334,9 @@ int CEditor::Init(HINSTANCE hInstance)
 
 	if(iShouldLoadAtEnd)
 		FileOpen(0, szArg1);
+	
+	//Load Default Values
+	EditLoadLibrary("C:\\Users\\User\\Desktop\\EVNova\\TC\\Base\\Nova Files");
 
 	return 1;
 }
@@ -1222,7 +1225,6 @@ int CEditor::ResourceNew(void)
 		pNovaResource->SetID(128);
 	else
 		pNovaResource->SetID(m_plugIn.m_vResources[m_iCurrentResourceType][m_plugIn.m_vResources[m_iCurrentResourceType].size() - 1]->GetID() + 1);
-
 	m_plugIn.m_vResources[m_iCurrentResourceType].push_back(pNovaResource);
 
 	UpdateResourceList();
@@ -1321,6 +1323,79 @@ int CEditor::ResourceEdit(void)
 
 	return 1;
 }
+
+void CEditor::ResourceExtra(short id, std::string dfltName, int type) {
+	CNovaResource* pNovaResource = Find(type, id);
+	if (pNovaResource == NULL)
+	{
+		pNovaResource = m_plugIn.AllocateResource(type);
+		pNovaResource->SetID(id);
+		pNovaResource->SetName(dfltName.c_str());
+		m_plugIn.m_vResources[type].push_back(pNovaResource);
+		UpdateResourceList();
+	}
+
+	for (int i = 0; i < m_vEditDialogs.size(); i++)
+	{
+		if (m_vEditDialogs[i]->GetExtraData(2) != (int)pNovaResource) continue;
+		SetFocus(m_vEditDialogs[i]->GetHWND());
+		return;
+	}
+
+	if (pNovaResource->GetDialogID() == -1) return;
+	CWindow* pWindow = new CWindow();
+	pNovaResource->SetWindow(pWindow);
+	pWindow->SetDlgProc(pNovaResource->GetDialogProc());
+	pWindow->SetExtraData(0, (int)this);
+	pWindow->SetExtraData(1, (int)&m_errorLog);
+	pWindow->SetExtraData(2, (int)pNovaResource);
+	m_vEditDialogs.push_back(pWindow);
+
+	int iCount = GetMenuItemCount(m_hWindowMenu);
+
+	std::string szMenuString = "";
+
+	if (iCount < 9)	szMenuString += '&';
+
+	szMenuString += ToString(iCount + 1);
+	szMenuString += " - ";
+	szMenuString += g_szResourceTypes[pNovaResource->GetType()];
+	szMenuString += ' ';
+	szMenuString += ToString(pNovaResource->GetID());
+	szMenuString += " (";
+	szMenuString += pNovaResource->GetName();
+	szMenuString += ')';
+
+	char* pString = NULL;
+
+	pString = new char[szMenuString.size() + 1];
+
+	if (pString == NULL) throw CException("Error: unable to allocate memory for menu item string!");
+
+	strcpy(pString, szMenuString.c_str());
+
+	pWindow->SetExtraData(4, (int)pString);
+
+	MENUITEMINFO menuItemInfo;
+
+	memset(&menuItemInfo, 0, sizeof(MENUITEMINFO));
+
+	menuItemInfo.cbSize = sizeof(MENUITEMINFO);
+	menuItemInfo.fMask = MIIM_DATA | MIIM_ID | MIIM_STATE | MIIM_TYPE;
+	menuItemInfo.fType = MFT_STRING;
+	menuItemInfo.fState = MFS_ENABLED;
+	menuItemInfo.wID = IDM_WINDOW_1 + iCount;
+	menuItemInfo.dwItemData = (DWORD)pWindow;
+	menuItemInfo.dwTypeData = pString;
+	menuItemInfo.cch = szMenuString.size();
+
+	InsertMenuItem(m_hWindowMenu, iCount, TRUE, &menuItemInfo);
+
+	pWindow->CreateAsDialog(m_dialogMain.GetInstance(), pNovaResource->GetDialogID(), 0, &m_dialogMain);
+	//		m_vEditDialogs[m_vEditDialogs.size() - 1]->CreateAsDialog(m_dialogMain.GetInstance(), pNovaResource->GetDialogID(), 1, NULL);
+}
+
+
 
 int CEditor::ResourceDelete(void)
 {
@@ -1640,6 +1715,16 @@ short CEditor::FindUniqueResourceID(int iType, short iStart)
 	return -1;
 }
 
+CNovaResource* CEditor::Find(int rezType, short iID) {
+	CNovaResource* pResource = NULL;
+	for (auto* ptr : m_plugIn.m_vResources[rezType]) {
+		if (ptr->GetID() != iID) continue;
+		pResource = ptr;
+		break;
+	}
+	return pResource;
+}
+
 int CEditor::IsUniqueResourceID(CNovaResource *pResource, short iID)
 {
 	int i;
@@ -1856,9 +1941,10 @@ BOOL CEditor::MainDialogProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 			{
 				pEditor->EditPreferences();
 			}
-			//else if (iControlID == IDM_EDIT_LOADLIBRARY) {
-				//pEditor->EditLoadLibrary("C:\\Users\\User\\Desktop\\EVNova\\TC\\Base\\Nova Files");
-			//}
+			else if (iControlID == ID_EDIT_LOADLIBRARY) 
+			{
+				pEditor->EditLoadLibrary("C:\\Users\\User\\Desktop\\EVNova\\TC\\Base\\Nova Files");
+			}
 			else if(iControlID == IDM_RESOURCE_NEW)
 			{
 				pEditor->ResourceNew();

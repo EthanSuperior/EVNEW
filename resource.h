@@ -1,5 +1,5 @@
 //{{NO_DEPENDENCIES}}
-// Microsoft Developer Studio generated include file.
+// Microsoft Visual C++ generated include file.
 // Used by Resources.rc
 //
 #define IDS_STRING1                     1
@@ -161,6 +161,8 @@
 #define IDS_STRING143                   143
 #define IDD_EDIT_OUTF30                 143
 #define IDS_STRING144                   144
+#define IDD_TEMP_                       144
+#define IDD_EDIT_TEMP                   144
 #define IDS_STRING145                   145
 #define IDD_PICT_EXPORT                 145
 #define IDS_STRING146                   146
@@ -865,6 +867,7 @@
 #define IDC_EDIT_STR_TEXT2              1006
 #define IDC_EDIT_SPIN_EDIT2             1007
 #define IDC_EDIT_STR_EDIT2              1007
+#define IDC_BUTTON_TEMPLATE1            1007
 #define IDC_EDIT_SPIN_TEXT1             1008
 #define IDS_STRING1008                  1008
 #define IDC_EDIT_STR_TEXT3              1008
@@ -2938,8 +2941,42 @@
 #define IDC_SYST_ED_ADDFILE             2608
 #define IDC_SYST_ED_TEXT1               2609
 #define IDC_SYST_ED_DELETEFILE          2610
+#define IDC_EDIT_MISN_TEXT52            2610
 #define IDC_SYST_ED_UPFILE              2611
+#define IDC_EDIT_MISN_TEXT53            2611
 #define IDC_SYST_ED_DOWNFILE            2612
+#define IDC_EDIT_MISN_TEXT54            2612
+#define IDC_EDIT_MISN_TEXT55            2613
+#define IDC_EDIT_DESC_BTN1              2615
+#define IDC_EDIT_TEMP_DROP1             2617
+#define IDC_EDIT_MISN_TEXT56            2618
+#define IDC_EDIT_TEMP_TEXT1             2618
+#define IDC_EDIT_MISN_TEXT57            2619
+#define IDC_EDIT_TEMP_EDIT1             2619
+#define IDC_EDIT_MISN_TEXT58            2620
+#define IDC_EDIT_TEMP_TEXT2             2620
+#define IDC_EDIT_MISN_TEXT59            2621
+#define IDC_EDIT_TEMP_EDIT2             2621
+#define IDC_EDIT_MISN_TEXT60            2622
+#define IDC_EDIT_TEMP_OK                2622
+#define IDC_EDIT_MISN_TEXT61            2623
+#define IDC_EDIT_TEMP_CANCEL            2623
+#define IDC_EDIT_MISN_TEXT62            2624
+#define IDC_EDIT_MISN_TEXT63            2625
+#define IDC_EDIT_MISN_TEXT64            2626
+#define IDC_EDIT_MISN_TEXT65            2627
+#define IDC_EDIT_MISN_TEXT66            2628
+#define IDC_EDIT_MISN_TEXT67            2629
+#define IDC_EDIT_DESC_BTN2              2630
+#define IDC_EDIT_DESC_BTN3              2631
+#define IDC_EDIT_DESC_BTN4              2632
+#define IDC_EDIT_DESC_BTN5              2633
+#define IDC_EDIT_DESC_BTN6              2634
+#define IDC_EDIT_DESC_BTN7              2635
+#define IDC_EDIT_DESC_BTN8              2636
+#define IDC_EDIT_DESC_BTN9              2637
+#define IDC_EDIT_MISN_TEXT68            2638
+#define IDC_EDIT_MISN_TEXT69            2640
 #define IDM_FILE_NEW                    40001
 #define IDM_FILE_OPEN                   40002
 #define IDM_FILE_SAVE                   40003
@@ -3007,6 +3044,7 @@
 #define IDM_RESOURCETYPEPOPUP_NEW       40082
 #define IDM_RESOURCEPOPUP_EDIT          40083
 #define IDA_EDITRESOURCE                40084
+#define ID_EDIT_LOADLIBRARY             40085
 #define IDM_WINDOW_1                    40100
 #define IDM_WINDOW_MAX                  40163
 
@@ -3014,9 +3052,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        136
-#define _APS_NEXT_COMMAND_VALUE         40085
-#define _APS_NEXT_CONTROL_VALUE         2610
+#define _APS_NEXT_RESOURCE_VALUE        146
+#define _APS_NEXT_COMMAND_VALUE         40086
+#define _APS_NEXT_CONTROL_VALUE         2624
 #define _APS_NEXT_SYMED_VALUE           102
 #endif
 #endif

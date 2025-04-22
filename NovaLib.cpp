@@ -1,4 +1,5 @@
 #include "NovaLib.h"
+#include "EVNEW.h"
 
 NovaLib* NovaLib::instance = NULL;
 
@@ -12,13 +13,21 @@ CNovaResource* NovaLib::At(int type, int id) {
 	if (type < 0 || type >= NUM_RESOURCE_TYPES) return NULL;
 	auto it = Get().rez[type].find(id);
 	if (it != Get().rez[type].end()) return it->second;
-	return NULL;
+	// If not found, check if the ID is within the current plugin
+	return CEditor::GetCurrentEditor()->Find(type, id);
 }
 
 char* NovaLib::RezName(int type, int id) {
 	CNovaResource* ptr = At(type, id);
 	if (ptr == NULL) return "None";
 	return ptr->GetName();
+}
+
+std::string NovaLib::RezStr(int type, int id, bool addType) {
+	CNovaResource* ptr = At(type, id);
+	if (ptr == NULL) return "None";
+	if (!addType) return std::string(ptr->GetName());
+	return g_szResourceTypes[type] + std::string(": ") + ptr->GetName();
 }
 
 
@@ -33,23 +42,16 @@ void NovaLib::AddFolder(std::string path, CWindow* pWndParent) {
 
 void NovaLib::AddRezFile(std::string filename, CWindow* pWndParent)
 {
-	CPlugIn* lib = new CPlugIn();
-	lib->Load((char*)filename.c_str(), pWndParent);
-	short id;
-	std::string line, name;
+	CPlugIn lib;
+	lib.Load((char*)filename.c_str(), pWndParent);
 
 	for (int i = 0; i < NUM_RESOURCE_TYPES; i++) {
-		for (int j = 0; j < lib->m_vResources[i].size(); j++) {
-			if (lib->m_vResources[i][j] == NULL) continue;
-			rez[i][lib->m_vResources[i][j]->GetID()] = lib->m_vResources[i][j];
-			//lib.m_vResources[i][j] = NULL;
+		for (int j = 0; j < lib.m_vResources[i].size(); j++) {
+			if (lib.m_vResources[i][j] == NULL) continue;
+			rez[i][lib.m_vResources[i][j]->GetID()] = lib.m_vResources[i][j];
+			lib.m_vResources[i][j] = NULL;
 		}
 	}
-	std::ofstream outputFile(filename + ".txt");
-	outputFile << filename << std::endl;
-	for (int i = 0; i < NUM_RESOURCE_TYPES; i++) outputFile << lib->m_vResources[i].size() << "\t";
-	outputFile << std::endl;
-	plugins.push_back(lib);
 }
 /*
 TODO LINKERS:
@@ -57,7 +59,7 @@ TODO LINKERS:
 -Cron: Govt Names
 -Dude: Ship Name
 -Flet: Ship&Govt Names;System
--Misn: sytems;dude
+-Misn: MOSTLY
 -Outf:WeapName
 -Pers: ship
 -Ship: Cost; weaps;outf; <Temp> should make shan,Ship,shipyad desc,escort desc,
@@ -73,12 +75,7 @@ void NovaLib::Clear()
 		for (auto& [id, ptr] : rez[i]) delete ptr;
 		rez[i].clear();
 	}
-	plugins.clear();
 	delete instance;
 	instance = NULL;
 }
 
-//CBoomResource* NovaLib::Boom(int id) { 
-//	return nullptr;
-//	//return *((CBoomResource*)rez[CNR_TYPE_BOOM][id]); 
-//}
