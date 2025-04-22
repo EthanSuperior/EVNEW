@@ -60,20 +60,6 @@ void NovaLib::AddRezFile(std::string filename, CWindow* pWndParent)
 		}
 	}
 }
-/*
-TODO LINKERS:
--- Template
--Cron: Govt Names
--Dude: Ship Name
--Flet: Ship&Govt Names;System
--Misn: MOSTLY
--Outf:WeapName
--Pers: ship
--Ship: Cost; weaps;outf; <Temp> should make shan,Ship,shipyad desc,escort desc,
--Shob tech lvls?
--Syst: Links; spobs;dudes;pers;reinfoce
--Weap: ammo;jam names;
-*/
 
 void NovaLib::Clear()
 {

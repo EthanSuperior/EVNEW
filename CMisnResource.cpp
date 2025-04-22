@@ -862,8 +862,11 @@ BOOL CMisnResource::MisnDlgProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lpara
 					}
 				}
 			}
+
+			if (iNotifyCode != EN_UPDATE && iNotifyCode != EN_CHANGE) return TRUE;
+
 			short id = pResource->m_controls[0].GetInt();
-			std::string name = pResource->m_controls[68].GetString();
+			std::string name = std::string(pResource->m_controls[68].GetString());
 			if ((iControlID == IDC_EDIT_DESC_BTN1))
 				CEditor::GetCurrentEditor()->ResourceExtra(id + 4000 - 128, "OFFER: " + name);
 			else if ((iControlID == IDC_EDIT_DESC_BTN2))
@@ -883,7 +886,7 @@ BOOL CMisnResource::MisnDlgProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lpara
 			else if ((iControlID == IDC_EDIT_DESC_BTN9))
 				CEditor::GetCurrentEditor()->ResourceExtra(id + 17000 - 128, "RJCT: " + name);
 
-			if((iControlID == IDC_EDIT_MISN_EDIT1) && (iNotifyCode == EN_CHANGE))
+			if (iControlID == IDC_EDIT_MISN_EDIT1)
 			{
 				if((id >= 128) && (id < 1128))
 				{

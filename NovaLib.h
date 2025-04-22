@@ -9,6 +9,23 @@
 
 class CEditor;
 
+//std::ofstream ofstream("log.txt", std::ios::app);
+//ofstream << iNotifyCode << std::endl;
+
+/*
+TODO LINKERS:
+-Cron: Govt Names
+-Dude: Ship Name
+-Flet: Ship&Govt Names;System
+-Misn: MOSTLY
+-Outf: WeapName; Other stuff
+-Pers: ship
+-Ship: Cost; weaps;outf
+-Shob tech lvls?
+-Syst: Links; spobs;dudes;pers;reinforce
+-Weap: ammo;jam names;
+*/
+
 class NovaLib
 {
 public:
