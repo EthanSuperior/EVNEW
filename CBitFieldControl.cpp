@@ -31,9 +31,7 @@ CBitFieldControl::CBitFieldControl(void)
 }
 
 CBitFieldControl::~CBitFieldControl(void)
-{
-
-}
+= default;
 
 int CBitFieldControl::DoDialog(CWindow *pWndParent, int iNumBits, char *pValue)
 {

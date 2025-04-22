@@ -31,9 +31,7 @@ CBoomResource::CBoomResource(void)
 }
 
 CBoomResource::~CBoomResource(void)
-{
-
-}
+= default;
 
 int CBoomResource::GetType(void)
 {
@@ -211,13 +209,12 @@ int CBoomResource::CloseAndDontSave(void)
 BOOL CBoomResource::BoomDlgProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 {
 	CWindow *pWindow;
-	CBoomResource *pResource;
+	CBoomResource *pResource = nullptr;
 
 	pWindow = CWindow::GetWindow(hwnd, 1);
 
-	if(pWindow != NULL)
-		pResource = (CBoomResource *)pWindow->GetExtraData(2);
-
+	if (pWindow != NULL) pResource = (CBoomResource*)pWindow->GetExtraData(2);
+	else if (!pResource) return FALSE;
 	int i;
 
 	switch(msg)

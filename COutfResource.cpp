@@ -71,9 +71,7 @@ COutfResource::COutfResource(void)
 }
 
 COutfResource::~COutfResource(void)
-{
-
-}
+= default;
 
 int COutfResource::GetType(void)
 {
@@ -402,13 +400,13 @@ int COutfResource::Initialize(HWND hwnd)
 	m_controls[39].Create(hwnd, IDC_EDIT_OUTF_EDIT27, CCONTROL_TYPE_STR256, IDS_STRING2544);
 	m_controls[39].SetString(m_szName);
 	m_controls[40].Create(hwnd, IDC_EDIT_OUTF_BUTTON8, CCONTROL_TYPE_COLOR, -1);
-	m_controls[40].SetInt(Color15To24((USHORT)m_iModValues[0]));
+	m_controls[40].SetInt(Color15To24(static_cast<USHORT>(m_iModValues[0])));
 	m_controls[41].Create(hwnd, IDC_EDIT_OUTF_BUTTON9, CCONTROL_TYPE_COLOR, -1);
-	m_controls[41].SetInt(Color15To24((USHORT)m_iModValues[1]));
+	m_controls[41].SetInt(Color15To24(static_cast<USHORT>(m_iModValues[1])));
 	m_controls[42].Create(hwnd, IDC_EDIT_OUTF_BUTTON10, CCONTROL_TYPE_COLOR, -1);
-	m_controls[42].SetInt(Color15To24((USHORT)m_iModValues[2]));
+	m_controls[42].SetInt(Color15To24(static_cast<USHORT>(m_iModValues[2])));
 	m_controls[43].Create(hwnd, IDC_EDIT_OUTF_BUTTON11, CCONTROL_TYPE_COLOR, -1);
-	m_controls[43].SetInt(Color15To24((USHORT)m_iModValues[3]));
+	m_controls[43].SetInt(Color15To24(static_cast<USHORT>(m_iModValues[3])));
 
 	Static_SetText(GetDlgItem(hwnd, IDC_EDIT_OUTF_TEXT6),  g_szOutfModValueTexts[ModTypeToIndex(m_iModTypes[0])].c_str());
 	Static_SetText(GetDlgItem(hwnd, IDC_EDIT_OUTF_TEXT8),  g_szOutfModValueTexts[ModTypeToIndex(m_iModTypes[1])].c_str());
@@ -565,13 +563,13 @@ int COutfResource::CloseAndSave(void)
 
 	m_iCost = m_controls[13].GetInt();
 
-	strcpy(m_szAvailability, m_controls[14].GetString());
-	strcpy(m_szOnPurchase, m_controls[15].GetString());
+	strcpy_s(m_szAvailability, m_controls[14].GetString());
+	strcpy_s(m_szOnPurchase, m_controls[15].GetString());
 
 	memcpy(m_cContribute, m_controls[16].GetString(), 8 * sizeof(char));
 	memcpy(m_cRequire,    m_controls[17].GetString(), 8 * sizeof(char));
 
-	strcpy(m_szOnSell, m_controls[18].GetString());
+	strcpy_s(m_szOnSell, m_controls[18].GetString());
 
 	m_iItemClass = m_controls[19].GetInt();
 
@@ -579,9 +577,9 @@ int COutfResource::CloseAndSave(void)
 
 	m_iBuyRandom = m_controls[21].GetInt();
 
-	strcpy(m_szShortName, m_controls[22].GetString());
-	strcpy(m_szLowerCaseName, m_controls[23].GetString());
-	strcpy(m_szLowerCasePluralName, m_controls[24].GetString());
+	strcpy_s(m_szShortName, m_controls[22].GetString());
+	strcpy_s(m_szLowerCaseName, m_controls[23].GetString());
+	strcpy_s(m_szLowerCasePluralName, m_controls[24].GetString());
 
 	m_iRequiredGovernment = m_controls[25].GetInt();
 
@@ -601,7 +599,7 @@ int COutfResource::CloseAndSave(void)
 	m_iFlags |= m_controls[37].GetInt() << 13;
 	m_iFlags |= m_controls[38].GetInt() << 14;
 
-	strcpy(m_szName, m_controls[39].GetString());
+	strcpy_s(m_szName, m_controls[39].GetString());
 
 	int i;
 

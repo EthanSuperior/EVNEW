@@ -35,9 +35,7 @@ COopsResource::COopsResource(void)
 }
 
 COopsResource::~COopsResource(void)
-{
-
-}
+= default;
 
 int COopsResource::GetType(void)
 {
@@ -210,9 +208,9 @@ int COopsResource::CloseAndSave(void)
 	m_iDuration   = m_controls[4].GetInt();
 	m_iRandom     = m_controls[5].GetInt();
 
-	strcpy(m_szActiveOn, m_controls[6].GetString());
+	strcpy_s(m_szActiveOn, m_controls[6].GetString());
 
-	strcpy(m_szName, m_controls[7].GetString());
+	strcpy_s(m_szName, m_controls[7].GetString());
 
 	int i;
 

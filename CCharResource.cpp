@@ -68,9 +68,7 @@ CCharResource::CCharResource(void)
 }
 
 CCharResource::~CCharResource(void)
-{
-
-}
+= default;
 
 int CCharResource::GetType(void)
 {
@@ -456,20 +454,20 @@ int CCharResource::CloseAndSave(void)
 	m_iPictDelay4   = m_controls[23].GetInt();
 	m_iIntroText    = m_controls[24].GetInt();
 
-	strcpy(m_szOnStart, m_controls[25].GetString());
+	strcpy_s(m_szOnStart, m_controls[25].GetString());
 
 	m_iStartDay   = m_controls[31].GetInt();
 	m_iStartMonth = m_controls[32].GetInt();
 	m_iStartYear  = m_controls[26].GetInt();
 
-	strcpy(m_szDatePrefix, m_controls[27].GetString());
-	strcpy(m_szDateSuffix, m_controls[28].GetString());
+	strcpy_s(m_szDatePrefix, m_controls[27].GetString());
+	strcpy_s(m_szDateSuffix, m_controls[28].GetString());
 
 	m_iFlags = 0x0000;
 
 	m_iFlags |= m_controls[29].GetInt() << 0;
 
-	strcpy(m_szName, m_controls[30].GetString());
+	strcpy_s(m_szName, m_controls[30].GetString());
 
 	int i;
 
@@ -504,9 +502,8 @@ BOOL CCharResource::CharDlgProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lpara
 
 	pWindow = CWindow::GetWindow(hwnd, 1);
 
-	if(pWindow != NULL)
-		pResource = (CCharResource *)pWindow->GetExtraData(2);
-
+	if (pWindow != NULL) pResource = (CCharResource*)pWindow->GetExtraData(2);
+	else if (!pResource) return FALSE;
 	int i;
 
 	switch(msg)

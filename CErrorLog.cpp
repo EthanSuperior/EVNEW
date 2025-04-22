@@ -102,7 +102,7 @@ int CErrorLog::WriteLogFile(char *szString, ...)
 	va_list argList;
 
 	va_start(argList, szString);
-	vsprintf(szBuffer, szString, argList);
+	vsprintf_s(szBuffer, szString, argList);
 	va_end(argList);
 
 	m_foutLogFile << szBuffer;

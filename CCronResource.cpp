@@ -66,9 +66,7 @@ CCronResource::CCronResource(void)
 }
 
 CCronResource::~CCronResource(void)
-{
-
-}
+= default;
 
 int CCronResource::GetType(void)
 {
@@ -389,9 +387,9 @@ int CCronResource::CloseAndSave(void)
 	m_iPreHoldoff  = m_controls[9].GetInt();
 	m_iPostHoldoff = m_controls[10].GetInt();
 
-	strcpy(m_szEnableOn, m_controls[11].GetString());
-	strcpy(m_szOnStart,  m_controls[12].GetString());
-	strcpy(m_szOnEnd,    m_controls[13].GetString());
+	strcpy_s(m_szEnableOn, m_controls[11].GetString());
+	strcpy_s(m_szOnStart,  m_controls[12].GetString());
+	strcpy_s(m_szOnEnd,    m_controls[13].GetString());
 
 	memcpy(m_cContribute, m_controls[14].GetString(), 8 * sizeof(char));
 	memcpy(m_cRequire,    m_controls[15].GetString(), 8 * sizeof(char));
@@ -412,7 +410,7 @@ int CCronResource::CloseAndSave(void)
 	m_iFlags |= m_controls[25].GetInt() << 0;
 	m_iFlags |= m_controls[26].GetInt() << 1;
 
-	strcpy(m_szName, m_controls[27].GetString());
+	strcpy_s(m_szName, m_controls[27].GetString());
 
 	int i;
 

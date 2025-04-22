@@ -29,15 +29,14 @@ namespace qt
 
 #include "CControl.h"
 #include "CNovaResource.h"
-#include "Utils.h"
 
 ////////////////////////////////////////////////////////////////
 //////////////////////////  CONSTANTS  /////////////////////////
 ////////////////////////////////////////////////////////////////
 
-const int NUM_SND_CONTROLS = 2;
+constexpr int NUM_SND_CONTROLS = 2;
 
-const int NUM_SND_FIELDS = 1;
+constexpr int NUM_SND_FIELDS = 1;
 
 const std::string g_szSndFields[NUM_SND_FIELDS] =
 	{"Filename"};
@@ -51,31 +50,31 @@ class CSndResource : public CNovaResource
 public:
 
 	CSndResource(void);
-	~CSndResource(void);
+	~CSndResource(void) override;
 
-	int GetType(void);
-	int GetSize(void);
+	int GetType(void) override;
+	int GetSize(void) override;
 
-	int GetDialogID(void);
-	DLGPROCNOCALLBACK GetDialogProc(void);
+	int GetDialogID(void) override;
+	DLGPROCNOCALLBACK GetDialogProc(void) override;
 
-	int GetNumFields(void);
-	const std::string * GetFieldNames(void);
+	int GetNumFields(void) override;
+	const std::string * GetFieldNames(void) override;
 
-	int Initialize(HWND hwnd);
+	int Initialize(HWND hwnd) override;
 
-	int CloseAndSave(void);
-	int CloseAndDontSave(void);
+	int CloseAndSave(void) override;
+	int CloseAndDontSave(void) override;
 
-	int Save(char *pOutput);
-	int Load(char *pInput, int iSize);
+	int Save(char *pOutput) override;
+	int Load(char *pInput, int iSize) override;
 
-	int SaveToTextEx(std::ostream & output, std::string & szFilePath, std::string & szFilename1, std::string & szFilename2, int iParam);
-	int LoadFromTextEx(std::istream & input, std::string & szFilePath);
+	int SaveToTextEx(std::ostream & output, std::string & szFilePath, std::string & szFilename1, std::string & szFilename2, int iParam) override;
+	int LoadFromTextEx(std::istream & input, std::string & szFilePath) override;
 
-	int ShouldLoadDirect(void);
-	int SaveDirect(std::ostream & output);
-	int LoadDirect(std::istream & input, int iSize);
+	int ShouldLoadDirect(void) override;
+	int SaveDirect(std::ostream & output) override;
+	int LoadDirect(std::istream & input, int iSize) override;
 
 	static BOOL SndDlgProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
 

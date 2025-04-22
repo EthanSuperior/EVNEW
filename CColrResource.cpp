@@ -80,9 +80,7 @@ CColrResource::CColrResource(void)
 }
 
 CColrResource::~CColrResource(void)
-{
-
-}
+= default;
 
 int CColrResource::GetType(void)
 {
@@ -547,7 +545,7 @@ int CColrResource::CloseAndSave(void)
 	m_iButtonDown = m_controls[2].GetInt();
 	m_iButtonGrey = m_controls[3].GetInt();
 
-	strcpy(m_szMenuFont, m_controls[4].GetString());
+	strcpy_s(m_szMenuFont, m_controls[4].GetString());
 
 	m_iMenuFontSize    = m_controls[5].GetInt();
 	m_iMenuColor1      = m_controls[6].GetInt();
@@ -579,7 +577,7 @@ int CColrResource::CloseAndSave(void)
 	m_iListHighlight   = m_controls[32].GetInt();
 	m_iEscortHighlight = m_controls[33].GetInt();
 
-	strcpy(m_szButtonFont, m_controls[34].GetString());
+	strcpy_s(m_szButtonFont, m_controls[34].GetString());
 
 	m_iButtonFontSize = m_controls[35].GetInt();
 	m_iLogoX          = m_controls[36].GetInt();
@@ -593,7 +591,7 @@ int CColrResource::CloseAndSave(void)
 	m_iSlide3X        = m_controls[44].GetInt();
 	m_iSlide3Y        = m_controls[45].GetInt();
 
-	strcpy(m_szName, m_controls[46].GetString());
+	strcpy_s(m_szName, m_controls[46].GetString());
 
 	int i;
 

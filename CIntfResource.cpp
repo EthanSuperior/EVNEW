@@ -87,9 +87,7 @@ CIntfResource::CIntfResource(void)
 }
 
 CIntfResource::~CIntfResource(void)
-{
-
-}
+= default;
 
 int CIntfResource::GetType(void)
 {
@@ -600,14 +598,14 @@ int CIntfResource::CloseAndSave(void)
 	m_iCargoX2 = m_controls[39].GetInt();
 	m_iCargoY2 = m_controls[40].GetInt();
 
-	strcpy(m_szStatusFont, m_controls[41].GetString());
+	strcpy_s(m_szStatusFont, m_controls[41].GetString());
 
 	m_iStatusFontSize   = m_controls[42].GetInt();
 	m_iSubtitleFontSize = m_controls[43].GetInt();
 
 	m_iBackground = m_controls[44].GetInt();
 
-	strcpy(m_szName, m_controls[45].GetString());
+	strcpy_s(m_szName, m_controls[45].GetString());
 
 	int i;
 

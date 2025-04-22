@@ -23,15 +23,14 @@ class CWeapResource;
 
 #include "CControl.h"
 #include "CNovaResource.h"
-#include "Utils.h"
 
 ////////////////////////////////////////////////////////////////
 //////////////////////////  CONSTANTS  /////////////////////////
 ////////////////////////////////////////////////////////////////
 
-const int NUM_WEAP_CONTROLS = 96;
+constexpr int NUM_WEAP_CONTROLS = 96;
 
-const int NUM_WEAP_GUIDANCE_CHOICES = 12;
+constexpr int NUM_WEAP_GUIDANCE_CHOICES = 12;
 
 const std::string g_szWeapGuidanceChoices[NUM_WEAP_GUIDANCE_CHOICES] =
 	{"Unguided projectile", "Beam weapon", "Homing weapon", "Turreted beam",
@@ -39,13 +38,13 @@ const std::string g_szWeapGuidanceChoices[NUM_WEAP_GUIDANCE_CHOICES] =
 	 "Front quadrant turret", "Rear quadrant turret", "Point defense turret",
 	 "Point defense beam", "Carried ship"};
 
-const int NUM_WEAP_EXITTYPE_CHOICES = 5;
+constexpr int NUM_WEAP_EXITTYPE_CHOICES = 5;
 
 const std::string g_szWeapExitTypeChoices[NUM_WEAP_EXITTYPE_CHOICES] =
 	{"Center of ship", "Gun exit points", "Turret exit points",
 	 "Guided weapon exit points", "Beam exit points"};
 
-const int NUM_WEAP_FIELDS = 54;
+constexpr int NUM_WEAP_FIELDS = 54;
 
 const std::string g_szWeapFields[NUM_WEAP_FIELDS] =
 	{"Reload", "Lifetime", "Mass Damage", "Energy Damage", "Guidance", "Speed",
@@ -72,27 +71,27 @@ class CWeapResource : public CNovaResource
 public:
 
 	CWeapResource(void);
-	~CWeapResource(void);
+	~CWeapResource(void) override;
 
-	int GetType(void);
-	int GetSize(void);
+	int GetType(void) override;
+	int GetSize(void) override;
 
-	int GetDialogID(void);
-	DLGPROCNOCALLBACK GetDialogProc(void);
+	int GetDialogID(void) override;
+	DLGPROCNOCALLBACK GetDialogProc(void) override;
 
-	int GetNumFields(void);
-	const std::string * GetFieldNames(void);
+	int GetNumFields(void) override;
+	const std::string * GetFieldNames(void) override;
 
-	int Initialize(HWND hwnd);
+	int Initialize(HWND hwnd) override;
 
-	int CloseAndSave(void);
-	int CloseAndDontSave(void);
+	int CloseAndSave(void) override;
+	int CloseAndDontSave(void) override;
 
-	int Save(char *pOutput);
-	int Load(char *pInput, int iSize);
+	int Save(char *pOutput) override;
+	int Load(char *pInput, int iSize) override;
 
-	int SaveToText(std::ostream & output);
-	int LoadFromText(std::istream & input);
+	int SaveToText(std::ostream & output) override;
+	int LoadFromText(std::istream & input) override;
 
 	static BOOL WeapDlgProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
 

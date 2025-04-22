@@ -39,9 +39,7 @@ CCicnResource::CCicnResource(void)
 }
 
 CCicnResource::~CCicnResource(void)
-{
-
-}
+= default;
 
 int CCicnResource::GetType(void)
 {
@@ -91,7 +89,7 @@ int CCicnResource::Save(char *pOutput)
 {
 	// Save PixMap
 
-	*(int *)pOutput = SwapEndianInt(0x00000000); pOutput += sizeof(int);	// baseAddr
+	*reinterpret_cast<int*>(pOutput) = SwapEndianInt(0x00000000); pOutput += sizeof(int);	// baseAddr
 
 	short iRowBytes = (m_iWidth * m_iBPP) / 8;
 
@@ -103,8 +101,8 @@ int CCicnResource::Save(char *pOutput)
 
 	short iBoundsLeft   = 0;
 	short iBoundsTop    = 0;
-	short iBoundsRight  = (short)m_iWidth;
-	short iBoundsBottom = (short)m_iHeight;
+	short iBoundsRight  = static_cast<short>(m_iWidth);
+	short iBoundsBottom = static_cast<short>(m_iHeight);
 
 	*(short *)pOutput = SwapEndianShort(iBoundsTop);    pOutput += sizeof(short);	// bounds
 	*(short *)pOutput = SwapEndianShort(iBoundsLeft);   pOutput += sizeof(short);
@@ -118,7 +116,7 @@ int CCicnResource::Save(char *pOutput)
 	*(int   *)pOutput = SwapEndianInt(0x00480000); pOutput += sizeof(int);		// vRes
 	*(short *)pOutput = SwapEndianShort(0x0000);	  pOutput += sizeof(short);	// pixelType
 
-	short iBPP = (short)m_iBPP;
+	short iBPP = static_cast<short>(m_iBPP);
 
 	*(short *)pOutput = SwapEndianShort(iBPP);     pOutput += sizeof(short);	// pixelSize
 	*(short *)pOutput = SwapEndianShort(0x0001);   pOutput += sizeof(short);	// cmpCount
@@ -155,7 +153,7 @@ int CCicnResource::Save(char *pOutput)
 
 	// Save mask data
 
-	int i, j;
+	size_t i, j;
 
 	UCHAR ucPixel;
 
@@ -169,7 +167,7 @@ int CCicnResource::Save(char *pOutput)
 		{
 			if(((j & 7) == 0) && (j > 0))
 			{
-				*pOutput = (char)ucPixel; pOutput++;
+				*pOutput = static_cast<char>(ucPixel); pOutput++;
 
 				ucPixel = 0x00;
 			}
@@ -178,7 +176,7 @@ int CCicnResource::Save(char *pOutput)
 				ucPixel |= 1 << (7 - (j & 7));
 		}
 
-		*pOutput = (char)ucPixel; pOutput++;
+		*pOutput = static_cast<char>(ucPixel); pOutput++;
 
 		if(iAlignment > 0)
 		{
@@ -192,12 +190,12 @@ int CCicnResource::Save(char *pOutput)
 
 	// Save color table
 
-	*(int   *)pOutput = SwapEndianInt(0x00000000); pOutput += sizeof(int);		// ctSeed
-	*(short *)pOutput = SwapEndianShort(0x0000);   pOutput += sizeof(short);	// ctFlags
+	*reinterpret_cast<int*>(pOutput) = SwapEndianInt(0x00000000); pOutput += sizeof(int);		// ctSeed
+	*reinterpret_cast<short*>(pOutput) = SwapEndianShort(0x0000);   pOutput += sizeof(short);	// ctFlags
 
-	short iNumColors = m_iNumColors - 1;
+	short iNumColors = static_cast<short>(m_iNumColors - 1);
 
-	*(short *)pOutput = SwapEndianShort(iNumColors); pOutput += sizeof(short);
+	*reinterpret_cast<short*>(pOutput) = SwapEndianShort(iNumColors); pOutput += sizeof(short);
 
 	USHORT iIndex;
 	USHORT iRed, iGreen, iBlue;
@@ -206,11 +204,11 @@ int CCicnResource::Save(char *pOutput)
 	{
 		if(m_vColorTable[i] & 0x80000000)
 		{
-			iIndex = (USHORT)i;
+			iIndex = static_cast<USHORT>(i);
 
-			iRed   = (USHORT) ((m_vColorTable[i] & 0x000000FF)        * 0x0101);
-			iGreen = (USHORT)(((m_vColorTable[i] & 0x0000FF00) >> 8)  * 0x0101);
-			iBlue  = (USHORT)(((m_vColorTable[i] & 0x00FF0000) >> 16) * 0x0101);
+			iRed   = static_cast<USHORT>((m_vColorTable[i] & 0x000000FF) * 0x0101);
+			iGreen = static_cast<USHORT>(((m_vColorTable[i] & 0x0000FF00) >> 8) * 0x0101);
+			iBlue  = static_cast<USHORT>(((m_vColorTable[i] & 0x00FF0000) >> 16) * 0x0101);
 
 			*(USHORT *)pOutput = SwapEndianShort(iIndex); pOutput += sizeof(USHORT);
 			*(USHORT *)pOutput = SwapEndianShort(iRed);   pOutput += sizeof(USHORT);
@@ -233,7 +231,7 @@ int CCicnResource::Save(char *pOutput)
 			{
 				if(((j & 7) == 0) && (j > 0))
 				{
-					*pOutput = (char)ucPixel; pOutput++;
+					*pOutput = static_cast<char>(ucPixel); pOutput++;
 
 					ucPixel = 0x00;
 				}
@@ -241,7 +239,7 @@ int CCicnResource::Save(char *pOutput)
 				ucPixel |= (FindColor(m_vIconData[(i * m_iWidth + j) * 3 + 2], m_vIconData[(i * m_iWidth + j) * 3 + 1], m_vIconData[(i * m_iWidth + j) * 3]) & 0x01) << (7 - (j & 7));
 			}
 
-			*pOutput = (char)ucPixel; pOutput++;
+			*pOutput = static_cast<char>(ucPixel); pOutput++;
 
 			if(iAlignment > 0)
 			{
@@ -261,7 +259,7 @@ int CCicnResource::Save(char *pOutput)
 			{
 				if(((j & 3) == 0) && (j > 0))
 				{
-					*pOutput = (char)ucPixel; pOutput++;
+					*pOutput = static_cast<char>(ucPixel); pOutput++;
 
 					ucPixel = 0x00;
 				}
@@ -269,7 +267,7 @@ int CCicnResource::Save(char *pOutput)
 				ucPixel |= (FindColor(m_vIconData[(i * m_iWidth + j) * 3 + 2], m_vIconData[(i * m_iWidth + j) * 3 + 1], m_vIconData[(i * m_iWidth + j) * 3]) & 0x03) << ((3 - (j & 3)) << 1);
 			}
 
-			*pOutput = (char)ucPixel; pOutput++;
+			*pOutput = static_cast<char>(ucPixel); pOutput++;
 
 			if(iAlignment > 0)
 			{
@@ -289,7 +287,7 @@ int CCicnResource::Save(char *pOutput)
 			{
 				if(((j & 1) == 0) && (j > 0))
 				{
-					*pOutput = (char)ucPixel; pOutput++;
+					*pOutput = static_cast<char>(ucPixel); pOutput++;
 
 					ucPixel = 0x00;
 				}
@@ -297,7 +295,7 @@ int CCicnResource::Save(char *pOutput)
 				ucPixel |= (FindColor(m_vIconData[(i * m_iWidth + j) * 3 + 2], m_vIconData[(i * m_iWidth + j) * 3 + 1], m_vIconData[(i * m_iWidth + j) * 3]) & 0x0F) << ((1 - (j & 1)) << 2);
 			}
 
-			*pOutput = (char)ucPixel; pOutput++;
+			*pOutput = static_cast<char>(ucPixel); pOutput++;
 
 			if(iAlignment > 0)
 			{
@@ -315,7 +313,7 @@ int CCicnResource::Save(char *pOutput)
 			{
 				ucPixel = FindColor(m_vIconData[(i * m_iWidth + j) * 3 + 2], m_vIconData[(i * m_iWidth + j) * 3 + 1], m_vIconData[(i * m_iWidth + j) * 3]);
 
-				*pOutput = (char)ucPixel; pOutput++;
+				*pOutput = static_cast<char>(ucPixel); pOutput++;
 			}
 
 			if(iAlignment > 0)
@@ -413,7 +411,7 @@ int CCicnResource::Load(char *pInput, int iSize)
 
 		for(j = 0; j < (m_iWidth + 7) / 8; j++)
 		{
-			ucPixel = (UCHAR)*pInput; pInput++;
+			ucPixel = static_cast<UCHAR>(*pInput); pInput++;
 
 			m_vMaskData[iCurIndex] = m_vMaskData[iCurIndex + 1] = m_vMaskData[iCurIndex + 2] = ((ucPixel & 0x80) >> 7) * 0xFF; iCurIndex += 3;
 			m_vMaskData[iCurIndex] = m_vMaskData[iCurIndex + 1] = m_vMaskData[iCurIndex + 2] = ((ucPixel & 0x40) >> 6) * 0xFF; iCurIndex += 3;
@@ -477,32 +475,32 @@ int CCicnResource::Load(char *pInput, int iSize)
 
 			for(j = 0; j < (m_iWidth + 7) / 8; j++)
 			{
-				ucPixel = (UCHAR)*pInput; pInput++;
+				ucPixel = static_cast<UCHAR>(*pInput); pInput++;
 
-				m_vIconData[iCurIndex]      = (UCHAR)((m_vColorTable[ ucPixel         >> 7] & 0x00FF0000) >> 16);
-				m_vIconData[iCurIndex + 1]  = (UCHAR)((m_vColorTable[ ucPixel         >> 7] & 0x0000FF00) >> 8);
-				m_vIconData[iCurIndex + 2]  = (UCHAR) (m_vColorTable[ ucPixel         >> 7] & 0x000000FF);
-				m_vIconData[iCurIndex + 3]  = (UCHAR)((m_vColorTable[(ucPixel & 0x40) >> 6] & 0x00FF0000) >> 16);
-				m_vIconData[iCurIndex + 4]  = (UCHAR)((m_vColorTable[(ucPixel & 0x40) >> 6] & 0x0000FF00) >> 8);
-				m_vIconData[iCurIndex + 5]  = (UCHAR) (m_vColorTable[(ucPixel & 0x40) >> 6] & 0x000000FF);
-				m_vIconData[iCurIndex + 6]  = (UCHAR)((m_vColorTable[(ucPixel & 0x20) >> 5] & 0x00FF0000) >> 16);
-				m_vIconData[iCurIndex + 7]  = (UCHAR)((m_vColorTable[(ucPixel & 0x20) >> 5] & 0x0000FF00) >> 8);
-				m_vIconData[iCurIndex + 8]  = (UCHAR) (m_vColorTable[(ucPixel & 0x20) >> 5] & 0x000000FF);
-				m_vIconData[iCurIndex + 9]  = (UCHAR)((m_vColorTable[(ucPixel & 0x10) >> 4] & 0x00FF0000) >> 16);
-				m_vIconData[iCurIndex + 10] = (UCHAR)((m_vColorTable[(ucPixel & 0x10) >> 4] & 0x0000FF00) >> 8);
-				m_vIconData[iCurIndex + 11] = (UCHAR) (m_vColorTable[(ucPixel & 0x10) >> 4] & 0x000000FF);
-				m_vIconData[iCurIndex + 12] = (UCHAR)((m_vColorTable[(ucPixel & 0x08) >> 3] & 0x00FF0000) >> 16);
-				m_vIconData[iCurIndex + 13] = (UCHAR)((m_vColorTable[(ucPixel & 0x08) >> 3] & 0x0000FF00) >> 8);
-				m_vIconData[iCurIndex + 14] = (UCHAR) (m_vColorTable[(ucPixel & 0x08) >> 3] & 0x000000FF);
-				m_vIconData[iCurIndex + 15] = (UCHAR)((m_vColorTable[(ucPixel & 0x04) >> 2] & 0x00FF0000) >> 16);
-				m_vIconData[iCurIndex + 16] = (UCHAR)((m_vColorTable[(ucPixel & 0x04) >> 2] & 0x0000FF00) >> 8);
-				m_vIconData[iCurIndex + 17] = (UCHAR) (m_vColorTable[(ucPixel & 0x04) >> 2] & 0x000000FF);
-				m_vIconData[iCurIndex + 18] = (UCHAR)((m_vColorTable[(ucPixel & 0x02) >> 1] & 0x00FF0000) >> 16);
-				m_vIconData[iCurIndex + 19] = (UCHAR)((m_vColorTable[(ucPixel & 0x02) >> 1] & 0x0000FF00) >> 8);
-				m_vIconData[iCurIndex + 20] = (UCHAR) (m_vColorTable[(ucPixel & 0x02) >> 1] & 0x000000FF);
-				m_vIconData[iCurIndex + 21] = (UCHAR)((m_vColorTable[(ucPixel & 0x01)     ] & 0x00FF0000) >> 16);
-				m_vIconData[iCurIndex + 22] = (UCHAR)((m_vColorTable[ ucPixel & 0x01      ] & 0x0000FF00) >> 8);
-				m_vIconData[iCurIndex + 23] = (UCHAR) (m_vColorTable[ ucPixel & 0x01      ] & 0x000000FF);
+				m_vIconData[iCurIndex]      = static_cast<UCHAR>((m_vColorTable[ucPixel >> 7] & 0x00FF0000) >> 16);
+				m_vIconData[iCurIndex + 1]  = static_cast<UCHAR>((m_vColorTable[ucPixel >> 7] & 0x0000FF00) >> 8);
+				m_vIconData[iCurIndex + 2]  = static_cast<UCHAR>(m_vColorTable[ucPixel >> 7] & 0x000000FF);
+				m_vIconData[iCurIndex + 3]  = static_cast<UCHAR>((m_vColorTable[(ucPixel & 0x40) >> 6] & 0x00FF0000) >> 16);
+				m_vIconData[iCurIndex + 4]  = static_cast<UCHAR>((m_vColorTable[(ucPixel & 0x40) >> 6] & 0x0000FF00) >> 8);
+				m_vIconData[iCurIndex + 5]  = static_cast<UCHAR>(m_vColorTable[(ucPixel & 0x40) >> 6] & 0x000000FF);
+				m_vIconData[iCurIndex + 6]  = static_cast<UCHAR>((m_vColorTable[(ucPixel & 0x20) >> 5] & 0x00FF0000) >> 16);
+				m_vIconData[iCurIndex + 7]  = static_cast<UCHAR>((m_vColorTable[(ucPixel & 0x20) >> 5] & 0x0000FF00) >> 8);
+				m_vIconData[iCurIndex + 8]  = static_cast<UCHAR>(m_vColorTable[(ucPixel & 0x20) >> 5] & 0x000000FF);
+				m_vIconData[iCurIndex + 9]  = static_cast<UCHAR>((m_vColorTable[(ucPixel & 0x10) >> 4] & 0x00FF0000) >> 16);
+				m_vIconData[iCurIndex + 10] = static_cast<UCHAR>((m_vColorTable[(ucPixel & 0x10) >> 4] & 0x0000FF00) >> 8);
+				m_vIconData[iCurIndex + 11] = static_cast<UCHAR>(m_vColorTable[(ucPixel & 0x10) >> 4] & 0x000000FF);
+				m_vIconData[iCurIndex + 12] = static_cast<UCHAR>((m_vColorTable[(ucPixel & 0x08) >> 3] & 0x00FF0000) >> 16);
+				m_vIconData[iCurIndex + 13] = static_cast<UCHAR>((m_vColorTable[(ucPixel & 0x08) >> 3] & 0x0000FF00) >> 8);
+				m_vIconData[iCurIndex + 14] = static_cast<UCHAR>(m_vColorTable[(ucPixel & 0x08) >> 3] & 0x000000FF);
+				m_vIconData[iCurIndex + 15] = static_cast<UCHAR>((m_vColorTable[(ucPixel & 0x04) >> 2] & 0x00FF0000) >> 16);
+				m_vIconData[iCurIndex + 16] = static_cast<UCHAR>((m_vColorTable[(ucPixel & 0x04) >> 2] & 0x0000FF00) >> 8);
+				m_vIconData[iCurIndex + 17] = static_cast<UCHAR>(m_vColorTable[(ucPixel & 0x04) >> 2] & 0x000000FF);
+				m_vIconData[iCurIndex + 18] = static_cast<UCHAR>((m_vColorTable[(ucPixel & 0x02) >> 1] & 0x00FF0000) >> 16);
+				m_vIconData[iCurIndex + 19] = static_cast<UCHAR>((m_vColorTable[(ucPixel & 0x02) >> 1] & 0x0000FF00) >> 8);
+				m_vIconData[iCurIndex + 20] = static_cast<UCHAR>(m_vColorTable[(ucPixel & 0x02) >> 1] & 0x000000FF);
+				m_vIconData[iCurIndex + 21] = static_cast<UCHAR>((m_vColorTable[(ucPixel & 0x01)] & 0x00FF0000) >> 16);
+				m_vIconData[iCurIndex + 22] = static_cast<UCHAR>((m_vColorTable[ucPixel & 0x01] & 0x0000FF00) >> 8);
+				m_vIconData[iCurIndex + 23] = static_cast<UCHAR>(m_vColorTable[ucPixel & 0x01] & 0x000000FF);
 
 				iCurIndex += 24;
 			}
@@ -520,20 +518,20 @@ int CCicnResource::Load(char *pInput, int iSize)
 
 			for(j = 0; j < (m_iWidth + 3) / 4; j++)
 			{
-				ucPixel = (UCHAR)*pInput; pInput++;
+				ucPixel = static_cast<UCHAR>(*pInput); pInput++;
 
-				m_vIconData[iCurIndex]      = (UCHAR)((m_vColorTable[ ucPixel         >> 6] & 0x00FF0000) >> 16);
-				m_vIconData[iCurIndex + 1]  = (UCHAR)((m_vColorTable[ ucPixel         >> 6] & 0x0000FF00) >> 8);
-				m_vIconData[iCurIndex + 2]  = (UCHAR) (m_vColorTable[ ucPixel         >> 6] & 0x000000FF);
-				m_vIconData[iCurIndex + 3]  = (UCHAR)((m_vColorTable[(ucPixel & 0x30) >> 4] & 0x00FF0000) >> 16);
-				m_vIconData[iCurIndex + 4]  = (UCHAR)((m_vColorTable[(ucPixel & 0x30) >> 4] & 0x0000FF00) >> 8);
-				m_vIconData[iCurIndex + 5]  = (UCHAR) (m_vColorTable[(ucPixel & 0x30) >> 4] & 0x000000FF);
-				m_vIconData[iCurIndex + 6]  = (UCHAR)((m_vColorTable[(ucPixel & 0x0C) >> 2] & 0x00FF0000) >> 16);
-				m_vIconData[iCurIndex + 7]  = (UCHAR)((m_vColorTable[(ucPixel & 0x0C) >> 2] & 0x0000FF00) >> 8);
-				m_vIconData[iCurIndex + 8]  = (UCHAR) (m_vColorTable[(ucPixel & 0x0C) >> 2] & 0x000000FF);
-				m_vIconData[iCurIndex + 9]  = (UCHAR)((m_vColorTable[ ucPixel & 0x03      ] & 0x00FF0000) >> 16);
-				m_vIconData[iCurIndex + 10] = (UCHAR)((m_vColorTable[ ucPixel & 0x03      ] & 0x0000FF00) >> 8);
-				m_vIconData[iCurIndex + 11] = (UCHAR) (m_vColorTable[ ucPixel & 0x03      ] & 0x000000FF);
+				m_vIconData[iCurIndex]      = static_cast<UCHAR>((m_vColorTable[ucPixel >> 6] & 0x00FF0000) >> 16);
+				m_vIconData[iCurIndex + 1]  = static_cast<UCHAR>((m_vColorTable[ucPixel >> 6] & 0x0000FF00) >> 8);
+				m_vIconData[iCurIndex + 2]  = static_cast<UCHAR>(m_vColorTable[ucPixel >> 6] & 0x000000FF);
+				m_vIconData[iCurIndex + 3]  = static_cast<UCHAR>((m_vColorTable[(ucPixel & 0x30) >> 4] & 0x00FF0000) >> 16);
+				m_vIconData[iCurIndex + 4]  = static_cast<UCHAR>((m_vColorTable[(ucPixel & 0x30) >> 4] & 0x0000FF00) >> 8);
+				m_vIconData[iCurIndex + 5]  = static_cast<UCHAR>(m_vColorTable[(ucPixel & 0x30) >> 4] & 0x000000FF);
+				m_vIconData[iCurIndex + 6]  = static_cast<UCHAR>((m_vColorTable[(ucPixel & 0x0C) >> 2] & 0x00FF0000) >> 16);
+				m_vIconData[iCurIndex + 7]  = static_cast<UCHAR>((m_vColorTable[(ucPixel & 0x0C) >> 2] & 0x0000FF00) >> 8);
+				m_vIconData[iCurIndex + 8]  = static_cast<UCHAR>(m_vColorTable[(ucPixel & 0x0C) >> 2] & 0x000000FF);
+				m_vIconData[iCurIndex + 9]  = static_cast<UCHAR>((m_vColorTable[ucPixel & 0x03] & 0x00FF0000) >> 16);
+				m_vIconData[iCurIndex + 10] = static_cast<UCHAR>((m_vColorTable[ucPixel & 0x03] & 0x0000FF00) >> 8);
+				m_vIconData[iCurIndex + 11] = static_cast<UCHAR>(m_vColorTable[ucPixel & 0x03] & 0x000000FF);
 
 				iCurIndex += 12;
 			}
@@ -551,14 +549,14 @@ int CCicnResource::Load(char *pInput, int iSize)
 
 			for(j = 0; j < (m_iWidth + 1) / 2; j++)
 			{
-				ucPixel = (UCHAR)*pInput; pInput++;
+				ucPixel = static_cast<UCHAR>(*pInput); pInput++;
 
-				m_vIconData[iCurIndex]     = (UCHAR)((m_vColorTable[ucPixel >>   4] & 0x00FF0000) >> 16);
-				m_vIconData[iCurIndex + 1] = (UCHAR)((m_vColorTable[ucPixel >>   4] & 0x0000FF00) >> 8);
-				m_vIconData[iCurIndex + 2] = (UCHAR) (m_vColorTable[ucPixel >>   4] & 0x000000FF);
-				m_vIconData[iCurIndex + 3] = (UCHAR)((m_vColorTable[ucPixel & 0x0F] & 0x00FF0000) >> 16);
-				m_vIconData[iCurIndex + 4] = (UCHAR)((m_vColorTable[ucPixel & 0x0F] & 0x0000FF00) >> 8);
-				m_vIconData[iCurIndex + 5] = (UCHAR) (m_vColorTable[ucPixel & 0x0F] & 0x000000FF);
+				m_vIconData[iCurIndex]     = static_cast<UCHAR>((m_vColorTable[ucPixel >> 4] & 0x00FF0000) >> 16);
+				m_vIconData[iCurIndex + 1] = static_cast<UCHAR>((m_vColorTable[ucPixel >> 4] & 0x0000FF00) >> 8);
+				m_vIconData[iCurIndex + 2] = static_cast<UCHAR>(m_vColorTable[ucPixel >> 4] & 0x000000FF);
+				m_vIconData[iCurIndex + 3] = static_cast<UCHAR>((m_vColorTable[ucPixel & 0x0F] & 0x00FF0000) >> 16);
+				m_vIconData[iCurIndex + 4] = static_cast<UCHAR>((m_vColorTable[ucPixel & 0x0F] & 0x0000FF00) >> 8);
+				m_vIconData[iCurIndex + 5] = static_cast<UCHAR>(m_vColorTable[ucPixel & 0x0F] & 0x000000FF);
 
 				iCurIndex += 6;
 			}
@@ -576,11 +574,11 @@ int CCicnResource::Load(char *pInput, int iSize)
 
 			for(j = 0; j < m_iWidth; j++)
 			{
-				ucPixel = (UCHAR)*pInput; pInput++;
+				ucPixel = static_cast<UCHAR>(*pInput); pInput++;
 
-				m_vIconData[iCurIndex]     = (UCHAR)((m_vColorTable[ucPixel] & 0x00FF0000) >> 16);
-				m_vIconData[iCurIndex + 1] = (UCHAR)((m_vColorTable[ucPixel] & 0x0000FF00) >> 8);
-				m_vIconData[iCurIndex + 2] = (UCHAR) (m_vColorTable[ucPixel] & 0x000000FF);
+				m_vIconData[iCurIndex]     = static_cast<UCHAR>((m_vColorTable[ucPixel] & 0x00FF0000) >> 16);
+				m_vIconData[iCurIndex + 1] = static_cast<UCHAR>((m_vColorTable[ucPixel] & 0x0000FF00) >> 8);
+				m_vIconData[iCurIndex + 2] = static_cast<UCHAR>(m_vColorTable[ucPixel] & 0x000000FF);
 
 				iCurIndex += 3;
 			}
@@ -639,8 +637,8 @@ int CCicnResource::LoadFromTextEx(std::istream & input, std::string & szFilePath
 	char szIconFilename[256];
 	char szMaskFilename[256];
 
-	strcpy(szIconFilename, szFilePath.c_str());
-	strcpy(szMaskFilename, szFilePath.c_str());
+	strcpy_s(szIconFilename, szFilePath.c_str());
+	strcpy_s(szMaskFilename, szFilePath.c_str());
 
 	ReadTextField(input, szIconFilename + strlen(szIconFilename), 256 - strlen(szIconFilename));
 	ReadTextField(input, szMaskFilename + strlen(szMaskFilename), 256 - strlen(szMaskFilename));
@@ -664,12 +662,12 @@ UCHAR CCicnResource::FindColor(UCHAR ucRed, UCHAR ucGreen, UCHAR ucBlue)
 	{
 		if(m_vColorTable[i] & 0x80000000)
 		{
-			ucR = (UCHAR) (m_vColorTable[i] & 0x000000FF);
-			ucG = (UCHAR)((m_vColorTable[i] & 0x0000FF00) >> 8);
-			ucB = (UCHAR)((m_vColorTable[i] & 0x00FF0000) >> 16);
+			ucR = static_cast<UCHAR>(m_vColorTable[i] & 0x000000FF);
+			ucG = static_cast<UCHAR>((m_vColorTable[i] & 0x0000FF00) >> 8);
+			ucB = static_cast<UCHAR>((m_vColorTable[i] & 0x00FF0000) >> 16);
 
 			if((ucRed == ucR) && (ucGreen == ucG) && (ucBlue == ucB))
-				return (UCHAR)i;
+				return static_cast<UCHAR>(i);
 		}
 	}
 
@@ -856,7 +854,7 @@ int CCicnResource::CloseAndSave(void)
 
 	m_iID = m_controls[0].GetInt();
 
-	strcpy(m_szName, m_controls[1].GetString());
+	strcpy_s(m_szName, m_controls[1].GetString());
 
 	int i;
 
@@ -944,7 +942,7 @@ int CCicnResource::FileImport(int iIsIcon, const char *szFilename, int iShowErro
 
 	if(szFilename == NULL)
 	{
-		strcpy(szFilename2, "");
+		strcpy_s(szFilename2, "");
 
 		OPENFILENAME ofn;
 
@@ -966,7 +964,7 @@ int CCicnResource::FileImport(int iIsIcon, const char *szFilename, int iShowErro
 	}
 	else
 	{
-		strcpy(szFilename2, szFilename);
+		strcpy_s(szFilename2, szFilename);
 	}
 
 	std::ifstream filein;
@@ -1108,7 +1106,7 @@ int CCicnResource::FileImport(int iIsIcon, const char *szFilename, int iShowErro
 		ucGreen = bmi.bmiColors[0].rgbGreen;
 		ucBlue  = bmi.bmiColors[0].rgbBlue;
 
-		m_vTempColorTable[0] = 0x80000000 | ((int)ucRed) | ((int)ucGreen << 8) | ((int)ucBlue << 16);
+		m_vTempColorTable[0] = 0x80000000 | static_cast<int>(ucRed) | (static_cast<int>(ucGreen) << 8) | (static_cast<int>(ucBlue) << 16);
 
 		if(iBPP == 1)
 		{
@@ -1118,7 +1116,7 @@ int CCicnResource::FileImport(int iIsIcon, const char *szFilename, int iShowErro
 			ucGreen = rgbQuad.rgbGreen;
 			ucBlue  = rgbQuad.rgbBlue;
 
-			m_vTempColorTable[1] = 0x80000000 | ((int)ucRed) | ((int)ucGreen << 8) | ((int)ucBlue << 16);
+			m_vTempColorTable[1] = 0x80000000 | static_cast<int>(ucRed) | (static_cast<int>(ucGreen) << 8) | (static_cast<int>(ucBlue) << 16);
 		}
 		else if(iBPP == 4)
 		{
@@ -1130,7 +1128,7 @@ int CCicnResource::FileImport(int iIsIcon, const char *szFilename, int iShowErro
 				ucGreen = rgbQuad.rgbGreen;
 				ucBlue  = rgbQuad.rgbBlue;
 
-				m_vTempColorTable[i] = 0x80000000 | ((int)ucRed) | ((int)ucGreen << 8) | ((int)ucBlue << 16);
+				m_vTempColorTable[i] = 0x80000000 | static_cast<int>(ucRed) | (static_cast<int>(ucGreen) << 8) | (static_cast<int>(ucBlue) << 16);
 			}
 		}
 		else if(iBPP == 8)
@@ -1143,7 +1141,7 @@ int CCicnResource::FileImport(int iIsIcon, const char *szFilename, int iShowErro
 				ucGreen = rgbQuad.rgbGreen;
 				ucBlue  = rgbQuad.rgbBlue;
 
-				m_vTempColorTable[i] = 0x80000000 | ((int)ucRed) | ((int)ucGreen << 8) | ((int)ucBlue << 16);
+				m_vTempColorTable[i] = 0x80000000 | static_cast<int>(ucRed) | (static_cast<int>(ucGreen) << 8) | (static_cast<int>(ucBlue) << 16);
 			}
 		}
 	}
@@ -1177,9 +1175,9 @@ int CCicnResource::FileImport(int iIsIcon, const char *szFilename, int iShowErro
 					iIndex1 = ((m_iTempHeight - 1 - i) * m_iTempWidth + j) * 3;
 					iIndex2 = (ucPixel >> (7 - (j & 7))) & 0x01;
 
-					m_vTempIconData[iIndex1 + 2] = (UCHAR) (m_vTempColorTable[iIndex2]        & 0xFF);
-					m_vTempIconData[iIndex1 + 1] = (UCHAR)((m_vTempColorTable[iIndex2] >> 8)  & 0xFF);
-					m_vTempIconData[iIndex1]     = (UCHAR)((m_vTempColorTable[iIndex2] >> 16) & 0xFF);
+					m_vTempIconData[iIndex1 + 2] = static_cast<UCHAR>(m_vTempColorTable[iIndex2] & 0xFF);
+					m_vTempIconData[iIndex1 + 1] = static_cast<UCHAR>((m_vTempColorTable[iIndex2] >> 8) & 0xFF);
+					m_vTempIconData[iIndex1]     = static_cast<UCHAR>((m_vTempColorTable[iIndex2] >> 16) & 0xFF);
 				}
 
 				if(iAlignment > 0)
@@ -1200,9 +1198,9 @@ int CCicnResource::FileImport(int iIsIcon, const char *szFilename, int iShowErro
 					iIndex1 = ((m_iTempHeight - 1 - i) * m_iTempWidth + j) * 3;
 					iIndex2 = (ucPixel >> ((1 - (j & 1)) << 2)) & 0x0F;
 
-					m_vTempIconData[iIndex1 + 2] = (UCHAR) (m_vTempColorTable[iIndex2]        & 0xFF);
-					m_vTempIconData[iIndex1 + 1] = (UCHAR)((m_vTempColorTable[iIndex2] >> 8)  & 0xFF);
-					m_vTempIconData[iIndex1]     = (UCHAR)((m_vTempColorTable[iIndex2] >> 16) & 0xFF);
+					m_vTempIconData[iIndex1 + 2] = static_cast<UCHAR>(m_vTempColorTable[iIndex2] & 0xFF);
+					m_vTempIconData[iIndex1 + 1] = static_cast<UCHAR>((m_vTempColorTable[iIndex2] >> 8) & 0xFF);
+					m_vTempIconData[iIndex1]     = static_cast<UCHAR>((m_vTempColorTable[iIndex2] >> 16) & 0xFF);
 				}
 
 				if(iAlignment > 0)
@@ -1221,9 +1219,9 @@ int CCicnResource::FileImport(int iIsIcon, const char *szFilename, int iShowErro
 
 					iIndex1 = ((m_iTempHeight - 1 - i) * m_iTempWidth + j) * 3;
 
-					m_vTempIconData[iIndex1 + 2] = (UCHAR) (m_vTempColorTable[ucPixel]        & 0xFF);
-					m_vTempIconData[iIndex1 + 1] = (UCHAR)((m_vTempColorTable[ucPixel] >> 8)  & 0xFF);
-					m_vTempIconData[iIndex1]     = (UCHAR)((m_vTempColorTable[ucPixel] >> 16) & 0xFF);
+					m_vTempIconData[iIndex1 + 2] = static_cast<UCHAR>(m_vTempColorTable[ucPixel] & 0xFF);
+					m_vTempIconData[iIndex1 + 1] = static_cast<UCHAR>((m_vTempColorTable[ucPixel] >> 8) & 0xFF);
+					m_vTempIconData[iIndex1]     = static_cast<UCHAR>((m_vTempColorTable[ucPixel] >> 16) & 0xFF);
 				}
 
 				if(iAlignment > 0)
@@ -1343,7 +1341,7 @@ int CCicnResource::FileExport(int iIsIcon, const char *szFilename, int iShowErro
 
 	if(szFilename == NULL)
 	{
-		strcpy(szFilename2, "");
+		strcpy_s(szFilename2, "");
 
 		OPENFILENAME ofn;
 
@@ -1365,7 +1363,7 @@ int CCicnResource::FileExport(int iIsIcon, const char *szFilename, int iShowErro
 	}
 	else
 	{
-		strcpy(szFilename2, szFilename);
+		strcpy_s(szFilename2, szFilename);
 	}
 
 	std::ofstream outfile;
@@ -1482,11 +1480,11 @@ int CCicnResource::FileExport(int iIsIcon, const char *szFilename, int iShowErro
 		{
 			if(pColorTable[i] & 0x80000000)
 			{
-				ucIndex = (UCHAR)i;
+				ucIndex = static_cast<UCHAR>(i);
 
-				ucRed   = (UCHAR) (pColorTable[i] & 0x000000FF);
-				ucGreen = (UCHAR)((pColorTable[i] & 0x0000FF00) >> 8);
-				ucBlue  = (UCHAR)((pColorTable[i] & 0x00FF0000) >> 16);
+				ucRed   = static_cast<UCHAR>(pColorTable[i] & 0x000000FF);
+				ucGreen = static_cast<UCHAR>((pColorTable[i] & 0x0000FF00) >> 8);
+				ucBlue  = static_cast<UCHAR>((pColorTable[i] & 0x00FF0000) >> 16);
 
 				rgbColors[ucIndex].rgbRed   = ucRed;
 				rgbColors[ucIndex].rgbGreen = ucGreen;

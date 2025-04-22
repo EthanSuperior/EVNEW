@@ -102,9 +102,7 @@ CMisnResource::CMisnResource(void)
 }
 
 CMisnResource::~CMisnResource(void)
-{
-
-}
+= default;
 
 int CMisnResource::GetType(void)
 {
@@ -714,20 +712,20 @@ int CMisnResource::CloseAndSave(void)
 
 	m_iRefuseDesc = m_controls[37].GetInt();
 
-	strcpy(m_szAvailableBits, m_controls[38].GetString());
-	strcpy(m_szOnAccept,      m_controls[39].GetString());
-	strcpy(m_szOnRefuse,      m_controls[40].GetString());
-	strcpy(m_szOnSuccess,     m_controls[41].GetString());
-	strcpy(m_szOnFailure,     m_controls[42].GetString());
-	strcpy(m_szOnAbort,       m_controls[43].GetString());
-	strcpy(m_szOnShipDone,    m_controls[44].GetString());
+	strcpy_s(m_szAvailableBits, m_controls[38].GetString());
+	strcpy_s(m_szOnAccept,      m_controls[39].GetString());
+	strcpy_s(m_szOnRefuse,      m_controls[40].GetString());
+	strcpy_s(m_szOnSuccess,     m_controls[41].GetString());
+	strcpy_s(m_szOnFailure,     m_controls[42].GetString());
+	strcpy_s(m_szOnAbort,       m_controls[43].GetString());
+	strcpy_s(m_szOnShipDone,    m_controls[44].GetString());
 
 	memcpy(m_cRequire, m_controls[45].GetString(), 8 * sizeof(char));
 
 	m_iDateIncrement = m_controls[46].GetInt();
 
-	strcpy(m_szAcceptButton, m_controls[47].GetString());
-	strcpy(m_szRefuseButton, m_controls[48].GetString());
+	strcpy_s(m_szAcceptButton, m_controls[47].GetString());
+	strcpy_s(m_szRefuseButton, m_controls[48].GetString());
 
 	m_iDisplayWeight = m_controls[49].GetInt();
 
@@ -754,7 +752,7 @@ int CMisnResource::CloseAndSave(void)
 	m_iFlags2 |= m_controls[66].GetInt() << 1;
 	m_iFlags2 |= m_controls[67].GetInt() << 2;
 
-	strcpy(m_szName, m_controls[68].GetString());
+	strcpy_s(m_szName, m_controls[68].GetString());
 
 	int i;
 

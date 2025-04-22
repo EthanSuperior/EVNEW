@@ -44,9 +44,7 @@ CRoidResource::CRoidResource(void)
 }
 
 CRoidResource::~CRoidResource(void)
-{
-
-}
+= default;
 
 int CRoidResource::GetType(void)
 {
@@ -268,7 +266,7 @@ int CRoidResource::CloseAndSave(void)
 
 	m_iMass          = m_controls[11].GetInt();
 
-	strcpy(m_szName, m_controls[12].GetString());
+	strcpy_s(m_szName, m_controls[12].GetString());
 
 	int i;
 

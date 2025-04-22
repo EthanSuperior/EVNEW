@@ -31,9 +31,7 @@ CStrlResource::CStrlResource(void)
 }
 
 CStrlResource::~CStrlResource(void)
-{
-
-}
+= default;
 
 int CStrlResource::GetType(void)
 {
@@ -47,7 +45,7 @@ int CStrlResource::GetSize(void)
 	int i;
 
 	for(i = 0; i < m_vStrings.size(); i++)
-		iSize += (int)(UCHAR)m_vStrings[i].size();
+		iSize += static_cast<int>((UCHAR)m_vStrings[i].size());
 
 	return iSize;
 }
@@ -74,7 +72,7 @@ const std::string * CStrlResource::GetFieldNames(void)
 
 int CStrlResource::Save(char *pOutput)
 {
-	short iNumStrings = SwapEndianShort((short)m_vStrings.size());
+	short iNumStrings = SwapEndianShort(static_cast<short>(m_vStrings.size()));
 
 	*(short *)pOutput = iNumStrings; pOutput += sizeof(short);
 
@@ -86,17 +84,17 @@ int CStrlResource::Save(char *pOutput)
 
 	for(i = 0; i < m_vStrings.size(); i++)
 	{
-		strcpy(szBuffer, m_vStrings[i].c_str());
+		strcpy_s(szBuffer, m_vStrings[i].c_str());
 
 		szBuffer[255] = '\0';
 
 		ToMacString(szBuffer);
 
-		ucStringLength = (UCHAR)strlen(szBuffer);
+		ucStringLength = static_cast<UCHAR>(strlen(szBuffer));
 
 		*pOutput = ucStringLength; pOutput++;
 
-		memcpy(pOutput, szBuffer, (int)ucStringLength * sizeof(char)); pOutput += (int)ucStringLength * sizeof(char);
+		memcpy(pOutput, szBuffer, static_cast<int>(ucStringLength) * sizeof(char)); pOutput += static_cast<int>(ucStringLength) * sizeof(char);
 	}
 
 	return 1;
@@ -119,7 +117,7 @@ int CStrlResource::Load(char *pInput, int iSize)
 	{
 		ucStringLength = *pInput; pInput++;
 
-		memcpy(szBuffer, pInput, (int)ucStringLength * sizeof(char)); pInput += (int)ucStringLength * sizeof(char);
+		memcpy(szBuffer, pInput, static_cast<int>(ucStringLength) * sizeof(char)); pInput += static_cast<int>(ucStringLength) * sizeof(char);
 
 		szBuffer[ucStringLength] = '\0';
 
@@ -215,7 +213,7 @@ int CStrlResource::Initialize(HWND hwnd)
 
 	char szString[16];
 
-	strcpy(szString, "");
+	strcpy_s(szString, "");
 
 	ListBox_AddString(hwndStringList, szString);
 
@@ -256,7 +254,7 @@ int CStrlResource::CloseAndSave(void)
 
 	m_iID = m_controls[0].GetInt();
 
-	strcpy(m_szName, m_controls[1].GetString());
+	strcpy_s(m_szName, m_controls[1].GetString());
 
 	HWND hwndStringList = GetDlgItem(m_pWindow->GetHWND(), IDC_EDIT_STRL_LIST1);
 
@@ -328,7 +326,7 @@ int CStrlResource::AddString(void)
 
 	char szString[16];
 
-	strcpy(szString, "");
+	strcpy_s(szString, "");
 
 	ListBox_InsertString(hwndStringList, iSelection, szString);
 
@@ -356,7 +354,7 @@ int CStrlResource::EditString(void)
 	{
 		char szString[16];
 
-		strcpy(szString, "");
+		strcpy_s(szString, "");
 
 		ListBox_InsertString(hwndStringList, iSelection, szString);
 
@@ -498,7 +496,7 @@ int CStrlResource::EditCopy(void)
 		return 0;
 	}
 
-	char *pMemPtr = (char *)GlobalLock(hGlobalMem);
+	char *pMemPtr = static_cast<char*>(GlobalLock(hGlobalMem));
 
 	ListBox_GetText(hwndStringList, iSelection, pMemPtr);
 
@@ -534,7 +532,7 @@ int CStrlResource::EditPaste(void)
 		return 0;
 	}
 
-	char *pMemPtr = (char *)GlobalLock(hGlobalMem);
+	char *pMemPtr = static_cast<char*>(GlobalLock(hGlobalMem));
 
 	if(pMemPtr == NULL)
 	{

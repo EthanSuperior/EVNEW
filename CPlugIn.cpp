@@ -30,6 +30,7 @@
 #include "CCronResource.h"
 #include "CDescResource.h"
 #include "CDudeResource.h"
+#include "CException.h"
 #include "CFletResource.h"
 #include "CGovtResource.h"
 #include "CIntfResource.h"
@@ -62,9 +63,9 @@
 
 CPlugIn::CPlugIn(void)
 {
-	strcpy(m_szFilename, "");
-	strcpy(m_szFilePath, "C:\\");
-	strcpy(m_szFilenameNoPath, "Untitled.rez");
+	strcpy_s(m_szFilename, "");
+	strcpy_s(m_szFilePath, "C:\\");
+	strcpy_s(m_szFilenameNoPath, "Untitled.rez");
 
 	m_iSaveAsText = 0;
 
@@ -76,37 +77,37 @@ CPlugIn::CPlugIn(void)
 	m_iShowProgressBar   = 1;
 
 	m_iCicnSave = 1;
-	strcpy(m_szCicnSubdirectory, "Cicns");
-	strcpy(m_szCicnFilenamePrefix, "cicn");
-	strcpy(m_szCicnMaskSubdirectory, "Cicns");
-	strcpy(m_szCicnMaskFilenamePrefix, "cicnmask");
+	strcpy_s(m_szCicnSubdirectory, "Cicns");
+	strcpy_s(m_szCicnFilenamePrefix, "cicn");
+	strcpy_s(m_szCicnMaskSubdirectory, "Cicns");
+	strcpy_s(m_szCicnMaskFilenamePrefix, "cicnmask");
 
 	m_iPictSave = 1;
-	strcpy(m_szPictSubdirectory, "Picts");
-	strcpy(m_szPictFilenamePrefix, "pict");
+	strcpy_s(m_szPictSubdirectory, "Picts");
+	strcpy_s(m_szPictFilenamePrefix, "pict");
 	m_iPictImageFileType = 0;		// .bmp
 
 	m_iRle8Save = 1;
-	strcpy(m_szRle8Subdirectory, "Rle8s");
-	strcpy(m_szRle8FilenamePrefix, "rle8_");
-	strcpy(m_szRle8MaskSubdirectory, "Rle8s");
-	strcpy(m_szRle8MaskFilenamePrefix, "rle8mask");
+	strcpy_s(m_szRle8Subdirectory, "Rle8s");
+	strcpy_s(m_szRle8FilenamePrefix, "rle8_");
+	strcpy_s(m_szRle8MaskSubdirectory, "Rle8s");
+	strcpy_s(m_szRle8MaskFilenamePrefix, "rle8mask");
 	m_iRle8ImageFileType = 0;		// .bmp
 	m_iRle8MaskFileType  = 0;		// .bmp
 	m_iRle8FramesPerRow  = 6;
 
 	m_iRleDSave = 1;
-	strcpy(m_szRleDSubdirectory, "RleDs");
-	strcpy(m_szRleDFilenamePrefix, "rleD_");
-	strcpy(m_szRleDMaskSubdirectory, "RleDs");
-	strcpy(m_szRleDMaskFilenamePrefix, "rleDmask");
+	strcpy_s(m_szRleDSubdirectory, "RleDs");
+	strcpy_s(m_szRleDFilenamePrefix, "rleD_");
+	strcpy_s(m_szRleDMaskSubdirectory, "RleDs");
+	strcpy_s(m_szRleDMaskFilenamePrefix, "rleDmask");
 	m_iRleDImageFileType = 0;		// .bmp
 	m_iRleDMaskFileType  = 0;		// .bmp
 	m_iRleDFramesPerRow  = 6;
 
 	m_iSndSave = 1;
-	strcpy(m_szSndSubdirectory, "Sounds");
-	strcpy(m_szSndFilenamePrefix, "snd");
+	strcpy_s(m_szSndSubdirectory, "Sounds");
+	strcpy_s(m_szSndFilenamePrefix, "snd");
 }
 
 CPlugIn::~CPlugIn(void)
@@ -131,7 +132,7 @@ int CPlugIn::GetCurFileOffset(void)
 
 int CPlugIn::SetFilename(const char *szFilename)
 {
-	strcpy(m_szFilename, szFilename);
+	strcpy_s(m_szFilename, szFilename);
 
 	char *pExtension = strrchr(m_szFilename, '.');
 
@@ -151,18 +152,18 @@ int CPlugIn::SetFilename(const char *szFilename)
 	{
 		pLastSlash = m_szFilename;
 
-		strcpy(m_szFilePath, "C:\\");
+		strcpy_s(m_szFilePath, "C:\\");
 	}
 	else
 	{
 		pLastSlash++;
 
-		strcpy(m_szFilePath, m_szFilename);
+		strcpy_s(m_szFilePath, m_szFilename);
 
 		m_szFilePath[pLastSlash - m_szFilename] = '\0';
 	}
 
-	strcpy(m_szFilenameNoPath, pLastSlash);
+	strcpy_s(m_szFilenameNoPath, pLastSlash);
 
 	return 1;
 }
@@ -184,9 +185,9 @@ int CPlugIn::Clear(void)
 
 int CPlugIn::ClearFilename(void)
 {
-	strcpy(m_szFilename, "");
-	strcpy(m_szFilePath, "C:\\");
-	strcpy(m_szFilenameNoPath, "Untitled.rez");
+	strcpy_s(m_szFilename, "");
+	strcpy_s(m_szFilePath, "C:\\");
+	strcpy_s(m_szFilenameNoPath, "Untitled.rez");
 
 	m_iSaveAsText = 0;
 
@@ -207,10 +208,10 @@ int CPlugIn::SetCicnSaveOptions(int iSave, char *szSubdirectory, char *szFilenam
 {
 	m_iCicnSave = iSave;
 
-	strcpy(m_szCicnSubdirectory,       szSubdirectory);
-	strcpy(m_szCicnFilenamePrefix,     szFilenamePrefix);
-	strcpy(m_szCicnMaskSubdirectory,   szMaskSubdirectory);
-	strcpy(m_szCicnMaskFilenamePrefix, szMaskFilenamePrefix);
+	strcpy_s(m_szCicnSubdirectory,       szSubdirectory);
+	strcpy_s(m_szCicnFilenamePrefix,     szFilenamePrefix);
+	strcpy_s(m_szCicnMaskSubdirectory,   szMaskSubdirectory);
+	strcpy_s(m_szCicnMaskFilenamePrefix, szMaskFilenamePrefix);
 
 	return 1;
 }
@@ -219,8 +220,8 @@ int CPlugIn::SetPictSaveOptions(int iSave, char *szSubdirectory, char *szFilenam
 {
 	m_iPictSave = iSave;
 
-	strcpy(m_szPictSubdirectory,   szSubdirectory);
-	strcpy(m_szPictFilenamePrefix, szFilenamePrefix);
+	strcpy_s(m_szPictSubdirectory,   szSubdirectory);
+	strcpy_s(m_szPictFilenamePrefix, szFilenamePrefix);
 
 	m_iPictImageFileType = iImageFileType;
 
@@ -231,10 +232,10 @@ int CPlugIn::SetRle8SaveOptions(int iSave, char *szSubdirectory, char *szFilenam
 {
 	m_iRle8Save = iSave;
 
-	strcpy(m_szRle8Subdirectory,       szSubdirectory);
-	strcpy(m_szRle8FilenamePrefix,     szFilenamePrefix);
-	strcpy(m_szRle8MaskSubdirectory,   szMaskSubdirectory);
-	strcpy(m_szRle8MaskFilenamePrefix, szMaskFilenamePrefix);
+	strcpy_s(m_szRle8Subdirectory,       szSubdirectory);
+	strcpy_s(m_szRle8FilenamePrefix,     szFilenamePrefix);
+	strcpy_s(m_szRle8MaskSubdirectory,   szMaskSubdirectory);
+	strcpy_s(m_szRle8MaskFilenamePrefix, szMaskFilenamePrefix);
 
 	m_iRle8ImageFileType = iImageFileType;
 	m_iRle8MaskFileType  = iMaskFileType;
@@ -247,10 +248,10 @@ int CPlugIn::SetRleDSaveOptions(int iSave, char *szSubdirectory, char *szFilenam
 {
 	m_iRleDSave = iSave;
 
-	strcpy(m_szRleDSubdirectory,       szSubdirectory);
-	strcpy(m_szRleDFilenamePrefix,     szFilenamePrefix);
-	strcpy(m_szRleDMaskSubdirectory,   szMaskSubdirectory);
-	strcpy(m_szRleDMaskFilenamePrefix, szMaskFilenamePrefix);
+	strcpy_s(m_szRleDSubdirectory,       szSubdirectory);
+	strcpy_s(m_szRleDFilenamePrefix,     szFilenamePrefix);
+	strcpy_s(m_szRleDMaskSubdirectory,   szMaskSubdirectory);
+	strcpy_s(m_szRleDMaskFilenamePrefix, szMaskFilenamePrefix);
 
 	m_iRleDImageFileType = iImageFileType;
 	m_iRleDMaskFileType  = iMaskFileType;
@@ -263,8 +264,8 @@ int CPlugIn::SetSndSaveOptions(int iSave, char *szSubdirectory, char *szFilename
 {
 	m_iSndSave = iSave;
 
-	strcpy(m_szSndSubdirectory,   szSubdirectory);
-	strcpy(m_szSndFilenamePrefix, szFilenamePrefix);
+	strcpy_s(m_szSndSubdirectory,   szSubdirectory);
+	strcpy_s(m_szSndFilenamePrefix, szFilenamePrefix);
 
 	return 1;
 }
@@ -357,7 +358,7 @@ int CPlugIn::Load(char *szFilename, CWindow *pWndParent)
 				filein >> iNumResources;
 
 				if(iNumResources > 0)
-					SendMessage(hwndProgressBar, PBM_SETRANGE, 0, MAKELPARAM(0, (short)iNumResources - 1));
+					SendMessage(hwndProgressBar, PBM_SETRANGE, 0, MAKELPARAM(0, static_cast<short>(iNumResources) - 1));
 
 				c = filein.get();
 
@@ -589,7 +590,7 @@ int CPlugIn::Load(char *szFilename, CWindow *pWndParent)
 			hwndLoadingText = GetDlgItem(m_wndLoading.GetHWND(), IDC_LOADING_TEXT1);
 			hwndProgressBar = GetDlgItem(m_wndLoading.GetHWND(), IDC_LOADING_PROGRESS1);
 
-			SendMessage(hwndProgressBar, PBM_SETRANGE, 0, MAKELPARAM(0, (short)iNumResources - 1));
+			SendMessage(hwndProgressBar, PBM_SETRANGE, 0, MAKELPARAM(0, static_cast<short>(iNumResources) - 1));
 		}
 
 		for(i = 0; i < iNumResourceTypes; i++)
@@ -681,7 +682,7 @@ int CPlugIn::Load(char *szFilename, CWindow *pWndParent)
 						break;
 					}
 
-					((CUnkResource *)m_vResources[CNR_TYPE_UNK][m_vResources[CNR_TYPE_UNK].size() - 1])->SetTypeCode(vResourceTypes[i].c_str());
+					static_cast<CUnkResource*>(m_vResources[CNR_TYPE_UNK][m_vResources[CNR_TYPE_UNK].size() - 1])->SetTypeCode(vResourceTypes[i].c_str());
 				}
 
 				if(iError)
@@ -921,7 +922,7 @@ int CPlugIn::Save(CWindow *pWndParent)
 
 	if((pWndParent != NULL) && (m_iShowProgressBar))
 	{
-		SendMessage(hwndProgressBar, PBM_SETRANGE, 0, MAKELPARAM(0, (short)iNumResources - 1));
+		SendMessage(hwndProgressBar, PBM_SETRANGE, 0, MAKELPARAM(0, static_cast<short>(iNumResources) - 1));
 	}
 
 	int iCurIndex = 0;
@@ -1094,7 +1095,7 @@ int CPlugIn::Save(CWindow *pWndParent)
 		{
 			for(j = 1; j < m_vResources[i].size(); j++)
 			{
-				if(strcmp(((CUnkResource *)m_vResources[i][j])->GetTypeCode(), ((CUnkResource *)m_vResources[i][j - 1])->GetTypeCode()) != 0)
+				if(strcmp(static_cast<CUnkResource*>(m_vResources[i][j])->GetTypeCode(), static_cast<CUnkResource*>(m_vResources[i][j - 1])->GetTypeCode()) != 0)
 					iNumResourceTypes++;
 			}
 		}
@@ -1204,7 +1205,7 @@ int CPlugIn::Save(CWindow *pWndParent)
 		{
 			for(j = 1; j < m_vResources[i].size(); j++)
 			{
-				if(strcmp(((CUnkResource *)m_vResources[i][j])->GetTypeCode(), ((CUnkResource *)m_vResources[i][j - 1])->GetTypeCode()) != 0)
+				if(strcmp(static_cast<CUnkResource*>(m_vResources[i][j])->GetTypeCode(), static_cast<CUnkResource*>(m_vResources[i][j - 1])->GetTypeCode()) != 0)
 					iMapOffset += 12;
 			}
 		}
@@ -1230,7 +1231,7 @@ int CPlugIn::Save(CWindow *pWndParent)
 		{
 			if(m_vResources[i].size() > 0)
 			{
-				fileout.write(((CUnkResource *)m_vResources[i][0])->GetTypeCode(), 4 * sizeof(char));
+				fileout.write(static_cast<CUnkResource*>(m_vResources[i][0])->GetTypeCode(), 4 * sizeof(char));
 
 				iTemp = SwapEndianInt(iMapOffset); fileout.write((char *)&iTemp, sizeof(int));
 
@@ -1238,7 +1239,7 @@ int CPlugIn::Save(CWindow *pWndParent)
 
 				for(j = 1; j < m_vResources[i].size(); j++)
 				{
-					if(strcmp(((CUnkResource *)m_vResources[i][j])->GetTypeCode(), ((CUnkResource *)m_vResources[i][j - 1])->GetTypeCode()) != 0)
+					if(strcmp(static_cast<CUnkResource*>(m_vResources[i][j])->GetTypeCode(), static_cast<CUnkResource*>(m_vResources[i][j - 1])->GetTypeCode()) != 0)
 					{
 						iTemp = SwapEndianInt(iCount); fileout.write((char *)&iTemp, sizeof(int));
 
@@ -1246,7 +1247,7 @@ int CPlugIn::Save(CWindow *pWndParent)
 
 						iCurIndex += m_vResources[i].size();
 
-						fileout.write(((CUnkResource *)m_vResources[i][j])->GetTypeCode(), 4 * sizeof(char));
+						fileout.write(static_cast<CUnkResource*>(m_vResources[i][j])->GetTypeCode(), 4 * sizeof(char));
 
 						iTemp = SwapEndianInt(iMapOffset); fileout.write((char *)&iTemp, sizeof(int));
 
@@ -1280,11 +1281,11 @@ int CPlugIn::Save(CWindow *pWndParent)
 			if(i != CNR_TYPE_UNK)
 				fileout.write(g_szMacResourceTypes[i].c_str(), 4 * sizeof(char));
 			else
-				fileout.write(((CUnkResource *)m_vResources[i][j])->GetTypeCode(), 4 * sizeof(char));
+				fileout.write(static_cast<CUnkResource*>(m_vResources[i][j])->GetTypeCode(), 4 * sizeof(char));
 
 			iID = SwapEndianShort(m_vResources[i][j]->GetID()); fileout.write((char *)&iID, sizeof(short));
 
-			strcpy(szResourceName, m_vResources[i][j]->GetName());
+			strcpy_s(szResourceName, m_vResources[i][j]->GetName());
 
 			ToMacString(szResourceName);
 
@@ -1346,13 +1347,13 @@ CNovaResource * CPlugIn::AllocateResource(int iType)
 	{
 		pResource = new CRLEResource;
 
-		((CRLEResource *)pResource)->SetBPP(8);
+		static_cast<CRLEResource*>(pResource)->SetBPP(8);
 	}
 	else if(iType == CNR_TYPE_RLED)
 	{
 		pResource = new CRLEResource;
 
-		((CRLEResource *)pResource)->SetBPP(16);
+		static_cast<CRLEResource*>(pResource)->SetBPP(16);
 	}
 	else if(iType == CNR_TYPE_ROID)
 		pResource = new CRoidResource;

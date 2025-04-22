@@ -23,15 +23,14 @@ class CIntfResource;
 
 #include "CControl.h"
 #include "CNovaResource.h"
-#include "Utils.h"
 
 ////////////////////////////////////////////////////////////////
 //////////////////////////  CONSTANTS  /////////////////////////
 ////////////////////////////////////////////////////////////////
 
-const int NUM_INTF_CONTROLS = 46;
+constexpr int NUM_INTF_CONTROLS = 46;
 
-const int NUM_INTF_FIELDS = 44;
+constexpr int NUM_INTF_FIELDS = 44;
 
 const std::string g_szIntfFields[NUM_INTF_FIELDS] =
 	{"Bright Text", "Dim Text", "Radar X1", "Radar Y1", "Radar X2",
@@ -54,27 +53,27 @@ class CIntfResource : public CNovaResource
 public:
 
 	CIntfResource(void);
-	~CIntfResource(void);
+	~CIntfResource(void) override;
 
-	int GetType(void);
-	int GetSize(void);
+	int GetType(void) override;
+	int GetSize(void) override;
 
-	int GetDialogID(void);
-	DLGPROCNOCALLBACK GetDialogProc(void);
+	int GetDialogID(void) override;
+	DLGPROCNOCALLBACK GetDialogProc(void) override;
 
-	int GetNumFields(void);
-	const std::string * GetFieldNames(void);
+	int GetNumFields(void) override;
+	const std::string * GetFieldNames(void) override;
 
-	int Initialize(HWND hwnd);
+	int Initialize(HWND hwnd) override;
 
-	int CloseAndSave(void);
-	int CloseAndDontSave(void);
+	int CloseAndSave(void) override;
+	int CloseAndDontSave(void) override;
 
-	int Save(char *pOutput);
-	int Load(char *pInput, int iSize);
+	int Save(char *pOutput) override;
+	int Load(char *pInput, int iSize) override;
 
-	int SaveToText(std::ostream & output);
-	int LoadFromText(std::istream & input);
+	int SaveToText(std::ostream & output) override;
+	int LoadFromText(std::istream & input) override;
 
 	static BOOL IntfDlgProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
 

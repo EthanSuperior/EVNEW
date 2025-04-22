@@ -35,9 +35,7 @@ CDescResource::CDescResource(void)
 }
 
 CDescResource::~CDescResource(void)
-{
-
-}
+= default;
 
 int CDescResource::GetType(void)
 {
@@ -278,7 +276,7 @@ int CDescResource::CloseAndSave(void)
 
 	m_iGraphics = m_controls[2].GetInt();
 
-	strcpy(m_szMovieFile, m_controls[3].GetString());
+	strcpy_s(m_szMovieFile, m_controls[3].GetString());
 
 	m_iFlags = 0x0000;
 
@@ -286,7 +284,7 @@ int CDescResource::CloseAndSave(void)
 	m_iFlags |= m_controls[5].GetInt() << 1;
 	m_iFlags |= m_controls[6].GetInt() << 2;
 
-	strcpy(m_szName, m_controls[7].GetString());
+	strcpy_s(m_szName, m_controls[7].GetString());
 
 	int i;
 

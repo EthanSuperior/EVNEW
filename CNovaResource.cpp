@@ -29,9 +29,7 @@ CNovaResource::CNovaResource(void)
 }
 
 CNovaResource::~CNovaResource(void)
-{
-
-}
+= default;
 
 int CNovaResource::SetID(short iID)
 {
@@ -47,7 +45,7 @@ short CNovaResource::GetID(void)
 
 int CNovaResource::SetName(const char *szName)
 {
-	strcpy(m_szName, szName);
+	strcpy_s(m_szName, szName);
 
 	return 1;
 }
@@ -141,9 +139,7 @@ void CNovaResource::SetIfDefaultStr(CControl* m_controls, short controlID, short
 }
 
 SNovaResourceCompare::SNovaResourceCompare(void)
-{
-
-}
+= default;
 
 bool SNovaResourceCompare::operator () (const CNovaResource *pResource1, const CNovaResource *pResource2)
 {

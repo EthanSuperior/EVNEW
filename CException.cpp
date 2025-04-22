@@ -33,7 +33,7 @@ CException::CException(char *szException, ...)
 
 		va_start(arglist, szException);
 
-		vsprintf(szBuffer, szException, arglist);
+		vsprintf_s(szBuffer, szException, arglist);
 
 		va_end(arglist);
 
@@ -49,9 +49,7 @@ CException::CException(const CException & exception)
 }
 
 CException::~CException(void)
-{
-
-}
+= default;
 
 std::string CException::GetExceptionString(void)
 {

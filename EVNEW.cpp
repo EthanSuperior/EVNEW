@@ -44,6 +44,8 @@
 
 #include <algorithm>
 
+#include "CException.h"
+
 namespace qt
 {
 #include <QTML.h>
@@ -104,14 +106,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hprevinstance, LPSTR lpcmdline
 ////////////////////////////////////////////////////////////////
 
 CEditor::CEditor(void)
-{
-
-}
+= default;
 
 CEditor::~CEditor(void)
-{
-
-}
+= default;
 
 int CEditor::Init(HINSTANCE hInstance)
 {
@@ -126,8 +124,8 @@ int CEditor::Init(HINSTANCE hInstance)
 
 	pLastBackslash[0] = '\0';
 
-	strcpy(m_szTempFileDirectory, m_szDirectory);
-	strcat(m_szTempFileDirectory, "\\Temp");
+	strcpy_s(m_szTempFileDirectory, m_szDirectory);
+	strcat_s(m_szTempFileDirectory, "\\Temp");
 
 	CreateDirectory(m_szTempFileDirectory, NULL);
 
@@ -137,8 +135,8 @@ int CEditor::Init(HINSTANCE hInstance)
 
 	if(m_iPrefGenerateLogFile)
 	{
-		strcpy(szBuffer, m_szDirectory);
-		strcat(szBuffer, "\\log.txt");
+		strcpy_s(szBuffer, m_szDirectory);
+		strcat_s(szBuffer, "\\log.txt");
 
 		m_errorLog.OpenLogFile(szBuffer, 0);
 		m_errorLog.EnableLogFileAutoFlush();
@@ -202,7 +200,7 @@ int CEditor::Init(HINSTANCE hInstance)
 				pExtension++;
 
 			if(strcmp(pExtension, "rez") != 0)
-				strcat(szArg3, ".rez");
+				strcat_s(szArg3, ".rez");
 
 			m_plugIn.SetFilename(szArg3);
 			m_plugIn.Save(NULL);
@@ -240,7 +238,7 @@ int CEditor::Init(HINSTANCE hInstance)
 				pExtension++;
 
 			if(strcmp(pExtension, "txt") != 0)
-				strcat(szArg3, ".txt");
+				strcat_s(szArg3, ".txt");
 
 			m_plugIn.SetFilename(szArg3);
 			m_plugIn.Save(NULL);
@@ -522,14 +520,14 @@ int CEditor::LoadPreferences(void)
 
 	char szBuffer[MAX_PATH];
 
-	strcpy(szBuffer, m_szDirectory);
-	strcat(szBuffer, "\\Preferences.txt");
+	strcpy_s(szBuffer, m_szDirectory);
+	strcat_s(szBuffer, "\\Preferences.txt");
 
 	inPrefs.open(szBuffer, std::ios::in);
 
 	if(inPrefs.is_open() == 0)
 	{
-//		strcpy(m_szEVNLocation, "C:\\Program Files\\Ambrosia\\EV Nova\\EV Nova.exe");
+//		strcpy_s(m_szEVNLocation, "C:\\Program Files\\Ambrosia\\EV Nova\\EV Nova.exe");
 
 		m_iPrefGenerateLogFile    = 1;
 		m_iPrefCacheRLEs          = 1;
@@ -567,7 +565,7 @@ int CEditor::LoadPreferences(void)
 			szStrLine = szStrLine.substr(1);
 
 //		if(szToken == "EVNLOCATION")
-//			strcpy(m_szEVNLocation, szStrLine.c_str());
+//			strcpy_s(m_szEVNLocation, szStrLine.c_str());
 		if(szToken == "GENERATELOGFILE")
 			m_iPrefGenerateLogFile = FromString<int>(szStrLine);
 		else if(szToken == "CACHERLES")
@@ -601,8 +599,8 @@ int CEditor::SavePreferences(void)
 
 	char szBuffer[MAX_PATH];
 
-	strcpy(szBuffer, m_szDirectory);
-	strcat(szBuffer, "\\Preferences.txt");
+	strcpy_s(szBuffer, m_szDirectory);
+	strcat_s(szBuffer, "\\Preferences.txt");
 
 	outPrefs.open(szBuffer, std::ios::out | std::ios::trunc);
 
@@ -734,7 +732,7 @@ int CEditor::FileOpen(int iDialog, char *szFilename)
 
 	if(iDialog)
 	{
-		strcpy(szFilename2, "");
+		strcpy_s(szFilename2, "");
 
 		m_ofnLoadSave.hwndOwner    = m_dialogMain.GetHWND();
 		m_ofnLoadSave.lpstrFile    = szFilename2;
@@ -749,7 +747,7 @@ int CEditor::FileOpen(int iDialog, char *szFilename)
 	}
 	else
 	{
-		strcpy(szFilename2, szFilename);
+		strcpy_s(szFilename2, szFilename);
 	}
 
 	int iResult = m_plugIn.Load(szFilename2, &m_dialogMain);
@@ -803,7 +801,7 @@ int CEditor::FileSaveAs(void)
 {
 	char szFilename[MAX_PATH];
 
-	strcpy(szFilename, "");
+	strcpy_s(szFilename, "");
 
 	m_ofnLoadSave.hwndOwner    = m_dialogMain.GetHWND();
 	m_ofnLoadSave.lpstrFile    = szFilename;
@@ -942,7 +940,7 @@ int CEditor::FileSaveAs(void)
 
 	char szFilenameCopy[MAX_PATH];
 
-	strcpy(szFilenameCopy, m_plugIn.GetFilename());
+	strcpy_s(szFilenameCopy, m_plugIn.GetFilename());
 
 	m_plugIn.SetFilename(m_szTempPluginFilename.c_str());
 
@@ -1048,7 +1046,7 @@ int CEditor::EditCopy(void)
 		return 0;
 	}
 
-	char *pGlobalMem = (char *)GlobalLock(hGlobalMem);
+	char *pGlobalMem = static_cast<char*>(GlobalLock(hGlobalMem));
 
 	if(pGlobalMem == NULL)
 	{
@@ -1062,7 +1060,7 @@ int CEditor::EditCopy(void)
 
 	char szName[256];
 
-	strcpy(szName, pResource->GetName());
+	strcpy_s(szName, pResource->GetName());
 
 	*(int   *) pGlobalMem      = iType;
 	*(int   *)(pGlobalMem + 4) = iSize;
@@ -1103,7 +1101,7 @@ int CEditor::EditPaste(int iOverwrite)
 		return 0;
 	}
 
-	char *pGlobalMem = (char *)GlobalLock(hGlobalMem);
+	char *pGlobalMem = static_cast<char*>(GlobalLock(hGlobalMem));
 
 	if(pGlobalMem == NULL)
 	{
@@ -1266,7 +1264,7 @@ int CEditor::ResourceEdit(void)
 	if(pNovaResource == NULL)
 		return 0;
 
-	int i;
+	size_t i;
 
 	for(i = 0; i < m_vEditDialogs.size(); i++)
 	{
@@ -1473,7 +1471,7 @@ int CEditor::ResourceDelete(void)
 	if(iSelected == -1)
 		return 0;
 
-	int i;
+	size_t i;
 
 	for(i = 0; i < m_vEditDialogs.size(); i++)
 	{
@@ -1553,7 +1551,7 @@ int CEditor::PrefsInitDialog(HWND hwnd)
 //{
 //	char szBuffer[MAX_PATH];
 //
-//	strcpy(szBuffer, m_prefControls[0].GetString());
+//	strcpy_s(szBuffer, m_prefControls[0].GetString());
 //
 //	m_ofnBrowse.hwndOwner = m_wndPreferences.GetHWND();
 //	m_ofnBrowse.lpstrFile = szBuffer;
@@ -1568,7 +1566,7 @@ int CEditor::PrefsInitDialog(HWND hwnd)
 
 int CEditor::PrefsCloseAndSave(void)
 {
-//	strcpy(m_szEVNLocation, m_prefControls[0].GetString());
+//	strcpy_s(m_szEVNLocation, m_prefControls[0].GetString());
 
 	m_iPrefGenerateLogFile    = m_prefControls[0].GetInt();
 	m_iPrefCacheRLEs          = m_prefControls[1].GetInt();
@@ -1932,7 +1930,7 @@ BOOL CEditor::MainDialogProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 
 	pEditor = CEditor::GetCurrentEditor();
 
-	int i;
+	size_t i;
 
 //	if(pEditor->m_iIsEVNRunning)
 //	{
@@ -2593,10 +2591,10 @@ BOOL CEditor::CicnExportFormatProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lp
 
 			if(iControlID == IDC_CICN_EXPORT_OK)
 			{
-				strcpy(pEditor->m_szCicnExportSubdirectory,       pEditor->m_cicnExportFormatControls[0].GetString());
-				strcpy(pEditor->m_szCicnExportFilenamePrefix,     pEditor->m_cicnExportFormatControls[1].GetString());
-				strcpy(pEditor->m_szCicnExportMaskSubdirectory,   pEditor->m_cicnExportFormatControls[2].GetString());
-				strcpy(pEditor->m_szCicnExportMaskFilenamePrefix, pEditor->m_cicnExportFormatControls[3].GetString());
+				strcpy_s(pEditor->m_szCicnExportSubdirectory,       pEditor->m_cicnExportFormatControls[0].GetString());
+				strcpy_s(pEditor->m_szCicnExportFilenamePrefix,     pEditor->m_cicnExportFormatControls[1].GetString());
+				strcpy_s(pEditor->m_szCicnExportMaskSubdirectory,   pEditor->m_cicnExportFormatControls[2].GetString());
+				strcpy_s(pEditor->m_szCicnExportMaskFilenamePrefix, pEditor->m_cicnExportFormatControls[3].GetString());
 
 				pEditor->m_iCicnExportReturnValue = 1;
 
@@ -2700,8 +2698,8 @@ BOOL CEditor::PictExportFormatProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lp
 
 			if(iControlID == IDC_PICT_EXPORT_OK)
 			{
-				strcpy(pEditor->m_szPictExportSubdirectory,   pEditor->m_pictExportFormatControls[0].GetString());
-				strcpy(pEditor->m_szPictExportFilenamePrefix, pEditor->m_pictExportFormatControls[1].GetString());
+				strcpy_s(pEditor->m_szPictExportSubdirectory,   pEditor->m_pictExportFormatControls[0].GetString());
+				strcpy_s(pEditor->m_szPictExportFilenamePrefix, pEditor->m_pictExportFormatControls[1].GetString());
 
 				pEditor->m_iPictExportType = pEditor->m_pictExportFormatControls[2].GetInt();
 
@@ -2836,13 +2834,13 @@ BOOL CEditor::RleExportFormatProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lpa
 
 			if(iControlID == IDC_RLE_EXPORT2_OK)
 			{
-				strcpy(pEditor->m_szRleExportSubdirectory,       pEditor->m_rleExportFormatControls[0].GetString());
-				strcpy(pEditor->m_szRleExportFilenamePrefix,     pEditor->m_rleExportFormatControls[1].GetString());
+				strcpy_s(pEditor->m_szRleExportSubdirectory,       pEditor->m_rleExportFormatControls[0].GetString());
+				strcpy_s(pEditor->m_szRleExportFilenamePrefix,     pEditor->m_rleExportFormatControls[1].GetString());
 
 				pEditor->m_iRleExportImageFileType = pEditor->m_rleExportFormatControls[2].GetInt();
 
-				strcpy(pEditor->m_szRleExportMaskSubdirectory,   pEditor->m_rleExportFormatControls[3].GetString());
-				strcpy(pEditor->m_szRleExportMaskFilenamePrefix, pEditor->m_rleExportFormatControls[4].GetString());
+				strcpy_s(pEditor->m_szRleExportMaskSubdirectory,   pEditor->m_rleExportFormatControls[3].GetString());
+				strcpy_s(pEditor->m_szRleExportMaskFilenamePrefix, pEditor->m_rleExportFormatControls[4].GetString());
 
 				pEditor->m_iRleExportMaskFileType = pEditor->m_rleExportFormatControls[5].GetInt();
 				pEditor->m_iRleExportFramesPerRow = pEditor->m_rleExportFormatControls[6].GetInt();
@@ -2946,8 +2944,8 @@ BOOL CEditor::SndExportFormatProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lpa
 
 			if(iControlID == IDC_SND_EXPORT_OK)
 			{
-				strcpy(pEditor->m_szSndExportSubdirectory,   pEditor->m_sndExportFormatControls[0].GetString());
-				strcpy(pEditor->m_szSndExportFilenamePrefix, pEditor->m_sndExportFormatControls[1].GetString());
+				strcpy_s(pEditor->m_szSndExportSubdirectory,   pEditor->m_sndExportFormatControls[0].GetString());
+				strcpy_s(pEditor->m_szSndExportFilenamePrefix, pEditor->m_sndExportFormatControls[1].GetString());
 
 				pEditor->m_iSndExportReturnValue = 1;
 

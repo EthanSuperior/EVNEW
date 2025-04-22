@@ -45,9 +45,7 @@ CRankResource::CRankResource(void)
 }
 
 CRankResource::~CRankResource(void)
-{
-
-}
+= default;
 
 int CRankResource::GetType(void)
 {
@@ -281,8 +279,8 @@ int CRankResource::CloseAndSave(void)
 
 	m_iPriceMod = m_controls[6].GetInt();
 
-	strcpy(m_szConvName,  m_controls[7].GetString());
-	strcpy(m_szShortName, m_controls[8].GetString());
+	strcpy_s(m_szConvName,  m_controls[7].GetString());
+	strcpy_s(m_szShortName, m_controls[8].GetString());
 
 	m_iFlags = 0x0000;
 
@@ -298,7 +296,7 @@ int CRankResource::CloseAndSave(void)
 	m_iFlags |= m_controls[18].GetInt() << 10;
 	m_iFlags |= m_controls[19].GetInt() << 11;
 
-	strcpy(m_szName, m_controls[20].GetString());
+	strcpy_s(m_szName, m_controls[20].GetString());
 
 	int i;
 

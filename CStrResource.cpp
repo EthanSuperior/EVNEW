@@ -29,9 +29,7 @@ CStrResource::CStrResource(void)
 }
 
 CStrResource::~CStrResource(void)
-{
-
-}
+= default;
 
 int CStrResource::GetType(void)
 {
@@ -72,11 +70,11 @@ int CStrResource::Save(char *pOutput)
 {
 	ToMacString(m_szString);
 
-	UCHAR ucStringLength = (UCHAR)strlen(m_szString);
+	UCHAR ucStringLength = static_cast<UCHAR>(strlen(m_szString));
 
 	*pOutput = ucStringLength; pOutput++;
 
-	memcpy(pOutput, m_szString, (int)ucStringLength * sizeof(char)); pOutput += (int)ucStringLength * sizeof(char);
+	memcpy(pOutput, m_szString, static_cast<int>(ucStringLength) * sizeof(char)); pOutput += static_cast<int>(ucStringLength) * sizeof(char);
 
 	if((ucStringLength + 1) & 1)
 	{
@@ -94,7 +92,7 @@ int CStrResource::Load(char *pInput, int iSize)
 
 	ucStringLength = *pInput; pInput++;
 
-	memcpy(m_szString, pInput, (int)ucStringLength * sizeof(char)); pInput += (int)ucStringLength * sizeof(char);
+	memcpy(m_szString, pInput, static_cast<int>(ucStringLength) * sizeof(char)); pInput += static_cast<int>(ucStringLength) * sizeof(char);
 
 	m_szString[ucStringLength] = '\0';
 
@@ -174,9 +172,9 @@ int CStrResource::CloseAndSave(void)
 
 	m_iID = m_controls[0].GetInt();
 
-	strcpy(m_szName, m_controls[1].GetString());
+	strcpy_s(m_szName, m_controls[1].GetString());
 
-	strcpy(m_szString, m_controls[2].GetString());
+	strcpy_s(m_szString, m_controls[2].GetString());
 
 	int i;
 

@@ -23,26 +23,25 @@ class CShanResource;
 
 #include "CControl.h"
 #include "CNovaResource.h"
-#include "Utils.h"
 
 ////////////////////////////////////////////////////////////////
 //////////////////////////  CONSTANTS  /////////////////////////
 ////////////////////////////////////////////////////////////////
 
-const int NUM_SHAN_CONTROLS = 95;
+constexpr int NUM_SHAN_CONTROLS = 95;
 
-const int NUM_SHAN_EXTRAFRAMES_CHOICES = 6;
+constexpr int NUM_SHAN_EXTRAFRAMES_CHOICES = 6;
 
 const std::string g_szShanExtraFramesChoices[NUM_SHAN_EXTRAFRAMES_CHOICES] =
 	{"No extra frames", "Banking", "Banking with engine glow", "Animated ship parts",
 	 "When carrying Key Carried ships", "Shown in sequence"};
 
-const int NUM_SHAN_BLINKMODE_CHOICES = 4;
+constexpr int NUM_SHAN_BLINKMODE_CHOICES = 4;
 
 const std::string g_szShanBlinkModeChoices[NUM_SHAN_BLINKMODE_CHOICES] =
 	{"None", "Square", "Triangle", "Random"};
 
-const int NUM_SHAN_FIELDS = 88;
+constexpr int NUM_SHAN_FIELDS = 88;
 
 const std::string g_szShanFields[NUM_SHAN_FIELDS] =
 	{"Frames", "Base Image", "Base Mask", "Base Set Count", "Base X Size", "Base Y Size",
@@ -76,27 +75,27 @@ class CShanResource : public CNovaResource
 public:
 
 	CShanResource(void);
-	~CShanResource(void);
+	~CShanResource(void) override;
 
-	int GetType(void);
-	int GetSize(void);
+	int GetType(void) override;
+	int GetSize(void) override;
 
-	int GetDialogID(void);
-	DLGPROCNOCALLBACK GetDialogProc(void);
+	int GetDialogID(void) override;
+	DLGPROCNOCALLBACK GetDialogProc(void) override;
 
-	int GetNumFields(void);
-	const std::string * GetFieldNames(void);
+	int GetNumFields(void) override;
+	const std::string * GetFieldNames(void) override;
 
-	int Initialize(HWND hwnd);
+	int Initialize(HWND hwnd) override;
 
-	int CloseAndSave(void);
-	int CloseAndDontSave(void);
+	int CloseAndSave(void) override;
+	int CloseAndDontSave(void) override;
 
-	int Save(char *pOutput);
-	int Load(char *pInput, int iSize);
+	int Save(char *pOutput) override;
+	int Load(char *pInput, int iSize) override;
 
-	int SaveToText(std::ostream & output);
-	int LoadFromText(std::istream & input);
+	int SaveToText(std::ostream & output) override;
+	int LoadFromText(std::istream & input) override;
 
 	static BOOL ShanDlgProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
 

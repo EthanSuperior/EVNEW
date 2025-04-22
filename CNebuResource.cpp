@@ -36,9 +36,7 @@ CNebuResource::CNebuResource(void)
 }
 
 CNebuResource::~CNebuResource(void)
-{
-
-}
+= default;
 
 int CNebuResource::GetType(void)
 {
@@ -216,10 +214,10 @@ int CNebuResource::CloseAndSave(void)
 	m_iXSize     = m_controls[3].GetInt();
 	m_iYSize     = m_controls[4].GetInt();
 
-	strcpy(m_szActiveOn,  m_controls[5].GetString());
-	strcpy(m_szOnExplore, m_controls[6].GetString());
+	strcpy_s(m_szActiveOn,  m_controls[5].GetString());
+	strcpy_s(m_szOnExplore, m_controls[6].GetString());
 
-	strcpy(m_szName, m_controls[7].GetString());
+	strcpy_s(m_szName, m_controls[7].GetString());
 
 	int i;
 

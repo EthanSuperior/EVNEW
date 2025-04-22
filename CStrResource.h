@@ -31,9 +31,9 @@ class CStrResource;
 //////////////////////////  CONSTANTS  /////////////////////////
 ////////////////////////////////////////////////////////////////
 
-const int NUM_STR_CONTROLS = 3;
+constexpr int NUM_STR_CONTROLS = 3;
 
-const int NUM_STR_FIELDS = 1;
+constexpr int NUM_STR_FIELDS = 1;
 
 const std::string g_szStrFields[NUM_STR_FIELDS] =
 	{"String"};
@@ -47,27 +47,27 @@ class CStrResource : public CNovaResource
 public:
 
 	CStrResource(void);
-	~CStrResource(void);
+	~CStrResource(void) override;
 
-	int GetType(void);
-	int GetSize(void);
+	int GetType(void) override;
+	int GetSize(void) override;
 
-	int GetDialogID(void);
-	DLGPROCNOCALLBACK GetDialogProc(void);
+	int GetDialogID(void) override;
+	DLGPROCNOCALLBACK GetDialogProc(void) override;
 
-	int GetNumFields(void);
-	const std::string * GetFieldNames(void);
+	int GetNumFields(void) override;
+	const std::string * GetFieldNames(void) override;
 
-	int Initialize(HWND hwnd);
+	int Initialize(HWND hwnd) override;
 
-	int CloseAndSave(void);
-	int CloseAndDontSave(void);
+	int CloseAndSave(void) override;
+	int CloseAndDontSave(void) override;
 
-	int Save(char *pOutput);
-	int Load(char *pInput, int iSize);
+	int Save(char *pOutput) override;
+	int Load(char *pInput, int iSize) override;
 
-	int SaveToText(std::ostream & output);
-	int LoadFromText(std::istream & input);
+	int SaveToText(std::ostream & output) override;
+	int LoadFromText(std::istream & input) override;
 
 	static BOOL StrDlgProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
 

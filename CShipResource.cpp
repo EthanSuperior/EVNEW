@@ -121,9 +121,7 @@ CShipResource::CShipResource(void)
 }
 
 CShipResource::~CShipResource(void)
-{
-
-}
+= default;
 
 int CShipResource::GetType(void)
 {
@@ -1038,9 +1036,9 @@ int CShipResource::CloseAndSave(void)
 
 	m_iSkillVariation   = m_controls[26].GetInt();
 
-	strcpy(m_szAvailability, m_controls[27].GetString());
-	strcpy(m_szAppearOn,     m_controls[28].GetString());
-	strcpy(m_szOnPurchase,   m_controls[29].GetString());
+	strcpy_s(m_szAvailability, m_controls[27].GetString());
+	strcpy_s(m_szAppearOn,     m_controls[28].GetString());
+	strcpy_s(m_szOnPurchase,   m_controls[29].GetString());
 
 	m_iDeionize      = m_controls[30].GetInt();
 	m_iMaxIonization = m_controls[31].GetInt();
@@ -1053,15 +1051,15 @@ int CShipResource::CloseAndSave(void)
 	m_iBuyRandom  = m_controls[35].GetInt();
 	m_iHireRandom = m_controls[36].GetInt();
 
-	strcpy(m_szOnCapture, m_controls[37].GetString());
-	strcpy(m_szOnRetire,  m_controls[38].GetString());
+	strcpy_s(m_szOnCapture, m_controls[37].GetString());
+	strcpy_s(m_szOnRetire,  m_controls[38].GetString());
 
-	strcpy(m_szSubtitle,  m_controls[39].GetString());
-	strcpy(m_szShortName, m_controls[40].GetString());
-	strcpy(m_szCommName,  m_controls[41].GetString());
-	strcpy(m_szLongName,  m_controls[42].GetString());
+	strcpy_s(m_szSubtitle,  m_controls[39].GetString());
+	strcpy_s(m_szShortName, m_controls[40].GetString());
+	strcpy_s(m_szCommName,  m_controls[41].GetString());
+	strcpy_s(m_szLongName,  m_controls[42].GetString());
 
-	strcpy(m_szMovieFile, m_controls[43].GetString());
+	strcpy_s(m_szMovieFile, m_controls[43].GetString());
 
 	m_iEscortAI          = m_controls[44].GetInt() + 1;
 	m_iEscortUpgradeTo   = m_controls[45].GetInt();
@@ -1158,7 +1156,7 @@ int CShipResource::CloseAndSave(void)
 	m_iFlags3 |= m_controls[124].GetInt() << 9;
 	m_iFlags3 |= m_controls[125].GetInt() << 14;
 
-	strcpy(m_szName, m_controls[126].GetString());
+	strcpy_s(m_szName, m_controls[126].GetString());
 
 	int i;
 

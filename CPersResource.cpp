@@ -70,9 +70,7 @@ CPersResource::CPersResource(void)
 }
 
 CPersResource::~CPersResource(void)
-{
-
-}
+= default;
 
 int CPersResource::GetType(void)
 {
@@ -510,7 +508,7 @@ int CPersResource::CloseAndSave(void)
 
 	m_iLinkedMission = m_controls[24].GetInt();
 
-	strcpy(m_szActiveOn, m_controls[25].GetString());
+	strcpy_s(m_szActiveOn, m_controls[25].GetString());
 
 	m_iGrantClass  = m_controls[26].GetInt();
 	m_iGrantCount  = m_controls[27].GetInt();
@@ -540,8 +538,8 @@ int CPersResource::CloseAndSave(void)
 
 	m_iFlags2 |= m_controls[46].GetInt() << 0;
 
-	strcpy(m_szName,     m_controls[47].GetString());
-	strcpy(m_szSubtitle, m_controls[48].GetString());
+	strcpy_s(m_szName,     m_controls[47].GetString());
+	strcpy_s(m_szSubtitle, m_controls[48].GetString());
 
 	int i;
 

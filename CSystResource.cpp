@@ -71,9 +71,7 @@ CSystResource::CSystResource(void)
 }
 
 CSystResource::~CSystResource(void)
-{
-
-}
+= default;
 
 int CSystResource::GetType(void)
 {
@@ -783,7 +781,7 @@ int CSystResource::CloseAndSave(void)
 
 	m_iID = m_controls[0].GetInt();
 
-	strcpy(m_szName, m_controls[1].GetString());
+	strcpy_s(m_szName, m_controls[1].GetString());
 
 	m_iXPosition = m_controls[2].GetInt();
 	m_iYPosition = m_controls[3].GetInt();
@@ -865,7 +863,7 @@ int CSystResource::CloseAndSave(void)
 	m_iPersonProbabilities[6] = m_controls[71].GetInt();
 	m_iPersonProbabilities[7] = m_controls[72].GetInt();
 
-	strcpy(m_szVisibility, m_controls[73].GetString());
+	strcpy_s(m_szVisibility, m_controls[73].GetString());
 
 	m_iBackgroundColor = m_controls[74].GetInt();
 
