@@ -506,9 +506,14 @@ int CEditor::ParseCommandLine(LPSTR szCommandLine, char *szBuffer)
 	return iRetValue;
 }
 
-CEditor * CEditor::GetCurrentEditor(void)
+CEditor* CEditor::GetCurrentEditor(void)
 {
 	return CEditor::ms_pCurrentEditor;
+}
+
+CPlugIn* CEditor::GetCurrentPlugin(void)
+{
+	return &CEditor::ms_pCurrentEditor->m_plugIn;
 }
 
 int CEditor::LoadPreferences(void)
@@ -1197,6 +1202,15 @@ int CEditor::EditDelete(void)
 	return 1;
 }
 
+int CEditor::EditTemplate(void)
+{
+	m_wndTemplate.SetExtraData(0, (int)this);
+	m_wndTemplate.SetExtraData(1, (int)&m_errorLog);
+	m_wndTemplate.SetDlgProc(CEditor::TemplateDialogProc);
+	m_wndTemplate.CreateAsDialog(m_dialogMain.GetInstance(), IDD_EDIT_TEMP, 1, &m_dialogMain);
+	return 1;
+}
+
 int CEditor::EditPreferences(void)
 {
 	m_wndPreferences.SetExtraData(0, (int)this);
@@ -1326,12 +1340,19 @@ int CEditor::ResourceEdit(void)
 
 void CEditor::ResourceExtra(short id, std::string dfltName, int type) {
 	CNovaResource* pNovaResource = Find(type, id);
-	if (pNovaResource == NULL)
-	{
+	// If the resource is not found in the plugin - copy it from the library
+	if (pNovaResource == NULL) {
+		pNovaResource = ResourceTemplate(id, NovaLib::At(type, id), dfltName);
+		SetDirty();
+		UpdateResourceList();
+	}
+	// If the resource is not found in the library - create a new one
+	if (pNovaResource == NULL) {
 		pNovaResource = m_plugIn.AllocateResource(type);
 		pNovaResource->SetID(id);
 		pNovaResource->SetName(dfltName.c_str());
 		m_plugIn.m_vResources[type].push_back(pNovaResource);
+		SetDirty();
 		UpdateResourceList();
 	}
 
@@ -1392,10 +1413,56 @@ void CEditor::ResourceExtra(short id, std::string dfltName, int type) {
 	InsertMenuItem(m_hWindowMenu, iCount, TRUE, &menuItemInfo);
 
 	pWindow->CreateAsDialog(m_dialogMain.GetInstance(), pNovaResource->GetDialogID(), 0, &m_dialogMain);
-	//		m_vEditDialogs[m_vEditDialogs.size() - 1]->CreateAsDialog(m_dialogMain.GetInstance(), pNovaResource->GetDialogID(), 1, NULL);
 }
 
+CNovaResource* CEditor::ResourceTemplate(short iID, CNovaResource* pTemplateResource, std::string rezName)
+{
+	if (pTemplateResource == NULL) return NULL;
+	int iType = pTemplateResource->GetType();
+	short tempID = pTemplateResource->GetID();
+	int iSize = pTemplateResource->GetSize();
 
+	if (iType == CNR_TYPE_MISN) {
+		ResourceTemplate(iID + 4000 - 128, NovaLib::At(CNR_TYPE_DESC, tempID + 4000 - 128), rezName);
+		ResourceTemplate(iID + 5000 - 128, NovaLib::At(CNR_TYPE_DESC, tempID + 5000 - 128), rezName);
+		ResourceTemplate(iID + 6000 - 128, NovaLib::At(CNR_TYPE_DESC, tempID + 6000 - 128), rezName);
+		ResourceTemplate(iID + 7000 - 128, NovaLib::At(CNR_TYPE_DESC, tempID + 7000 - 128), rezName);
+		ResourceTemplate(iID + 8000 - 128, NovaLib::At(CNR_TYPE_DESC, tempID + 8000 - 128), rezName);
+		ResourceTemplate(iID + 9000 - 128, NovaLib::At(CNR_TYPE_DESC, tempID + 9000 - 128), rezName);
+		ResourceTemplate(iID + 15000 - 128, NovaLib::At(CNR_TYPE_DESC, tempID + 15000 - 128), rezName);
+		ResourceTemplate(iID + 16000 - 128, NovaLib::At(CNR_TYPE_DESC, tempID + 16000 - 128), rezName);
+		ResourceTemplate(iID + 17000 - 128, NovaLib::At(CNR_TYPE_DESC, tempID + 17000 - 128), rezName);
+	}
+	else if (iType == CNR_TYPE_OUTF) {
+		ResourceTemplate(iID + 3000 - 128, NovaLib::At(CNR_TYPE_DESC, tempID + 3000 - 128), rezName);
+		ResourceTemplate(iID + 6000 - 128, NovaLib::At(CNR_TYPE_PICT, tempID + 6000 - 128), rezName);
+	}
+	else if (iType == CNR_TYPE_SHIP) {
+		ResourceTemplate(iID, NovaLib::At(CNR_TYPE_SHAN, tempID), rezName);
+		ResourceTemplate(iID + 3000 - 128, NovaLib::At(CNR_TYPE_PICT, tempID + 3000 - 128), rezName + "; Targeting");
+		ResourceTemplate(iID + 5000 - 128, NovaLib::At(CNR_TYPE_PICT, tempID + 5000 - 128), rezName);
+		ResourceTemplate(iID + 13000 - 128, NovaLib::At(CNR_TYPE_DESC, tempID + 13000 - 128), rezName);
+		ResourceTemplate(iID + 14000 - 128, NovaLib::At(CNR_TYPE_DESC, tempID + 14000 - 128), rezName + "; Escort");
+	}
+	else if (iType == CNR_TYPE_SPOB) ResourceTemplate(iID, NovaLib::At(CNR_TYPE_DESC, tempID), rezName);
+
+	char* pBuffer = new char[iSize];
+	pTemplateResource->Save(pBuffer);
+
+	CNovaResource* pNewResource = Find(iType, iID);
+	if (pNewResource == NULL) {
+		pNewResource = m_plugIn.AllocateResource(iType);
+		m_plugIn.m_vResources[iType].push_back(pNewResource);
+		UpdateResourceList();
+	}
+	pNewResource->Load(pBuffer, iSize);
+	pNewResource->SetID(iID);
+	pNewResource->SetName(rezName.c_str());
+	pNewResource->SetIsNew(0);
+	SetDirty();
+	delete[] pBuffer;
+	return pNewResource;
+}
 
 int CEditor::ResourceDelete(void)
 {
@@ -1530,6 +1597,58 @@ int CEditor::PrefsCloseAndDontSave(void)
 
 	return 1;
 }
+
+int CEditor::TempInitDialog(HWND hwnd)
+{
+	m_tempControls[0].Create(hwnd, IDC_EDIT_TEMP_EDIT1, CCONTROL_TYPE_INT, IDS_STRING400);
+	m_tempControls[0].SetInt(FindUniqueResourceID(m_iCurrentResourceType, 128));
+	m_tempControls[1].Create(hwnd, IDC_EDIT_TEMP_EDIT2, CCONTROL_TYPE_STR256, IDS_STRING468);
+	m_tempControls[2].Create(hwnd, IDC_EDIT_TEMP_DROP1, CCONTROL_TYPE_COMBOBOX, IDS_STRING996);
+	std::vector<CNovaResource*> values = NovaLib::GetAllOf(m_iCurrentResourceType);
+	std::vector<std::string> names;
+	names.reserve(values.size());
+	for (const auto& res : values) names.push_back(std::to_string(res->GetID()) + ": " + res->GetName());
+	m_tempControls[2].SetComboStrings(names.size(), names.data());
+	if (!values.empty()) m_tempControls[2].SetInt(0);
+	return 1;
+}
+
+int CEditor::TempCloseAndSave(void)
+{
+	short m_iTempID = m_tempControls[0].GetInt();
+	std::string m_szTempName = m_tempControls[1].GetString();
+	int m_iTempCombo = m_tempControls[2].GetInt();
+
+	for (int i = 0; i < NUM_TEMPLATE_CONTROLS; i++)
+		m_tempControls[i].Destroy();
+
+	m_wndTemplate.Destroy();
+	ResourceTemplate(m_iTempID, NovaLib::GetAllOf(m_iCurrentResourceType)[m_iTempCombo], m_szTempName);
+	UpdateResourceList();
+	HWND hwndListResources = GetDlgItem(m_dialogMain.GetHWND(), IDC_LIST_RESOURCES);
+
+	int i;
+	for (i = 0; i < m_plugIn.m_vResources[m_iCurrentResourceType].size(); i++) {
+		if (m_plugIn.m_vResources[m_iCurrentResourceType][i]->GetID() == m_iTempID) {
+			ListBox_SetCurSel(hwndListResources, i);
+			break;
+		}
+	}
+	if (i == m_plugIn.m_vResources[m_iCurrentResourceType].size()) ListBox_SetCurSel(hwndListResources, -1);
+
+	SetDirty();
+	ResourceEdit();
+	return 1;
+}
+
+int CEditor::TempCloseAndDontSave(void)
+{
+	for (int i = 0; i < NUM_TEMPLATE_CONTROLS; i++)
+		m_tempControls[i].Destroy();
+	m_wndTemplate.Destroy();
+	return 1;
+}
+
 
 int CEditor::RemoveEditDialog(CWindow *pWindow, int iIDOrNameChanged)
 {
@@ -1888,6 +2007,13 @@ BOOL CEditor::MainDialogProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 				if(iNotifyCode == BN_CLICKED)
 				{
 					pEditor->ResourceEdit();
+				}
+			}
+			else if (iControlID == IDC_BUTTON_TEMPLATE1)
+			{
+				if (iNotifyCode == BN_CLICKED)
+				{
+					pEditor->EditTemplate();
 				}
 			}
 			else if(iControlID == IDC_BUTTON_DELETE)
@@ -2286,6 +2412,79 @@ BOOL CEditor::PreferencesDialogProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM l
 		{
 			break;
 		}
+	}
+
+	return FALSE;
+}
+
+
+BOOL CEditor::TemplateDialogProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
+{
+	CWindow* pWindow;
+	CEditor* pEditor;
+
+	pWindow = CWindow::GetWindow(hwnd, 1);
+
+	pEditor = (CEditor*)pWindow->GetExtraData(0);
+
+	int i;
+
+	switch (msg)
+	{
+	case WM_INITDIALOG:
+	{
+		pEditor->TempInitDialog(hwnd);
+
+		return TRUE;
+	}
+
+	case WM_SYSCOMMAND:
+	{
+		if (wparam == SC_CLOSE)
+		{
+			pEditor->TempCloseAndDontSave();
+
+			return TRUE;
+		}
+
+		break;
+	}
+
+	case WM_COMMAND:
+	{
+		int iNotifyCode = HIWORD(wparam);
+		int iControlID = LOWORD(wparam);
+
+		if (iControlID == IDC_EDIT_TEMP_CANCEL)
+		{
+			pEditor->TempCloseAndDontSave();
+		}
+		else if (iControlID == IDC_EDIT_TEMP_OK)
+		{
+			pEditor->TempCloseAndSave();
+		}
+		else
+		{
+			for (i = 0; i < NUM_TEMPLATE_CONTROLS; i++)
+			{
+				if (iControlID == pEditor->m_tempControls[i].GetControlID())
+				{
+					pEditor->m_tempControls[i].ProcessMessage(iNotifyCode);
+
+					break;
+				}
+			}
+		}
+
+		return TRUE;
+
+		break;
+	}
+
+	default:
+	{
+		break;
+	}
 	}
 
 	return FALSE;

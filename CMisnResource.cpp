@@ -1030,16 +1030,16 @@ BOOL CMisnResource::MisnDlgProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lpara
 
 				Static_SetText(GetDlgItem(hwnd, IDC_EDIT_MISN_TEXT63), rezName.c_str());
 			}
-			else if (iControlID == IDC_EDIT_MISN_EDIT36) {
-				int id = pResource->m_controls[35].GetInt();
+			else if (iControlID == IDC_EDIT_MISN_EDIT35) {
+				int id = pResource->m_controls[34].GetInt();
 				std::string rezName = "None";
 
 				if (id >= 128 && id <= 639) rezName = NovaLib::RezStr(CNR_TYPE_DUDE, id);
 
 				Static_SetText(GetDlgItem(hwnd, IDC_EDIT_MISN_TEXT68), rezName.c_str());
 			}
-			else if (iControlID == IDC_EDIT_MISN_EDIT37) {
-				int id = pResource->m_controls[37].GetInt();
+			else if (iControlID == IDC_EDIT_MISN_EDIT36) {
+				int id = pResource->m_controls[35].GetInt();
 				std::string rezName = "Follow Player";
 
 				if (id == -2) rezName = "Travel System";
@@ -1059,6 +1059,19 @@ BOOL CMisnResource::MisnDlgProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lpara
 					rezName = "Rand !ClassOf " + NovaLib::RezStr(CNR_TYPE_GOVT, id - 31000);
 
 				Static_SetText(GetDlgItem(hwnd, IDC_EDIT_MISN_TEXT69), rezName.c_str());
+			}
+			else if (iControlID == IDC_EDIT_MISN_EDIT37) {
+				int id = pResource->m_controls[36].GetInt();
+				std::string rezName = "Any Ship";
+
+				if (id >= 128 && id <= 255)	rezName = NovaLib::RezStr(CNR_TYPE_SHIP, id);
+				else if (id >= 1128 && id <= 1255) rezName = "Not" + NovaLib::RezStr(CNR_TYPE_SHIP, id - 1000);
+				else if (id >= 2128 && id <= 2255)
+					rezName = "GovtOf" + NovaLib::RezStr(CNR_TYPE_GOVT, id - 2000);
+				else if (id >= 3128 && id <= 3255)
+					rezName = "NotGovtOf" + NovaLib::RezStr(CNR_TYPE_GOVT, id - 3000);
+
+				Static_SetText(GetDlgItem(hwnd, IDC_EDIT_MISN_TEXT70), rezName.c_str());
 			}
 			
 			return TRUE;

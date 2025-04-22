@@ -30,6 +30,13 @@ std::string NovaLib::RezStr(int type, int id, bool addType) {
 	return g_szResourceTypes[type] + std::string(": ") + ptr->GetName();
 }
 
+std::vector<CNovaResource*> NovaLib::GetAllOf(int type)
+{
+	std::vector<CNovaResource*> values(CEditor::GetCurrentPlugin()->m_vResources[type]);
+	for (auto& [id, val] : Get().rez[type])	values.push_back(val);
+	return values;
+}
+
 
 NovaLib::~NovaLib(){ Clear(); }
 

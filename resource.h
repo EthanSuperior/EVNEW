@@ -161,7 +161,6 @@
 #define IDS_STRING143                   143
 #define IDD_EDIT_OUTF30                 143
 #define IDS_STRING144                   144
-#define IDD_TEMP_                       144
 #define IDD_EDIT_TEMP                   144
 #define IDS_STRING145                   145
 #define IDD_PICT_EXPORT                 145
@@ -852,6 +851,7 @@
 #define IDS_STRING993                   993
 #define IDS_STRING994                   994
 #define IDS_STRING995                   995
+#define IDS_STRING996                   996
 #define IDC_EDIT_STR_EDIT3              1000
 #define IDC_LIST_RESOURCETYPES          1002
 #define IDC_EDIT_STR_TEXT1              1002
@@ -2977,6 +2977,7 @@
 #define IDC_EDIT_DESC_BTN9              2637
 #define IDC_EDIT_MISN_TEXT68            2638
 #define IDC_EDIT_MISN_TEXT69            2640
+#define IDC_EDIT_MISN_TEXT70            2641
 #define IDM_FILE_NEW                    40001
 #define IDM_FILE_OPEN                   40002
 #define IDM_FILE_SAVE                   40003
@@ -3054,7 +3055,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        146
 #define _APS_NEXT_COMMAND_VALUE         40086
-#define _APS_NEXT_CONTROL_VALUE         2624
+#define _APS_NEXT_CONTROL_VALUE         2640
 #define _APS_NEXT_SYMED_VALUE           102
 #endif
 #endif

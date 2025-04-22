@@ -3,6 +3,7 @@
 #include <map>
 #include <string>
 #include <filesystem>
+#include <vector>
 
 #include "CPlugIn.h"
 
@@ -17,6 +18,7 @@ public:
 	static CNovaResource* At(int type, int id);
 	static char* RezName(int type, int id);
 	static std::string RezStr(int type, int id, bool addType=false);
+	static std::vector<CNovaResource*> GetAllOf(int type);
 	void Clear();
 	std::map<int, CNovaResource*> rez[NUM_RESOURCE_TYPES] = {};
 

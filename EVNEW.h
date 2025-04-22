@@ -37,6 +37,7 @@ class CEditor;
 ////////////////////////////////////////////////////////////////
 
 const int NUM_PREFERENCE_CONTROLS = 3;
+const int NUM_TEMPLATE_CONTROLS = 3;
 
 const int NUM_CICN_EXPORT_FORMAT_CONTROLS = 4;
 const int NUM_PICT_EXPORT_FORMAT_CONTROLS = 3;
@@ -73,7 +74,8 @@ public:
 
 	int Run(HINSTANCE hInstance);
 
-	static CEditor * GetCurrentEditor(void);
+	static CEditor* GetCurrentEditor(void);
+	static CPlugIn* GetCurrentPlugin(void);
 
 	char *GetCurFilename(void);
 	char *GetCurFilenameNoPath(void);
@@ -100,6 +102,7 @@ public:
 
 	int SetDirty(void);
 
+
 private:
 
 	int Init(HINSTANCE hInstance);
@@ -115,6 +118,10 @@ private:
 	int PrefsCloseAndSave(void);
 	int PrefsCloseAndDontSave(void);
 
+	int TempInitDialog(HWND hwnd);
+	int TempCloseAndSave(void);
+	int TempCloseAndDontSave(void);
+
 	int FileNew(void);
 	int FileOpen(int iOpenDialog, char *szFilename);
 	int FileSave(void);
@@ -126,12 +133,14 @@ private:
 	int EditCopy(void);
 	int EditPaste(int iOverwrite);
 	int EditDelete(void);
+	int EditTemplate(void);
 	int EditPreferences(void);
 	void EditLoadLibrary(std::string path);
 
 	int ResourceNew(void);
 	int ResourceEdit(void);
 	int ResourceDelete(void);
+	CNovaResource* ResourceTemplate(short id, CNovaResource* pTemplateResource, std::string resName);
 
 	int HelpAbout(void);
 
@@ -150,11 +159,14 @@ private:
 	static BOOL MainDialogProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
 	static BOOL PreferencesDialogProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
 	static BOOL AboutDialogProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
+	static BOOL TemplateDialogProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
 
 	static BOOL CicnExportFormatProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
 	static BOOL PictExportFormatProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
 	static BOOL RleExportFormatProc( HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
 	static BOOL SndExportFormatProc( HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
+
+	CPlugIn m_plugIn;
 
 	CWindow m_dialogMain;
 
@@ -176,6 +188,7 @@ private:
 
 	CWindow m_wndPreferences;
 	CWindow m_wndAbout;
+	CWindow m_wndTemplate;
 
 	CWindow m_wndCicnExportFormat;
 	CWindow m_wndPictExportFormat;
@@ -195,6 +208,7 @@ private:
 	int m_iPrefRLEBackgroundColor;
 
 	CControl m_prefControls[NUM_PREFERENCE_CONTROLS];
+	CControl m_tempControls[NUM_TEMPLATE_CONTROLS];
 
 	CControl m_cicnExportFormatControls[NUM_CICN_EXPORT_FORMAT_CONTROLS];
 	CControl m_pictExportFormatControls[NUM_PICT_EXPORT_FORMAT_CONTROLS];
@@ -229,7 +243,6 @@ private:
 
 	UINT m_iResourceClipboardFormat;
 
-	CPlugIn m_plugIn;
 
 //	PROCESS_INFORMATION m_EVNProcessInfo;
 
