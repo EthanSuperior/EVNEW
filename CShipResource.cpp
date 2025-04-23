@@ -18,6 +18,7 @@
 #include "CShipResource.h"
 
 #include "resource.h"
+#include "COutfResource.h"
 
 ////////////////////////////////////////////////////////////////
 ///////////////////  CLASS MEMBER FUNCTIONS  ///////////////////
@@ -1254,16 +1255,13 @@ BOOL CShipResource::ShipDlgProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lpara
 
 				pResource->m_controls[34].SetString(cValue);
 			}
-			else
+			for (i = 0; i < NUM_SHIP_CONTROLS; i++)
 			{
-				for(i = 0; i < NUM_SHIP_CONTROLS; i++)
+				if (iControlID == pResource->m_controls[i].GetControlID())
 				{
-					if(iControlID == pResource->m_controls[i].GetControlID())
-					{
-						pResource->m_controls[i].ProcessMessage(iNotifyCode);
+					pResource->m_controls[i].ProcessMessage(iNotifyCode);
 
-						break;
-					}
+					break;
 				}
 			}
 
@@ -1279,16 +1277,251 @@ BOOL CShipResource::ShipDlgProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lpara
 				}
 			}
 
+			if (iControlID == IDC_EDIT_SHIP_BUTTON3 && iNotifyCode == BN_CLICKED) {
+				CWindow* w = &pResource->m_wndDiff;
+				w->SetDlgProc(CShipResource::DiffDlgProc);
+				w->SetExtraData(0, (int)pWindow->GetExtraData(0));
+				w->SetExtraData(1, (int)pWindow->GetExtraData(1));
+				w->SetExtraData(2, (int)pResource);
+				w->CreateAsDialog(pWindow->GetInstance(), IDD_SHIP_DIFF, 0, pWindow);
+			}
+
+
+			if (iNotifyCode == EN_CHANGE && pResource->m_wndDiff.GetHWND() != NULL)
+				pResource->DiffUpdate(pResource->m_iDiffID);
+
 			return TRUE;
 
 			break;
 		}
-
-		default:
-		{
-			break;
-		}
+		default: { break; }
 	}
 
 	return FALSE;
+}
+
+void CShipResource::DiffOpen(void)
+{
+}
+
+int CShipResource::DiffClose(void)
+{
+	m_iDiffID = m_diffCtrl.GetInt();
+	m_diffCtrl.Destroy();
+	m_wndDiff.Destroy();
+	return 1;
+}
+
+BOOL CShipResource::DiffDlgProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
+{
+	CWindow* pWindow;
+	CShipResource* pResource;
+
+	pWindow = CWindow::GetWindow(hwnd, 1);
+
+	if (pWindow != NULL)
+		pResource = (CShipResource*)pWindow->GetExtraData(2);
+
+	int i;
+
+	switch (msg)
+	{
+	case WM_INITDIALOG:
+	{
+		pResource->DiffInitDialog(hwnd);
+		return TRUE;
+	}
+
+	case WM_SYSCOMMAND:
+	{
+		if (wparam == SC_CLOSE)
+		{
+			pResource->DiffClose();
+
+			return TRUE;
+		}
+		break;
+	}
+
+	case WM_COMMAND:
+	{
+		int iNotifyCode = HIWORD(wparam);
+		if (LOWORD(wparam) == IDC_SHIP_DIFF_DROP1) {
+			pResource->m_diffCtrl.ProcessMessage(iNotifyCode);
+			if (iNotifyCode == CBN_SELCHANGE) 
+				pResource->DiffUpdate(pResource->m_diffCtrl.GetInt());
+		}
+		return TRUE;
+	}
+
+	default:
+	{
+		break;
+	}
+	}
+
+	return FALSE;
+}
+
+std::string CShipResource::NumsToString(std::string name, int shields, int shieldReg,
+	int armor, int armorReg, int fuel, int fuelReg, int ion, int ionReg, int cargo,
+	int mass, int accel, int speed, int turn, int guns, int turrets, int cost,
+	int weight,	int gravMass, int length, int crew, int str, int skill, short weaps[8],
+	short wCnts[8], short wAmmo[8], short outfs[8], short oCnts[8]) {
+	int usedMass = 0;
+	long long usedCost = 0;
+	int usedCargo = 0;
+	std::string weapStr = "----LOADOUT (" + ToString(guns) + "[" + ToString(turrets) + "])----\n";
+	auto allOutf = NovaLib::GetAllOf(CNR_TYPE_OUTF);
+	auto matchingO = [all=allOutf](int mod, short weapId) {
+		for (auto& o : all) {
+			auto r = (COutfResource*)o;
+			for (int i=0;i<4;i++)
+				if (r->m_iModTypes[i] == mod && r->m_iModValues[i] == weapId)
+					return r;
+		}
+		return (COutfResource*) NULL;
+	};
+	for (int i = 0; i < 8; ++i) {
+		if (weaps[i] < 128) continue;
+		std::string wName = NovaLib::RezStr(CNR_TYPE_WEAP, weaps[i]);
+		auto r = matchingO(1, weaps[i]);
+		if (r != NULL) {
+			usedMass += r->m_iMass * oCnts[i];
+			usedCost += r->m_iCost * oCnts[i];
+		}
+		weapStr += wName + " x" + ToString(wCnts[i]);
+		if (wAmmo[i] > 0) {
+			auto a = matchingO(3, weaps[1]);
+			if (a != NULL) {
+				usedMass += a->m_iMass * wAmmo[i];
+				usedCost += a->m_iCost * wAmmo[i];
+			}
+			weapStr += " (" + ToString(wAmmo[i]) + ")";
+		}
+		weapStr += (i % 2 == 1) ? "\n" : "  ";
+	}
+
+	std::string outfStr = "\n----Equipment----\n";
+	for (int i = 0; i < 8; ++i) {
+		if (outfs[i] < 128) continue;
+		COutfResource* r = (COutfResource*)NovaLib::At(CNR_TYPE_OUTF, outfs[i]);
+		std::string oName = r->GetName();
+		usedMass += r->m_iMass*oCnts[i];
+		usedCost += r->m_iCost*oCnts[i];
+		for (int i = 0; i < 4; i++)
+			if (r->m_iModTypes[i] == 2) usedCargo += r->m_iModValues[i];
+		outfStr += oName + " x" + ToString(oCnts[i]);
+		outfStr += (i % 2 == 1) ? "\n" : "  ";
+	}
+
+	std::string result = " ~~ " + name + "~~\n";
+	result += "Shields: " + ToString(shields) + " (" + ToString(shieldReg) + "/frm)\n";
+	result += "Shields: " + ToString(shields) + " (" + ToString(shieldReg) + "/frm)\n";
+	result += "Armor: " + ToString(armor) + " (" + ToString(armorReg) + "/frm)\n";
+	result += "Fuel: " + ToString(fuel) + " [" + ToString(fuel / 100) + " JMPs] (" + ToString(fuelReg) + "/frm)\n";
+	result += "Ionization: " + ToString(ion) + " [" + ToString(ion / 100) + " EMPs] (" + ToString(ionReg) + "/frm)\n";
+
+	std::string cargoStr = ((cargo < 0) ? "Fixed: " : "") + ToString(abs(cargo)+usedCargo);
+	result += "Cargo: " + cargoStr + "t\n";
+
+	result += "Mass: " + ToString(mass)+"t/"+ToString(usedMass+mass) + "t free" + "\n";
+	result += "Accel: " + ToString(accel) + " [" + ToString(accel / 3) + "%]\n";
+	result += "Speed: " + ToString(speed) + " [" + ToString(speed / 3) + "%]\n";
+	result += "Maneuver: ~" + ToString(turn * 3) + " deg/sec\n";
+	result += "Size: " + ToString(length) + "m; ";
+
+	if (gravMass < 100) result += "Small\n";
+	else if (gravMass < 200) result += "Medium\n";
+	else result += "Large\n";
+
+	result += "Crew: " + ToString(crew) + "  Str: " + ToString(str) + "  Skill: +/-"+ ToString(skill) + "%\n";
+	result += weapStr + outfStr;
+	auto FormatNumberShort = ([](int v) {
+		char buffer[32];
+		if (v >= 1'000'000'000) sprintf(buffer, "%.2fB", v / 1'000'000'000.0);
+		else if (v >= 1'000'000) sprintf(buffer, "%.2fM", v / 1'000'000.0);
+		else if (v >= 1'000) sprintf(buffer, "%.2fK", v / 1'000.0);
+		else sprintf(buffer, "%d", v);
+		return std::string(buffer);
+	});
+	result += "\n-----------------\n";
+	result += "Cost: $" + FormatNumberShort(cost) + " [BASE: " + FormatNumberShort(cost-usedCost) + "]" + "\n"; //CALC TOTAL
+	/*
+	Sheilds: Val (Regen=(Val/1000)/Frame)
+	Armor: Val (Regen=(Val/1000)/Frame)
+	Fuel: Val[Val/100JMPs] (Regen=1/Val/Frame;3000/Val(s/jmp))
+	Ion: Val[Val/100EMPs] (-Regen=Val/3000=sec)
+	Cargo((if Val<0) "Fixed"): abs(Val)t/Tott
+	Mass: Val/Tot(Outf+Val)
+	Accel: Val [Val/300+%]
+	Speed: Val [Val/300+%]
+	Maneuver  ~(Val*3)deg/sec.
+	Size: Valm; Valt (Small;Med;Large (<100,<200,+
+	Crew: Val Str: Val Skill:+/-Val%
+	----LOADOUT (Gun[Tur])----
+	Name(short)xCnt(Amm?)  Name(short)xCnt(Amm?)
+	Name(short)xCnt(Amm?)  Name(short)xCnt(Amm?)
+	Name(short)xCnt(Amm?)  Name(short)xCnt(Amm?)
+	Name(short)xCnt(Amm?)  Name(short)xCnt(Amm?)
+	----Equipment----
+	Outfit(short)xCnt  Outfit(short)xCnt
+	Outfit(short)xCnt  Outfit(short)xCnt
+	Outfit(short)xCnt  Outfit(short)xCnt
+	Outfit(short)xCnt  Outfit(short)xCnt
+	-----------------
+	Cost: Val$([base]+Outf/Weap)
+	*/
+	return result;
+}
+
+void CShipResource::DiffUpdate(int dId) {
+	std::ofstream ofstream("./log.txt", std::ios::app);
+	ofstream << dId << std::endl;
+	//Lambda function to shorthand control access
+	auto l = [ctr=m_controls](int i) { return ctr[i].GetInt(); };
+
+	HWND ourTxt = GetDlgItem(m_wndDiff.GetHWND(), IDC_DIFF_SHIP_TEXT1);
+	short weaps[8] = { l(49), l(50), l(51), l(52), l(53), l(54), l(55), l(56) };
+	short wCnts[8] = { l(57), l(58), l(59), l(60), l(61), l(62), l(63), l(64) };
+	short wAmmo[8] = { l(65), l(66), l(67), l(68), l(69), l(70), l(71), l(72) };
+	short outfs[8] = { l(73), l(74), l(75), l(76), l(77), l(78), l(79), l(80) };
+	short oCnts[8] = { l(81), l(82), l(83), l(84), l(85), l(86), l(87), l(88) };
+	std::string output = NumsToString(m_controls[126].GetString(), l(2), l(3), l(4),
+		l(5), l(9), l(25), l(31), l(30), l(1), l(10), l(6), l(7), l(8), l(11), l(12),
+		l(14), l(18), l(19), l(20), l(21), l(22), l(26), weaps, wCnts, wAmmo, outfs, oCnts);
+	Static_SetText(ourTxt, output.c_str());
+	m_iDiffID = dId;
+	HWND enemyTxt = GetDlgItem(m_wndDiff.GetHWND(), IDC_DIFF_SHIP_TEXT3);
+	CShipResource* comp = NULL;
+	if (m_iDiffID != -1) 
+		comp = (CShipResource*)NovaLib::GetAllOf(CNR_TYPE_SHIP)[m_iDiffID];
+	if (comp == NULL) comp = this;
+	if (comp->GetID() < 128) {
+		Static_SetText(enemyTxt, "No ship selected");
+		return;
+	}
+	Static_SetText(enemyTxt, NumsToString(comp->m_szName, comp->m_iShields, comp->m_iShieldRecharge,
+		comp->m_iArmor, comp->m_iArmorRecharge, comp->m_iFuel, comp->m_iFuelRegeneration, 
+		comp->m_iMaxIonization, comp->m_iDeionize, comp->m_iCargo, comp->m_iFreeMass,
+		comp->m_iAcceleration, comp->m_iMaxSpeed, comp->m_iTurning, comp->m_iMaxGuns,
+		comp->m_iMaxTurrets, comp->m_iCost, comp->m_iDisplayWeight, comp->m_iMass,
+		comp->m_iLength, comp->m_iCrew, comp->m_iStrength, comp->m_iSkillVariation,
+		comp->m_iWeapons, comp->m_iWeaponCounts, comp->m_iWeaponAmmos,
+		comp->m_iOutfits, comp->m_iOutfitCounts).c_str());
+}
+
+int CShipResource::DiffInitDialog(HWND hwnd)
+{
+	int i = m_iDiffID;
+	m_diffCtrl.Create(hwnd, IDC_SHIP_DIFF_DROP1, CCONTROL_TYPE_COMBOBOX, IDS_STRING640);
+	std::vector<CNovaResource*> values = NovaLib::GetAllOf(CNR_TYPE_SHIP);
+	std::vector<std::string> names;
+	names.reserve(values.size());
+	for (const auto& res : values)
+		names.push_back(std::to_string(res->GetID()) + ": " + res->GetName()+";"+((CShipResource*)res)->m_szSubtitle);
+	m_diffCtrl.SetComboStrings(names.size(), names.data());
+	if (!values.empty()) m_diffCtrl.SetInt(i);
+	DiffUpdate(i);
+	return 1;
 }

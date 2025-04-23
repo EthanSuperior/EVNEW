@@ -20,7 +20,7 @@ TODO LINKERS:
 -Misn: MOSTLY
 -Outf: WeapName; Other stuff
 -Pers: ship
--Ship: Cost; weaps;outf
+-Ship: Cost; weaps;outf; do the stats
 -Shob tech lvls?
 -Syst: Links; spobs;dudes;pers;reinforce
 -Weap: ammo;jam names;

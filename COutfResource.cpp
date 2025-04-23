@@ -18,6 +18,7 @@
 #include "COutfResource.h"
 
 #include "resource.h"
+#include "CPictResource.h"
 
 ////////////////////////////////////////////////////////////////
 ///////////////////  CLASS MEMBER FUNCTIONS  ///////////////////
@@ -608,6 +609,13 @@ int COutfResource::CloseAndSave(void)
 	for(i = 0; i < NUM_OUTF_CONTROLS; i++)
 		m_controls[i].Destroy();
 
+	if (m_iPortExists)
+	{
+		qt::DestroyPortAssociation((qt::CGrafPort*)qt::GetHWNDPort(m_pWindow->GetHWND()));
+
+		m_iPortExists = 0;
+	}
+
 	m_iIsNew = 0;
 
 	CEditor::GetCurrentEditor()->SetDirty();
@@ -623,6 +631,13 @@ int COutfResource::CloseAndDontSave(void)
 
 	for(i = 0; i < NUM_OUTF_CONTROLS; i++)
 		m_controls[i].Destroy();
+
+	if (m_iPortExists)
+	{
+		qt::DestroyPortAssociation((qt::CGrafPort*)qt::GetHWNDPort(m_pWindow->GetHWND()));
+
+		m_iPortExists = 0;
+	}
 
 	CEditor::GetCurrentEditor()->RemoveEditDialog(m_pWindow, 0);
 
@@ -660,7 +675,6 @@ BOOL COutfResource::OutfDlgProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lpara
 
 	if(pWindow != NULL)
 		pResource = (COutfResource *)pWindow->GetExtraData(2);
-
 	int i;
 
 	switch(msg)
@@ -673,6 +687,15 @@ BOOL COutfResource::OutfDlgProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lpara
 
 			break;
 		}
+
+		/*case WM_PAINT:
+		{
+			pResource->OnPaint();
+
+			return TRUE;
+
+			break;
+		}*/
 
 		case WM_SYSCOMMAND:
 		{
@@ -689,17 +712,17 @@ BOOL COutfResource::OutfDlgProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lpara
 		case WM_COMMAND:
 		{
 			int iNotifyCode = HIWORD(wparam);
-			int iControlID  = LOWORD(wparam);
+			int iControlID = LOWORD(wparam);
 
-			if(iControlID == IDC_EDIT_OUTF_CANCEL)
+			if (iControlID == IDC_EDIT_OUTF_CANCEL)
 			{
 				pResource->CloseAndDontSave();
 			}
-			else if(iControlID == IDC_EDIT_OUTF_OK)
+			else if (iControlID == IDC_EDIT_OUTF_OK)
 			{
 				pResource->CloseAndSave();
 			}
-			else if(iControlID == IDC_EDIT_OUTF_BUTTON1)
+			else if (iControlID == IDC_EDIT_OUTF_BUTTON1)
 			{
 				char cValue[2];
 
@@ -709,7 +732,7 @@ BOOL COutfResource::OutfDlgProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lpara
 
 				pResource->m_controls[20].SetString(cValue);
 			}
-			else if(iControlID == IDC_EDIT_OUTF_BUTTON2)
+			else if (iControlID == IDC_EDIT_OUTF_BUTTON2)
 			{
 				char cValue[8];
 
@@ -719,7 +742,7 @@ BOOL COutfResource::OutfDlgProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lpara
 
 				pResource->m_controls[16].SetString(cValue);
 			}
-			else if(iControlID == IDC_EDIT_OUTF_BUTTON3)
+			else if (iControlID == IDC_EDIT_OUTF_BUTTON3)
 			{
 				char cValue[8];
 
@@ -729,47 +752,47 @@ BOOL COutfResource::OutfDlgProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lpara
 
 				pResource->m_controls[17].SetString(cValue);
 			}
-			else if(iControlID == IDC_EDIT_OUTF_BUTTON4)
+			else if (iControlID == IDC_EDIT_OUTF_BUTTON4)
 			{
 				pResource->m_iEditModTypeIndex = 5;
 
-				if(pResource->m_controls[4].GetInt() == 16)
+				if (pResource->m_controls[4].GetInt() == 16)
 					pResource->DoEditModType17();
 				else
 					pResource->DoEditModType30();
 			}
-			else if(iControlID == IDC_EDIT_OUTF_BUTTON5)
+			else if (iControlID == IDC_EDIT_OUTF_BUTTON5)
 			{
 				pResource->m_iEditModTypeIndex = 7;
 
-				if(pResource->m_controls[6].GetInt() == 16)
+				if (pResource->m_controls[6].GetInt() == 16)
 					pResource->DoEditModType17();
 				else
 					pResource->DoEditModType30();
 			}
-			else if(iControlID == IDC_EDIT_OUTF_BUTTON6)
+			else if (iControlID == IDC_EDIT_OUTF_BUTTON6)
 			{
 				pResource->m_iEditModTypeIndex = 9;
 
-				if(pResource->m_controls[8].GetInt() == 16)
+				if (pResource->m_controls[8].GetInt() == 16)
 					pResource->DoEditModType17();
 				else
 					pResource->DoEditModType30();
 			}
-			else if(iControlID == IDC_EDIT_OUTF_BUTTON7)
+			else if (iControlID == IDC_EDIT_OUTF_BUTTON7)
 			{
 				pResource->m_iEditModTypeIndex = 11;
 
-				if(pResource->m_controls[10].GetInt() == 16)
+				if (pResource->m_controls[10].GetInt() == 16)
 					pResource->DoEditModType17();
 				else
 					pResource->DoEditModType30();
 			}
 			else
 			{
-				for(i = 0; i < NUM_OUTF_CONTROLS; i++)
+				for (i = 0; i < NUM_OUTF_CONTROLS; i++)
 				{
-					if(iControlID == pResource->m_controls[i].GetControlID())
+					if (iControlID == pResource->m_controls[i].GetControlID())
 					{
 						pResource->m_controls[i].ProcessMessage(iNotifyCode);
 
@@ -778,38 +801,38 @@ BOOL COutfResource::OutfDlgProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lpara
 				}
 			}
 
-			if((iNotifyCode == CBN_SELCHANGE) && ((iControlID == IDC_EDIT_OUTF_COMBO1) || (iControlID == IDC_EDIT_OUTF_COMBO2) || (iControlID == IDC_EDIT_OUTF_COMBO3) || (iControlID == IDC_EDIT_OUTF_COMBO4)))
+			if ((iNotifyCode == CBN_SELCHANGE) && ((iControlID == IDC_EDIT_OUTF_COMBO1) || (iControlID == IDC_EDIT_OUTF_COMBO2) || (iControlID == IDC_EDIT_OUTF_COMBO3) || (iControlID == IDC_EDIT_OUTF_COMBO4)))
 			{
 				HWND hwndText;
 				HWND hwndEdit;
 				HWND hwndButton1;
 				HWND hwndButton2;
 
-				if(iControlID == IDC_EDIT_OUTF_COMBO1)
+				if (iControlID == IDC_EDIT_OUTF_COMBO1)
 				{
-					hwndText    = GetDlgItem(hwnd, IDC_EDIT_OUTF_TEXT6);
-					hwndEdit    = GetDlgItem(hwnd, IDC_EDIT_OUTF_EDIT6);
+					hwndText = GetDlgItem(hwnd, IDC_EDIT_OUTF_TEXT6);
+					hwndEdit = GetDlgItem(hwnd, IDC_EDIT_OUTF_EDIT6);
 					hwndButton1 = GetDlgItem(hwnd, IDC_EDIT_OUTF_BUTTON4);
 					hwndButton2 = GetDlgItem(hwnd, IDC_EDIT_OUTF_BUTTON8);
 				}
-				else if(iControlID == IDC_EDIT_OUTF_COMBO2)
+				else if (iControlID == IDC_EDIT_OUTF_COMBO2)
 				{
-					hwndText    = GetDlgItem(hwnd, IDC_EDIT_OUTF_TEXT8);
-					hwndEdit    = GetDlgItem(hwnd, IDC_EDIT_OUTF_EDIT8);
+					hwndText = GetDlgItem(hwnd, IDC_EDIT_OUTF_TEXT8);
+					hwndEdit = GetDlgItem(hwnd, IDC_EDIT_OUTF_EDIT8);
 					hwndButton1 = GetDlgItem(hwnd, IDC_EDIT_OUTF_BUTTON5);
 					hwndButton2 = GetDlgItem(hwnd, IDC_EDIT_OUTF_BUTTON9);
 				}
-				else if(iControlID == IDC_EDIT_OUTF_COMBO3)
+				else if (iControlID == IDC_EDIT_OUTF_COMBO3)
 				{
-					hwndText    = GetDlgItem(hwnd, IDC_EDIT_OUTF_TEXT10);
-					hwndEdit    = GetDlgItem(hwnd, IDC_EDIT_OUTF_EDIT10);
+					hwndText = GetDlgItem(hwnd, IDC_EDIT_OUTF_TEXT10);
+					hwndEdit = GetDlgItem(hwnd, IDC_EDIT_OUTF_EDIT10);
 					hwndButton1 = GetDlgItem(hwnd, IDC_EDIT_OUTF_BUTTON6);
 					hwndButton2 = GetDlgItem(hwnd, IDC_EDIT_OUTF_BUTTON10);
 				}
 				else
 				{
-					hwndText    = GetDlgItem(hwnd, IDC_EDIT_OUTF_TEXT12);
-					hwndEdit    = GetDlgItem(hwnd, IDC_EDIT_OUTF_EDIT12);
+					hwndText = GetDlgItem(hwnd, IDC_EDIT_OUTF_TEXT12);
+					hwndEdit = GetDlgItem(hwnd, IDC_EDIT_OUTF_EDIT12);
 					hwndButton1 = GetDlgItem(hwnd, IDC_EDIT_OUTF_BUTTON7);
 					hwndButton2 = GetDlgItem(hwnd, IDC_EDIT_OUTF_BUTTON11);
 				}
@@ -818,29 +841,29 @@ BOOL COutfResource::OutfDlgProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lpara
 
 				Static_SetText(hwndText, g_szOutfModValueTexts[iIndex].c_str());
 
-				if((iIndex == 16) || (iIndex == 28))
+				if ((iIndex == 16) || (iIndex == 28))
 				{
-					ShowWindow(hwndEdit,    SW_HIDE);
+					ShowWindow(hwndEdit, SW_HIDE);
 					ShowWindow(hwndButton1, SW_SHOW);
 					ShowWindow(hwndButton2, SW_HIDE);
 				}
-				else if(iIndex == 41)
+				else if (iIndex == 41)
 				{
-					ShowWindow(hwndEdit,    SW_HIDE);
+					ShowWindow(hwndEdit, SW_HIDE);
 					ShowWindow(hwndButton1, SW_HIDE);
 					ShowWindow(hwndButton2, SW_SHOW);
 				}
 				else
 				{
-					ShowWindow(hwndEdit,    SW_SHOW);
+					ShowWindow(hwndEdit, SW_SHOW);
 					ShowWindow(hwndButton1, SW_HIDE);
 					ShowWindow(hwndButton2, SW_HIDE);
 				}
 			}
 
-			if((iControlID == IDC_EDIT_OUTF_EDIT1) && (iNotifyCode == EN_CHANGE))
+			if ((iControlID == IDC_EDIT_OUTF_EDIT1) && (iNotifyCode == EN_CHANGE))
 			{
-				if((pResource->m_controls[0].GetInt() >= 128) && (pResource->m_controls[0].GetInt() < 640))
+				if ((pResource->m_controls[0].GetInt() >= 128) && (pResource->m_controls[0].GetInt() < 640))
 				{
 					std::string szText = "Outfitter Desc ID: ";
 					szText += ToString(pResource->m_controls[0].GetInt() + 3000 - 128);
@@ -848,9 +871,17 @@ BOOL COutfResource::OutfDlgProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lpara
 					Static_SetText(GetDlgItem(hwnd, IDC_EDIT_OUTF_TEXT28), szText.c_str());
 
 					szText = "Outfitter PICT ID: ";
-					szText += ToString(pResource->m_controls[0].GetInt() + 6000 - 128);
+					szText += ToString(pResource->m_controls[0].GetInt() + 6000 - 128) + " - ";
+					szText += NovaLib::RezStr(CNR_TYPE_PICT, pResource->m_controls[0].GetInt() + 6000 - 128);
 
 					Static_SetText(GetDlgItem(hwnd, IDC_EDIT_OUTF_TEXT29), szText.c_str());
+				}
+			}
+			else if ((iControlID == IDC_EDIT_OUTF_BTN1) && (iNotifyCode == EN_CHANGE || iNotifyCode == EN_UPDATE))
+			{
+				if ((pResource->m_controls[0].GetInt() >= 128) && (pResource->m_controls[0].GetInt() < 640)) {
+					short id = pResource->m_controls[0].GetInt() + 3000 - 128;
+					CEditor::GetCurrentEditor()->ResourceExtra(id, std::string(pResource->m_controls[39].GetString()));
 				}
 			}
 
@@ -866,6 +897,36 @@ BOOL COutfResource::OutfDlgProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lpara
 	}
 
 	return FALSE;
+}
+
+
+int COutfResource::OnPaint(void)
+{
+	if (!m_iPortExists)
+	{
+		qt::MacSetPort(qt::CreatePortAssociation(m_pWindow->GetHWND(), NULL, qt::kQTMLNoIdleEvents));
+		m_iPortExists = 1;
+	}
+	else qt::MacSetPort(qt::GetHWNDPort(m_pWindow->GetHWND()));
+	PAINTSTRUCT paintStruct;
+
+	BeginPaint(m_pWindow->GetHWND(), &paintStruct);
+
+	CPictResource* pict = (CPictResource*) NovaLib::At(CNR_TYPE_PICT, m_iID + 6000 - 128);
+	if (pict == NULL) {
+		EndPaint(m_pWindow->GetHWND(), &paintStruct);
+		return 1;
+	}
+	qt::Rect m_rectDest = { 0, 0, 64, 64 };
+	//m_rectDest.right += m_rectDest.left;
+	//m_rectDest.bottom += m_rectDest.top;
+	if (pict->m_hTempPicture != NULL)
+		qt::DrawPicture((qt::PicHandle)pict->m_hTempPicture, &m_rectDest);
+	else if (pict->m_hPicture != NULL)
+		qt::DrawPicture((qt::PicHandle)pict->m_hPicture, &m_rectDest);
+	EndPaint(m_pWindow->GetHWND(), &paintStruct);
+
+	return 1;
 }
 
 int COutfResource::DoEditModType17(void)

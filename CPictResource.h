@@ -83,6 +83,9 @@ public:
 
 	static BOOL PictDlgProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
 
+	qt::Handle m_hPicture;
+	qt::Handle m_hTempPicture;
+
 private:
 
 	int FindBPP(void);
@@ -99,14 +102,11 @@ private:
 
 	int m_iPortExists;
 
-	qt::Handle m_hPicture;
-
 	qt::Rect m_rectDest;
 
 	short m_iTempWidth;
 	short m_iTempHeight;
 
-	qt::Handle m_hTempPicture;
 
 	qt::Rect m_tempRectDest;
 

@@ -1433,6 +1433,17 @@ CNovaResource* CEditor::ResourceTemplate(short iID, CNovaResource* pTemplateReso
 		ResourceTemplate(iID + 16000 - 128, NovaLib::At(CNR_TYPE_DESC, tempID + 16000 - 128), rezName);
 		ResourceTemplate(iID + 17000 - 128, NovaLib::At(CNR_TYPE_DESC, tempID + 17000 - 128), rezName);
 	}
+	else if (iType == CNR_TYPE_NEBU) {
+		short nebuTempID = ((tempID - 128) * 7) + 9500;
+		short nebuID = ((iID - 128) * 7) + 9500;
+		ResourceTemplate(nebuID, NovaLib::At(CNR_TYPE_PICT, nebuTempID), rezName + "; 42.1%");
+		ResourceTemplate(nebuID + 1, NovaLib::At(CNR_TYPE_PICT, nebuTempID + 1), rezName + "; 56.2%");
+		ResourceTemplate(nebuID + 2, NovaLib::At(CNR_TYPE_PICT, nebuTempID + 2), rezName + "; 75.0%");
+		ResourceTemplate(nebuID + 3, NovaLib::At(CNR_TYPE_PICT, nebuTempID + 3), rezName + "; 100.0%");
+		ResourceTemplate(nebuID + 4, NovaLib::At(CNR_TYPE_PICT, nebuTempID + 4), rezName + "; 133.3%");
+		ResourceTemplate(nebuID + 5, NovaLib::At(CNR_TYPE_PICT, nebuTempID + 5), rezName + "; 177.7%");
+		ResourceTemplate(nebuID + 6, NovaLib::At(CNR_TYPE_PICT, nebuTempID + 6), rezName + "; 237.0%");
+	}
 	else if (iType == CNR_TYPE_OUTF) {
 		ResourceTemplate(iID + 3000 - 128, NovaLib::At(CNR_TYPE_DESC, tempID + 3000 - 128), rezName);
 		ResourceTemplate(iID + 6000 - 128, NovaLib::At(CNR_TYPE_PICT, tempID + 6000 - 128), rezName);
@@ -2416,7 +2427,6 @@ BOOL CEditor::PreferencesDialogProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM l
 
 	return FALSE;
 }
-
 
 BOOL CEditor::TemplateDialogProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 {

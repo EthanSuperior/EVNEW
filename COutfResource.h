@@ -21,6 +21,15 @@ class COutfResource;
 
 #include <string>
 
+namespace qt
+{
+#include <QTML.h>
+#include <QuickDraw.h>
+#include <ImageCompression.h>
+#include <QuickTimeComponents.h>
+#include <TextUtils.h>
+}
+
 #include "CControl.h"
 #include "CBitFieldControl.h"
 #include "CNovaResource.h"
@@ -120,6 +129,12 @@ public:
 	int LoadFromText(std::istream & input);
 
 	static BOOL OutfDlgProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
+	int COutfResource::OnPaint(void);
+
+	short m_iMass;
+	short m_iModTypes[4];
+	short m_iModValues[4];
+	int   m_iCost;
 
 private:
 
@@ -143,17 +158,12 @@ private:
 	short IndexToModType(short iIndex);
 
 	short m_iDisplayWeight;
-	short m_iMass;
 	short m_iTechLevel;
-
-	short m_iModTypes[4];
-	short m_iModValues[4];
 
 	short m_iMaxCount;
 
 	USHORT m_iFlags;
-
-	int   m_iCost;
+	int m_iPortExists;
 
 	char  m_szAvailability[255];
 	char  m_szOnPurchase[255];

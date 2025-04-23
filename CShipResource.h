@@ -91,8 +91,22 @@ public:
 	int LoadFromText(std::istream & input);
 
 	static BOOL ShipDlgProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
+	static BOOL DiffDlgProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
+	std::string NumsToString(std::string name, int shields, int shieldReg, int armor,
+		int armorReg, int fuel, int fuelReg, int ion, int ionReg, int cargo, int mass,
+		int accel, int speed, int turn, int guns, int turrets, int cost, int weight,
+		int gravMass, int length, int crew, int str, int skill, short weaps[8],
+		short wCnts[8], short wAmmo[8], short outfs[8], short oCnts[8]);
+	int DiffInitDialog(HWND hwnd);
+	void DiffOpen(void);
+	void DiffUpdate(int dID);
+	int DiffClose(void);
+	short m_iDiffID = -1;
+	char  m_szSubtitle[64];
 
 private:
+	CControl m_diffCtrl;
+	CWindow m_wndDiff;
 
 	int SwapEndians(void);
 
@@ -155,7 +169,6 @@ private:
 	char  m_szOnCapture[255];
 	char  m_szOnRetire[255];
 
-	char  m_szSubtitle[64];
 	char  m_szShortName[64];
 	char  m_szCommName[32];
 	char  m_szLongName[128];
