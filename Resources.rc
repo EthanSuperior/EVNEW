@@ -3027,6 +3027,7 @@ BEGIN
     BEGIN
         MENUITEM "&About",                      IDM_HELP_ABOUT
     END
+    MENUITEM "RUN DEV",                     IDM_RUNDEV
 END
 
 IDR_PICTMENU MENU

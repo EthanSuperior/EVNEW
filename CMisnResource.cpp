@@ -825,10 +825,12 @@ BOOL CMisnResource::MisnDlgProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lpara
 			if(iControlID == IDC_EDIT_MISN_CANCEL)
 			{
 				pResource->CloseAndDontSave();
+				return TRUE;
 			}
 			else if(iControlID == IDC_EDIT_MISN_OK)
 			{
 				pResource->CloseAndSave();
+				return FALSE;
 			}
 			else if(iControlID == IDC_EDIT_MISN_BUTTON1)
 			{
@@ -863,28 +865,30 @@ BOOL CMisnResource::MisnDlgProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lpara
 				}
 			}
 
-			if (iNotifyCode != EN_UPDATE && iNotifyCode != EN_CHANGE) return TRUE;
-
 			short id = pResource->m_controls[0].GetInt();
-			std::string name = std::string(pResource->m_controls[68].GetString());
-			if ((iControlID == IDC_EDIT_DESC_BTN1))
-				CEditor::GetCurrentEditor()->ResourceExtra(id + 4000 - 128, "OFFER: " + name);
-			else if ((iControlID == IDC_EDIT_DESC_BTN2))
-				CEditor::GetCurrentEditor()->ResourceExtra(id + 5000 - 128, "BREIF: " + name);
-			else if ((iControlID == IDC_EDIT_DESC_BTN3))
-				CEditor::GetCurrentEditor()->ResourceExtra(id + 6000 - 128, "QUICK: " + name);
-			else if ((iControlID == IDC_EDIT_DESC_BTN4))
-				CEditor::GetCurrentEditor()->ResourceExtra(id + 7000 - 128, "LOAD: " + name);
-			else if ((iControlID == IDC_EDIT_DESC_BTN5))
-				CEditor::GetCurrentEditor()->ResourceExtra(id + 8000 - 128, "DROP: " + name);
-			else if ((iControlID == IDC_EDIT_DESC_BTN6))
-				CEditor::GetCurrentEditor()->ResourceExtra(id + 9000 - 128, "DONE: " + name);
-			else if ((iControlID == IDC_EDIT_DESC_BTN7))
-				CEditor::GetCurrentEditor()->ResourceExtra(id + 15000 - 128, "FAIL: " + name);
-			else if ((iControlID == IDC_EDIT_DESC_BTN8))
-				CEditor::GetCurrentEditor()->ResourceExtra(id + 16000 - 128, "SHIP: " + name);
-			else if ((iControlID == IDC_EDIT_DESC_BTN9))
-				CEditor::GetCurrentEditor()->ResourceExtra(id + 17000 - 128, "RJCT: " + name);
+			if (iNotifyCode == BN_CLICKED) {
+				std::string name = std::string(pResource->m_controls[68].GetString());
+				if ((iControlID == IDC_EDIT_DESC_BTN1))
+					CEditor::GetCurrentEditor()->ResourceExtra(id + 4000 - 128, "OFFER: " + name);
+				else if ((iControlID == IDC_EDIT_DESC_BTN2))
+					CEditor::GetCurrentEditor()->ResourceExtra(id + 5000 - 128, "BREIF: " + name);
+				else if ((iControlID == IDC_EDIT_DESC_BTN3))
+					CEditor::GetCurrentEditor()->ResourceExtra(id + 6000 - 128, "QUICK: " + name);
+				else if ((iControlID == IDC_EDIT_DESC_BTN4))
+					CEditor::GetCurrentEditor()->ResourceExtra(id + 7000 - 128, "LOAD: " + name);
+				else if ((iControlID == IDC_EDIT_DESC_BTN5))
+					CEditor::GetCurrentEditor()->ResourceExtra(id + 8000 - 128, "DROP: " + name);
+				else if ((iControlID == IDC_EDIT_DESC_BTN6))
+					CEditor::GetCurrentEditor()->ResourceExtra(id + 9000 - 128, "DONE: " + name);
+				else if ((iControlID == IDC_EDIT_DESC_BTN7))
+					CEditor::GetCurrentEditor()->ResourceExtra(id + 15000 - 128, "FAIL: " + name);
+				else if ((iControlID == IDC_EDIT_DESC_BTN8))
+					CEditor::GetCurrentEditor()->ResourceExtra(id + 16000 - 128, "SHIP: " + name);
+				else if ((iControlID == IDC_EDIT_DESC_BTN9))
+					CEditor::GetCurrentEditor()->ResourceExtra(id + 17000 - 128, "RJCT: " + name);
+			}
+
+			if (iNotifyCode != EN_UPDATE && iNotifyCode != EN_CHANGE) return TRUE;
 
 			if (iControlID == IDC_EDIT_MISN_EDIT1)
 			{
@@ -1082,10 +1086,12 @@ void CMisnResource::UpdateDynamicDefaults(CControl* controls, short oldId, short
 	SetIfDefaultInt(controls, 37, oldId, newId, 17000 - 128);
 	SetIfDefaultStr(controls, 38, oldId + 1100, newId + 1100);
 	SetIfDefaultStr(controls, 41, oldId + 1100, newId + 1100);
-	if (oldId != -1) return;
 
-	controls[1].SetInt(162);
-	controls[38].SetString(("!b" + std::to_string(newId + 1100)).c_str());
-	controls[41].SetString(("b" + std::to_string(newId + 1100)+ " o368").c_str());
-	controls[68].SetString("New Name; $¢ M");
+	// TODO: THIS TRIGGERS ALWAYS
+	//if (oldId != -1) return;
+
+	//controls[1].SetInt(162);
+	//controls[38].SetString(("!b" + std::to_string(newId + 1100)).c_str());
+	//controls[41].SetString(("b" + std::to_string(newId + 1100)+ " o368").c_str());
+	//controls[68].SetString("New Name; $¢ M");
 } 

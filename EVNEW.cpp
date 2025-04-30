@@ -1224,6 +1224,17 @@ int CEditor::EditPreferences(void)
 void CEditor::EditLoadLibrary(std::string path)
 {
 	NovaLib::Get().AddFolder(path, &m_dialogMain);
+	//std::ofstream of("./log.txt");
+	//for (auto stl : NovaLib::GetAllOf(CNR_TYPE_STRL)) {
+	//	stl->SaveToText(of);
+	//	of << std::endl;
+	//}
+	//of << std::endl;
+	//int n = 0;
+	//for (auto ptr : NovaLib::GetAllOf(CNR_TYPE_SPOB))
+	//	if (((CSpobResource*)ptr)->m_iGovernment == 128)
+	//		n += ((CSpobResource*)ptr)->m_iTribute;
+	//of << "TOTAL: " << n << std::endl;
 }
 
 int CEditor::ResourceNew(void)
@@ -1343,8 +1354,10 @@ void CEditor::ResourceExtra(short id, std::string dfltName, int type) {
 	// If the resource is not found in the plugin - copy it from the library
 	if (pNovaResource == NULL) {
 		pNovaResource = ResourceTemplate(id, NovaLib::At(type, id), dfltName);
-		SetDirty();
-		UpdateResourceList();
+		if (pNovaResource != NULL) {
+			SetDirty();
+			UpdateResourceList();
+		}
 	}
 	// If the resource is not found in the library - create a new one
 	if (pNovaResource == NULL) {
@@ -2112,6 +2125,9 @@ BOOL CEditor::MainDialogProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 			else if(iControlID == IDM_HELP_ABOUT)
 			{
 				pEditor->HelpAbout();
+			}
+			else if (iControlID == IDM_RUNDEV) {
+				ShellExecute(NULL, "open", "C:\\Users\\User\\Desktop\\EVNova\\Dev.lnk", NULL, NULL, SW_SHOWNORMAL);
 			}
 			else if(iControlID == IDA_FILENEW)		// Ctrl+N
 			{

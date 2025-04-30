@@ -81,6 +81,8 @@ public:
 
 	static BOOL SpobDlgProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
 
+	short m_iTribute;
+	short m_iGovernment;
 private:
 
 	int SwapEndians(void);
@@ -90,12 +92,10 @@ private:
 
 	short m_iGraphics;
 
-	short m_iTribute;
 
 	short m_iTechLevel;
 	short m_iSpecialTechs[8];
 
-	short m_iGovernment;
 	short m_iMinStatus;
 
 	short m_iCustomPicture;

@@ -3122,6 +3122,8 @@
 #define IDM_RESOURCEPOPUP_EDIT          40083
 #define IDA_EDITRESOURCE                40084
 #define ID_EDIT_LOADLIBRARY             40085
+#define ID_RUNDEV                       40086
+#define IDM_RUNDEV                      40087
 #define IDM_WINDOW_1                    40100
 #define IDM_WINDOW_MAX                  40163
 
@@ -3130,7 +3132,7 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        158
-#define _APS_NEXT_COMMAND_VALUE         40086
+#define _APS_NEXT_COMMAND_VALUE         40088
 #define _APS_NEXT_CONTROL_VALUE         2673
 #define _APS_NEXT_SYMED_VALUE           102
 #endif
