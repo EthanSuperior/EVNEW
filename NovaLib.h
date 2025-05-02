@@ -9,8 +9,8 @@
 
 class CEditor;
 
-//std::ofstream ofstream("log.txt", std::ios::app);
-//ofstream << iNotifyCode << std::endl;
+// std::ofstream ofstream("log.txt", std::ios::app);
+// ofstream << iNotifyCode << std::endl;
 
 /*
 TODO LINKERS:
@@ -35,23 +35,12 @@ TODO LINKERS:
 	including (but not limited to) DITL and DLOG.
 
 # QUESTIONS:
-- How cron; with 0s and negs and repeats?
-- How make single time event (Im looking at you crons)?
-- Can you make something run on startup (crons? Remove the limit of starting char)?
-- Make a cron run daily?
-- Make a cron run each time with on/offs?
-- How do loop crons work?
-- If you have a cron that modfies bits, does it trigger prior crons?
+- Do multi days run all crons in order or 1 at a time just x times?
 - Does Fxxx do anything on planet? How about off?
-- Does buying something then leaving a planet double trigger crons? (seems yes)
-- Do crons trigger on land and on leave or just one and if so which?
-- If I set both itters, do they check 1 run both or check between, which runs first?
-- Detect Return Stellar/Misn Stellar
-- If Else with misn
 - Check Fxxx again and Fxxx vs Axxx
-- Make Dev Branch
+- Detect Return Stellar/Misn Stellar
 - Do failed missions progress time?
-
+- If Else with misn
 
 # Set Expression Behavior:
 - Sxxx: Start mission ID xxx automatically.
@@ -64,9 +53,36 @@ TODO LINKERS:
 	- OnShipDone runs in any system of the goal once completed.
 	- The Ship having No Goal really just means always completed.
 	- You can have multiple of the same mission at the same time.
+	- Large Negative Time Limit; Same as 0
+	- Auto-Aborted mission progress time by Date Increment, but Axxx and Fxxx do not
+- Fxxx: Fails a mission; notice fail dialog is only shown are the return stellar and only for failed shipgoals/cargo
 
-- Leaving progresses time, not landing.
-- Large Negative Time Limit; Same as 0
+# Cron Witchcrafty:
+	- Modifying bit does not change for crons of lower IDs but does effect crons of higher values
+	- Crons do not run Day 0; IE the day the game starts; use the char OnStart instead
+	- Execution: Crons are evaluated OnDateChange (IE when you leave a planet or a mission is completed/auto-aborted).
+	- Crons run for each day that passes, meaning if 10 days pass they will run 10 times.
+	- 0 means 0 days after OnEnabled returns true; ie the day of 3 would be 3 days after(4 total)
+	- ALL CRONS TAKE A MINIMUM OF 2 DAYS to evaluate;
+		If you need to check daily for changes use a self-restarting misn OR
+		2 crons both 0 1 0; one set to Continuous OnStart; the other OnEnd and some complex bit logic
+	- A=OnStart B=OnEnd ' '=Next Iteration (Number order is Pre Duration Post)
+	- If Duration is less than 0: Never Execute
+	- Pre-Holdoff = max(0, Pre-Holdoff)
+	- Post-Holdoff = max(0,  Post-Holdoff)
+	- Cron 0 0 0: 0:AB 1:B; Repeat {0 0 0: AB B;}
+	- Cron 0 0 Z: 0:AB Z:_; Repeat {0 0 3: AB _ _;} * The only time Z's value is actually used
+	- Cron 0 Y 0: 0:A Y:B; Repeat {0 3 0: A _ _ B;}
+	- Cron X 0 0: 0:_ X:AB (X+1):B; Repeat {3 0 0: _ _ AB B;}
+	- Cron 0 Y Z: 0:A Y:B (Y+1):B ... INF {0 2 Z: A _ B B ... B}
+	- Cron X 0 Z: 0:_ X:AB X+1:B (2X+1):_; Repeat {2 0 X: _ _ AB B _ _;}
+	- Cron X Y 0: 0:_ X:A (X+Y):B; Repeat {2 3 0: _ _ A _ _ B;}
+	- Cron X Y Z: 0:_ X:A (X+Y):B (2X+Y):AB (2X+Y+1):B (3X+Y+1):_; Repeat {2 5 Z: _ _ A _ _ _ _ B _ AB B _ _;}
+	- Continuous Iterative is a while loop
+	- If Both Continuous Iterative as set it will execute All OnStarts and then All OnEnds (Basically skipping the OnEnd all together);
+	- CRONs evaluate for each day passed; one at a time ie 3 days will do: c1 c2 c1 c2 c1 c2
+	- Leaving progresses time, not landing; and as such crons execute on leaving a planet.
+	- To force a cron to only run once;	set a bit during it's OnStart and Check during its OnEnable
 
 # TIPS & TRICKS
 	ESOTERIC: //http://asw.forums.cytheraguides.com/topic/21842/esoteric-nova-knowledge-compendium
@@ -88,15 +104,12 @@ TODO LINKERS:
 	OnShipDone will run afterwards if not on a planet
 - Did You Leave: To detect leaving a planet start a misn with no ShipGoal, then use OnShipDone.
 
-	CRONS:
-- Execution: Crons run OnLand&OnDateChange
-- Grounded: Triggering a Date Advance; even when on a planet will reruns crons
-- Witchcraft: Umm good luck but negatives do weird things... http://asw.forums.cytheraguides.com/topic/20361/crons-give-me-headaches/
-
-	LOGICAL: 
+	LOGICAL:
 - NCB Set Counting: ( [b1 b2 b3 b4 b5 b6 b7]=x); =<> supported; x must be literal; the '( [' part is required.
 	a bunch of &s is ( [b1 b2 ...bN]=N) |s is ( [b1 b2 ...bN]>0); >= not supported
-- Conditionals: To make one in a set expression, you need to have a mission that represents your condition,
+	alternativly &s can be ( [!b1 !b2 ...!bN]=0) |s can be ( [!b1 !b2 ...!bN]<N)
+	[b1 b2 ...bN]<N
+- Conditionals: To make one, you need to have a mission that represents your condition,
 	Active being true and Inactive being false. Put your True expression in the missions OnAbort field,
 	then in your set expression Axxx the mission. OnAbort only triggers if the misn is active.
 
@@ -108,17 +121,27 @@ TODO LINKERS:
 - Misn Counter: http://asw.forums.cytheraguides.com/topic/22110/cron-less-counting
 	Works within outfitter & http://asw.forums.cytheraguides.com/topic/22158/multiple-ammo-types
 - RANC: A counter using Ncron and N+1 NCB to store a N bit number [0b1000 would be b4=1]
-	In this example b0 is the toggle bit.
+	In this example b10 is the increment bit. http://asw.forums.cytheraguides.com/topic/16686/
+	RANC counters are limited to +/- 1 at a time; an outfit can be used to trigger the +/- if multi +/- is needed; be sure to add the (b10&b11) safegaurd
 	NOTE: cron order matters as cron 128 is executed before cron 129
-	cronXX0: EnableOn: ( [b0 b1 b2 b3]=4)	OnStart: ^b4     OR: EnableOn: ( [!b0 !b1 !b2 !b3]=0)
-	cronXX1: EnableOn: ( [b0 b1 b2]=3)		OnStart: ^b3
-	cronXX2: EnableOn: b0 & b1				OnStart: ^b2
-	cronXX3: EnableOn: b0					OnStart: ^b1 !b0
-- Bi-Directional RANC: http://asw.forums.cytheraguides.com/topic/19025/
+	cronXX0: EnableOn: ( [!b10 !b1 !b2 !b3]=0)		OnStart: ^b4
+	cronXX1: EnableOn: ( [!b10 !b1 !b2]=0)			OnStart: ^b3
+	cronXX2: EnableOn: ( [!b10 !b1]=0)				OnStart: ^b2
+	cronXX3: EnableOn: ( [!b10]=0)					OnStart: ^b1 !b10
+- Bi-Directional RANC: http://asw.forums.cytheraguides.com/topic/19025/    This seems to invalidate the first bit and regulates it to be just (N-1)+1
+	cronXX0: EnableOn: b10 & b11											OnStart: !b10 !b11
+	cronXX1: EnableOn: ( [!b10 !b3 !b2 !b1]=0)|( [!b11 b3 b2 b1]=0)			OnStart: ^b4
+	cronXX2: EnableOn: ( [!b10 !b2 !b1]=0)|( [!b11 b2 b1]=0)	 			OnStart: ^b3
+	cronXX3: EnableOn: ( [!b10 !b1]=0)|( [!b11 b1]=0)	 					OnStart: ^b2
+	cronXX4: EnableOn: ( [!b10]=0)|( [!b11]=0)								OnStart: ^b1 !b10 !b11
+	- If you have multiple counters you can combine the first cron; see the forum for how they did it
+	- Roll-over can be prevented by adding (...&!( b3 b4....)) and (...&( [b3 b4...]>0)) etc to all the conditional
+		Warning however this limits the max and the minimums to [1, ((N-1)+1)] additionally it seems that once you reach max it freezes the value.
+		This is because the transitionary state b1111{from b0111->b1000} is indisigishable from the actual b1111
 - BONC [http://asw.forums.cytheraguides.com/topic/19004/new-counter-method/]
 
 	TIMER:
-- Cron Pwrs:
+- Cron Pwrs: See Cron Witchcrafty
 - Daily Runner: Create a hidden abortable misnXXX with a 1-day time limit; OnFail: Sxxx; Start/End w/ Sxxx/Axxx
 - Inflight Timer: Sxxx a misn that spawns an invisible ship, with 0 armor&turn&accel&fuel. Give the ship a
 	death delay of X, this will be your timer. In the OnShipDone field you can add your effects; If you want
@@ -158,19 +181,18 @@ TODO LINKERS:
 class NovaLib
 {
 public:
-	static NovaLib& Get();
-	void AddFolder(std::string path, CWindow* pWndParent);
-	void AddRezFile(std::string filename, CWindow* pWndParent);
-	static CNovaResource* At(int type, int id);
-	static char* RezName(int type, int id);
-	static std::string RezStr(int type, int id, bool addType=false);
-	static std::vector<CNovaResource*> GetAllOf(int type);
+	static NovaLib &Get();
+	void AddFolder(std::string path, CWindow *pWndParent);
+	void AddRezFile(std::string filename, CWindow *pWndParent);
+	static CNovaResource *At(int type, int id);
+	static char *RezName(int type, int id);
+	static std::string RezStr(int type, int id, bool addType = false);
+	static std::vector<CNovaResource *> GetAllOf(int type);
 	void Clear();
-	std::map<int, CNovaResource*> rez[NUM_RESOURCE_TYPES] = {};
+	std::map<int, CNovaResource *> rez[NUM_RESOURCE_TYPES] = {};
 
 private:
 	NovaLib() = default;
 	~NovaLib();
-	static NovaLib* instance;
+	static NovaLib *instance;
 };
-
