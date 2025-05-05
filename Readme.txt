@@ -251,129 +251,67 @@ Characters that can be converted into Mac fonts:
  Char   Windows code
  -------------------
   ¡      Alt+0161
-
   ¢      Alt+0162
-
   £      Alt+0163
-
   ¥      Alt+0165
-
   §      Alt+0167
-
   ©      Alt+0169
-
   «      Alt+0171
-
   ¬      Alt+0172
-
   ®      Alt+0174
-
   ¯      Alt+0175
-
   ±      Alt+0177
-
   ´      Alt+0180
-
   µ      Alt+0181
-
   »      Alt+0187
-
   ¿      Alt+0191
-
   À      Alt+0192
-
   Á      Alt+0193
-
   Â      Alt+0194
-
   Ä      Alt+0196
-
   Ç      Alt+0199
-
   È      Alt+0200
-
   É      Alt+0201
-
   Ê      Alt+0202
-
   Ë      Alt+0203
-
   Ì      Alt+0204
-
   Í      Alt+0205
-
   Î      Alt+0206
-
   Ï      Alt+0207
-
   Ñ      Alt+0209
-
   Ò      Alt+0210
-
   Ó      Alt+0211
-
   Ô      Alt+0212
-
   Õ      Alt+0213
-
   Ö      Alt+0214
-
   Ø      Alt+0216
-
   Ù      Alt+0217
-
   Û      Alt+0219
-
   Ü      Alt+0220
-
   à      Alt+0224
-
   á      Alt+0225
-
   â      Alt+0226
-
   ã      Alt+0227
-
   ä      Alt+0228
-
   å      Alt+0229
-
   æ      Alt+0230
-
   ç      Alt+0231
-
   è      Alt+0232
-
   é      Alt+0233
-
   ê      Alt+0234
-
   ë      Alt+0235
-
   ì      Alt+0236
-
   í      Alt+0237
-
   î      Alt+0238
-
   ï      Alt+0239
-
   ñ      Alt+0241
-
   ò      Alt+0242
-
   ó      Alt+0243
-
   ô      Alt+0244
-
   ö      Alt+0246
-
   ÷      Alt+0247
-
   ø      Alt+0248
-
   ü      Alt+0252
-
 
 
 The following characters exist in Mac fonts but not in Windows fonts.  You can use these in plugins, but they will not display correctly
@@ -457,6 +395,15 @@ any characters that are converted incorrectly, or anything else that might be us
 * Added the ability to choose the color to display transparent pixels of RLE resources (the previous was always gray, 0x808080)
 * RLE masks are now automatically generated after imports, using black as transparent pixels (but masks can still be imported separately, too)
 
+??/25: Release Public Beta 1.1.0
+* Added NovaLib
+* Added Open Recent
+* Added Auto Reopen previous
+* Added Cron timeline
+* Added Ship Comparisons
+* Added Resource As Template
+* Added Resource Links
+
 
 +-------------+
 | 6. Legalese |
@@ -477,4 +424,4 @@ I cannot thank Ambrosia, ATMOS, and Contraband Entertainment enough for making E
 
 Mehrunes of the Ambrosia webboards, who posted a lot of detailed information on the rez file format
 The makers of the open-source projects SpriteWorld and BlitPixie, who helped me understand and work with the RLE image data format
-All of the beta testers who have been especially helpful in finding bugs and suggesting new features
+All of the beta testers who have been especially helpful in finding bugs and suggesting new features
