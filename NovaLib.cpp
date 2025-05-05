@@ -43,7 +43,7 @@ NovaLib::~NovaLib(){ Clear(); }
 void NovaLib::AddFolder(std::string path, CWindow* pWndParent) {
 	for (const auto& entry : std::filesystem::directory_iterator(path)) {
 		if (entry.is_regular_file() && entry.path().extension() == ".rez")
-			AddRezFile(entry.path().string(), pWndParent);
+			AddRezFile(entry.path().lexically_normal().string(), pWndParent);
 	}
 }
 
@@ -68,7 +68,5 @@ void NovaLib::Clear()
 		for (auto& [id, ptr] : rez[i]) delete ptr;
 		rez[i].clear();
 	}
-	delete instance;
-	instance = NULL;
 }
 

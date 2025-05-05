@@ -3053,6 +3053,7 @@
 #define IDC_SHIP_DIFF_DROP1             2670
 #define IDC_DIFF_SHIP_TEXT1             2671
 #define IDC_DIFF_SHIP_TEXT3             2673
+#define IDC_EDIT_CRON_TEXT36            2673
 #define IDC_DIFF_SHIP_TEXT2             2674
 #define IDM_FILE_NEW                    40001
 #define IDM_FILE_OPEN                   40002
@@ -3124,7 +3125,18 @@
 #define ID_EDIT_LOADLIBRARY             40085
 #define ID_RUNDEV                       40086
 #define IDM_RUNDEV                      40087
+#define ID_Menu                         40088
+#define IDM_RECENT_FILE                 40089
+#define ID_FILE_OPENRECENT              40090
+#define ID_OPENRECENT_                  40091
+#define ID_OPEN_RECENT                  40092
+#define IDM_OPEN_RECENT                 40093
 #define IDM_WINDOW_1                    40100
+#define IDM_RECENT_FILE_0               40151
+#define IDM_RECENT_FILE_1               40152
+#define IDM_RECENT_FILE_2               40153
+#define IDM_RECENT_FILE_3               40154
+#define IDM_RECENT_FILE_4               40155
 #define IDM_WINDOW_MAX                  40163
 
 // Next default values for new objects
@@ -3132,8 +3144,8 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        158
-#define _APS_NEXT_COMMAND_VALUE         40088
-#define _APS_NEXT_CONTROL_VALUE         2673
-#define _APS_NEXT_SYMED_VALUE           102
+#define _APS_NEXT_COMMAND_VALUE         40094
+#define _APS_NEXT_CONTROL_VALUE         2674
+#define _APS_NEXT_SYMED_VALUE           107
 #endif
 #endif

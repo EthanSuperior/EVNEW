@@ -105,6 +105,8 @@ public:
 
 private:
 
+	std::string GetRootFolder(std::string filename = "");
+
 	int Init(HINSTANCE hInstance);
 	int Shutdown(void);
 
@@ -135,7 +137,7 @@ private:
 	int EditDelete(void);
 	int EditTemplate(void);
 	int EditPreferences(void);
-	void EditLoadLibrary(std::string path);
+	void EditLoadLibrary(std::string path, bool clearFirst = true);
 
 	int ResourceNew(void);
 	int ResourceEdit(void);
@@ -171,6 +173,7 @@ private:
 	CWindow m_dialogMain;
 
 	std::vector<CWindow *> m_vEditDialogs;
+	std::vector<std::string> m_szRecentPaths;
 
 	HMENU m_hMainMenu;
 	HMENU m_hWindowMenu;
@@ -251,6 +254,6 @@ private:
 //	std::string m_szTempPluginFilename;
 
 	CErrorLog m_errorLog;
-
+	std::string szLastOpen;
 	static CEditor * ms_pCurrentEditor;
 };

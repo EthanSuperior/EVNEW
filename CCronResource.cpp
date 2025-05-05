@@ -521,6 +521,48 @@ BOOL CCronResource::CronDlgProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lpara
 				}
 			}
 
+			if (iNotifyCode != EN_UPDATE && iNotifyCode != EN_CHANGE) return TRUE;
+
+			if (iControlID == IDC_EDIT_CRON_EDIT9 || iControlID == IDC_EDIT_CRON_EDIT10 || iControlID == IDC_EDIT_CRON_EDIT11)
+			{
+				auto wait = [](int n) {
+					std::string r;
+					for (int i = 0; i < n; i++)r += "_ ";
+					return r;
+					};
+				std::string szText = "_: Wait S:OnStart E:OnEnd B:Both ...:Non-teminating\n";
+				int iPreHoldoff = pResource->m_controls[9].GetInt();
+				if (iPreHoldoff < 0) iPreHoldoff = 0;
+				int iPostHoldoff = pResource->m_controls[10].GetInt();
+				if (iPostHoldoff < 0) iPostHoldoff = 0;
+				int iDuration = pResource->m_controls[8].GetInt();
+				if (iDuration < 0) szText = "Invalid duration - Will NEVER Execute";
+				else if (iPreHoldoff == 0) {
+					if (iDuration == 0) {
+						if (iPostHoldoff == 0) szText += "B E;";
+						else szText += "B "+ wait(--iPostHoldoff)+";";
+					}
+					else {
+						if (iPostHoldoff == 0) szText += "S " + wait(--iDuration) + "E;";
+						else szText += "S " + wait(--iPostHoldoff) + "E E E ...";
+					}
+				}
+				else {
+					if (iDuration == 0) {
+						if (iPostHoldoff == 0) szText += wait(iPreHoldoff) + "B E;";
+						else szText += wait(iPreHoldoff) + "B E "+ wait(iPreHoldoff) +";";
+					}
+					else {
+						if (iPostHoldoff == 0) szText += wait(iPreHoldoff) + "S " + wait(--iDuration) + "E;";
+						else {
+							szText += wait(iPreHoldoff) + "S " + wait(--iDuration) + "E "
+								+ wait(iPreHoldoff - 1) + "B. E " + wait(iPreHoldoff) +";";
+						}
+					}
+				}
+				Static_SetText(GetDlgItem(hwnd, IDC_EDIT_CRON_TEXT36), szText.c_str());			
+			}
+
 			return TRUE;
 
 			break;

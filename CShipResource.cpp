@@ -957,6 +957,20 @@ int CShipResource::Initialize(HWND hwnd)
 	m_controls[126].Create(hwnd, IDC_EDIT_SHIP_EDIT90, CCONTROL_TYPE_STR256, IDS_STRING732);
 	m_controls[126].SetString(m_szName);
 
+	std::string s = m_szName;
+	auto sc = s.find(';'), col = s.find(':', sc);
+	if (m_iDiffID == -1 && sc != std::string::npos && col != std::string::npos) {
+		try { 
+			m_iDiffID = std::stoi(s.substr(col + 1));
+			std::vector<CNovaResource*> values = NovaLib::GetAllOf(CNR_TYPE_SHIP);
+			for (auto i = 0; i < values.size(); ++i)
+				if (values[i]->GetID() == m_iDiffID) {
+					m_iDiffID = i;
+					break;
+				}
+		} catch (...) {}
+	}
+
 	Static_SetText(GetDlgItem(hwnd, IDC_EDIT_SHIP_TEXT77), ToString(m_iID).c_str());
 	Static_SetText(GetDlgItem(hwnd, IDC_EDIT_SHIP_TEXT78), ToString(m_iID + 3000 - 128).c_str());
 	Static_SetText(GetDlgItem(hwnd, IDC_EDIT_SHIP_TEXT79), ToString(m_iID + 5000 - 128).c_str());
@@ -1382,13 +1396,15 @@ std::string CShipResource::NumsToString(std::string name, int shields, int shiel
 		}
 		return (COutfResource*) NULL;
 	};
+
 	for (int i = 0; i < 8; ++i) {
 		if (weaps[i] < 128) continue;
 		std::string wName = NovaLib::RezStr(CNR_TYPE_WEAP, weaps[i]);
 		auto r = matchingO(1, weaps[i]);
 		if (r != NULL) {
-			usedMass += r->m_iMass * oCnts[i];
-			usedCost += r->m_iCost * oCnts[i];
+			wName += "(" + ToString(r->GetID()) + ")";
+			usedMass += r->m_iMass * wCnts[i];
+			usedCost += r->m_iCost * wCnts[i];
 		}
 		weapStr += wName + " x" + ToString(wCnts[i]);
 		if (wAmmo[i] > 0) {

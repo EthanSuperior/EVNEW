@@ -272,7 +272,6 @@ int CPlugIn::SetSndSaveOptions(int iSave, char *szSubdirectory, char *szFilename
 int CPlugIn::Load(char *szFilename, CWindow *pWndParent)
 {
 	SetFilename(szFilename);
-
 	int iError = 0;
 
 	CErrorLog *pLog = CErrorLog::GetCurrentErrorLog();

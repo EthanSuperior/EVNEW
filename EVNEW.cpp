@@ -43,6 +43,7 @@
 #include <commctrl.h>
 
 #include <algorithm>
+#include <unordered_set>
 
 namespace qt
 {
@@ -111,6 +112,12 @@ CEditor::CEditor(void)
 CEditor::~CEditor(void)
 {
 
+}
+
+std::string CEditor::GetRootFolder(std::string filename)
+{
+	if(filename == "") filename = m_plugIn.GetFilename();
+	return std::filesystem::path(filename).parent_path().parent_path().generic_string();
 }
 
 int CEditor::Init(HINSTANCE hInstance)
@@ -331,12 +338,14 @@ int CEditor::Init(HINSTANCE hInstance)
 //	m_iIsEVNRunning = 0;
 
 	m_iResourceClipboardFormat = RegisterClipboardFormat("CNovaResource");
-
-	if(iShouldLoadAtEnd)
-		FileOpen(0, szArg1);
 	
+	if (iShouldLoadAtEnd) {
+		FileOpen(0, szArg1);
+	}
+	else if (szLastOpen != "") {
+		FileOpen(0, szLastOpen.data());
+	}
 	//Load Default Values
-	EditLoadLibrary("C:\\Users\\User\\Desktop\\EVNova\\TC\\Base\\Nova Files");
 
 	return 1;
 }
@@ -534,7 +543,7 @@ int CEditor::LoadPreferences(void)
 		m_iPrefGenerateLogFile    = 1;
 		m_iPrefCacheRLEs          = 1;
 		m_iPrefRLEBackgroundColor = 0x00808080;
-
+		m_szRecentPaths.clear();
 		SavePreferences();
 
 		return 1;
@@ -586,6 +595,11 @@ int CEditor::LoadPreferences(void)
 
 			m_iPrefRLEBackgroundColor = ((iRed & 0xFF) << 16) | ((iGreen & 0xFF) << 8) | (iBlue & 0xFF);
 		}
+		else if (szToken == "RECENTFILE")
+		{
+			if (szLastOpen == "") szLastOpen = szStrLine;
+			m_szRecentPaths.push_back(szStrLine);
+		}
 	}
 
 	inPrefs.close();
@@ -615,14 +629,18 @@ int CEditor::SavePreferences(void)
 
 	outPrefs << "EVNEW Preferences"                             << std::endl
 			                                                    << std::endl
-//			 << "EVNLOCATION "        << m_szEVNLocation        << std::endl
-//			                                                    << std::endl
 			 << "GENERATELOGFILE "    << m_iPrefGenerateLogFile << std::endl
 			 << "CACHERLES "          << m_iPrefCacheRLEs       << std::endl
 			 << "RLEBACKGROUNDCOLOR " << ((m_iPrefRLEBackgroundColor >> 16) & 0xFF) << ' '
 									  << ((m_iPrefRLEBackgroundColor >> 8)  & 0xFF) << ' '
 									  << ( m_iPrefRLEBackgroundColor        & 0xFF) << std::endl;
 
+	std::unordered_set<std::string> s;
+	for (auto& p : m_szRecentPaths) {
+		if (!s.insert(p).second) continue;
+		outPrefs << "RECENTFILE " << p << std::endl;
+		if (s.size() == 5) break;
+	}
 	outPrefs.close();
 
 	return 1;
@@ -753,7 +771,10 @@ int CEditor::FileOpen(int iDialog, char *szFilename)
 	}
 
 	int iResult = m_plugIn.Load(szFilename2, &m_dialogMain);
-
+	szLastOpen = szFilename2;
+	m_szRecentPaths.insert(m_szRecentPaths.begin(), szFilename2);
+	
+	EditLoadLibrary(GetRootFolder(szFilename2) + "/Nova Files");
 	UpdateResourceList();
 
 	if(iResult == 0)
@@ -995,6 +1016,8 @@ int CEditor::FileExit(void)
 
 	PostQuitMessage(0);
 
+	SavePreferences();
+
 	return 1;
 }
 
@@ -1221,9 +1244,10 @@ int CEditor::EditPreferences(void)
 	return 1;
 }
 
-void CEditor::EditLoadLibrary(std::string path)
+void CEditor::EditLoadLibrary(std::string path, bool clearFirst)
 {
-	NovaLib::Get().AddFolder(path, &m_dialogMain);
+	if (clearFirst) NovaLib::Get().Clear();
+	NovaLib::Get().AddFolder(std::filesystem::absolute(path).generic_string(), &m_dialogMain);
 	//std::ofstream of("./log.txt");
 	//for (auto stl : NovaLib::GetAllOf(CNR_TYPE_STRL)) {
 	//	stl->SaveToText(of);
@@ -1980,6 +2004,21 @@ BOOL CEditor::MainDialogProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 	{
 		case WM_INITDIALOG:
 		{
+			//HWND hMainWnd = GetParent(hwnd); // or your main window HWND directly
+			HMENU hMainMenu = GetMenu(hwnd);
+			if (!hMainMenu) return TRUE; // Or handle error
+
+			HMENU hRecentMenu = CreatePopupMenu();
+			for (size_t i = 0; i < pEditor->m_szRecentPaths.size(); ++i) {
+				std::string displayName = pEditor->m_szRecentPaths[i];
+				AppendMenuA(hRecentMenu, MF_STRING, IDM_RECENT_FILE_0 + static_cast<UINT>(i), displayName.c_str());
+			}
+
+			HMENU hFileMenu = GetSubMenu(hMainMenu, 0); // assuming File is first
+			InsertMenuA(hFileMenu, 2, MF_BYPOSITION | MF_POPUP, (UINT_PTR)hRecentMenu, "Open Recent");
+
+			DrawMenuBar(hwnd);
+
 			return TRUE;
 
 			break;
@@ -2024,6 +2063,19 @@ BOOL CEditor::MainDialogProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 				if(iNotifyCode == BN_CLICKED)
 				{
 					pEditor->ResourceNew();
+				}
+			}
+			else if(iControlID >= IDM_RECENT_FILE_0 && iControlID <= IDM_RECENT_FILE_0 + 4) {
+				char buffer[256] = {};
+				MENUITEMINFOA mii = { sizeof(MENUITEMINFOA) };
+				mii.fMask = MIIM_STRING;
+				mii.dwTypeData = buffer;
+				mii.cch = sizeof(buffer);
+
+				HMENU hFileMenu = GetSubMenu(GetMenu(hwnd), 0); // Assuming "File" is first submenu
+
+				if (GetMenuItemInfoA(hFileMenu, iControlID, FALSE, &mii)) {
+					pEditor->FileOpen(0, buffer);
 				}
 			}
 			else if(iControlID == IDC_BUTTON_EDIT)
@@ -2093,7 +2145,7 @@ BOOL CEditor::MainDialogProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 			}
 			else if (iControlID == ID_EDIT_LOADLIBRARY) 
 			{
-				pEditor->EditLoadLibrary("C:\\Users\\User\\Desktop\\EVNova\\TC\\Base\\Nova Files");
+				pEditor->EditLoadLibrary("../Nova Files", false);
 			}
 			else if(iControlID == IDM_RESOURCE_NEW)
 			{
@@ -2126,8 +2178,18 @@ BOOL CEditor::MainDialogProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 			{
 				pEditor->HelpAbout();
 			}
-			else if (iControlID == IDM_RUNDEV) {
-				ShellExecute(NULL, "open", "C:\\Users\\User\\Desktop\\EVNova\\Dev.lnk", NULL, NULL, SW_SHOWNORMAL);
+			else if (iControlID == IDM_RUNDEV)
+			{	
+				std::vector<std::string> extensions = { ".nplay", ".exe", ".lnk" };
+				for (const auto& ext : extensions) {
+					for (const auto& entry : std::filesystem::directory_iterator(pEditor->GetRootFolder())) {
+						if (entry.is_regular_file() && entry.path().extension() == ext) {
+							auto pathStr = entry.path().generic_string();
+							ShellExecute(NULL,"open", pathStr.c_str(), NULL, pEditor->GetRootFolder().c_str(), SW_SHOWNORMAL);
+							return TRUE;
+						}
+					}
+				}
 			}
 			else if(iControlID == IDA_FILENEW)		// Ctrl+N
 			{

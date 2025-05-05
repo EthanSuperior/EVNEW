@@ -73,7 +73,7 @@ TODO LINKERS:
 	- Cron 0 0 0: 0:AB 1:B; Repeat {0 0 0: AB B;}
 	- Cron 0 0 Z: 0:AB Z:_; Repeat {0 0 3: AB _ _;} * The only time Z's value is actually used
 	- Cron 0 Y 0: 0:A Y:B; Repeat {0 3 0: A _ _ B;}
-	- Cron X 0 0: 0:_ X:AB (X+1):B; Repeat {3 0 0: _ _ AB B;}
+	- Cron X 0 0: 0:_ X:AB (X+1):B; Repeat {3 0 0: _ _ AB B;}    !!!!!!!!!!!!! WHY does this differ from X0Z is this correct?
 	- Cron 0 Y Z: 0:A Y:B (Y+1):B ... INF {0 2 Z: A _ B B ... B}
 	- Cron X 0 Z: 0:_ X:AB X+1:B (2X+1):_; Repeat {2 0 X: _ _ AB B _ _;}
 	- Cron X Y 0: 0:_ X:A (X+Y):B; Repeat {2 3 0: _ _ A _ _ B;}
