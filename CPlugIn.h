@@ -4,8 +4,7 @@
 
 // File CPlugIn.h
 
-#ifndef CPLUGIN_H_INCLUDED	// Prevent multiple inclusions
-#define CPLUGIN_H_INCLUDED
+#pragma once
 
 ////////////////////////////////////////////////////////////////
 ///////////////////////  CLASS FORWARDS  ///////////////////////
@@ -112,5 +111,3 @@ private:
 	char m_szSndSubdirectory[256];
 	char m_szSndFilenamePrefix[256];
 };
-
-#endif		// #ifndef CPLUGIN_H_INCLUDED

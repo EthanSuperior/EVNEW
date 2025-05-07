@@ -1,4 +1,4 @@
-### QUESTIONS:
+##### QUESTIONS:
 - Do multi days run all crons in order or 1 at a time just x times?
 - Does Fxxx do anything on planet? How about off?
 - Check Fxxx again and Fxxx vs Axxx
@@ -50,7 +50,7 @@
 - To force a cron to only run once;	set a bit during it's OnStart and Check during its OnEnable
 
 ### TIPS & TRICKS
-	ESOTERIC: //http://asw.forums.cytheraguides.com/topic/21842/esoteric-nova-knowledge-compendium
+- SEE ESOTERIC: //http://asw.forums.cytheraguides.com/topic/21842/esoteric-nova-knowledge-compendium
 - 30 FPS: 30 frames is 1 second
 - Comments within desc: Use {b9999 "text" ""} to leave comments in descs that will never be displayed
 	(use whatever your 'always false' bit is if you're using b9999 for something else)
@@ -113,14 +113,14 @@
 	
 - BONC [http://asw.forums.cytheraguides.com/topic/19004/new-counter-method/]
 
-	TIMER:
+##### TIMER:
 - Cron Pwrs: See Cron Witchcrafty
 - Daily Runner: Create a hidden abortable misnXXX with a 1-day time limit; OnFail: Sxxx; Start/End w/ Sxxx/Axxx
 - Inflight Timer: Sxxx a misn that spawns an invisible ship, with 0 armor&turn&accel&fuel. Give the ship a
 	death delay of X, this will be your timer. In the OnShipDone field you can add your effects; If you want
 	the timer to be repeating add Axxx Sxxx for the misn of the timer. Calling Axxx will stop the timer.
 
-	EXTRAS:
+##### EXTRAS:
 - In-Flight Stat Recalc: To recalc the players stats just Gxxx Dxxx any outfit on timer;
 - Time Flys when you're having fun: http://asw.forums.cytheraguides.com/topic/20232/
 	Create a repeating timer as above, have the OnShipDone Syyy a misn, which is  is autoaborting
@@ -152,3 +152,5 @@ Beam Weapons: http://asw.forums.cytheraguides.com/topic/20831/an-insight-on-beam
 Delay Guidance: http://asw.forums.cytheraguides.com/topic/19791/-evn--unguided----guided-submunitioning-/
 No Jumps Allowed: http://asw.forums.cytheraguides.com/topic/20221/no-jumping-here-/
 Spob Atks: http://asw.forums.cytheraguides.com/topic/19947/random-idea-about-inter-planetary-combat---/4
+Annotations: http://asw.forums.cytheraguides.com/topic/19906/
+http://asw.forums.cytheraguides.com/topic/22195/all-the-important-links-you-ll-ever-need/

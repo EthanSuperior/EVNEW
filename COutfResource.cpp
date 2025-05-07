@@ -912,7 +912,7 @@ int COutfResource::OnPaint(void)
 
 	BeginPaint(m_pWindow->GetHWND(), &paintStruct);
 
-	CPictResource* pict = (CPictResource*) NovaLib::At(CNR_TYPE_PICT, m_iID + 6000 - 128);
+	CPictResource* pict = (CPictResource*) NovaLib::Find(CNR_TYPE_PICT, m_iID + 6000 - 128);
 	if (pict == NULL) {
 		EndPaint(m_pWindow->GetHWND(), &paintStruct);
 		return 1;

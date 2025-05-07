@@ -145,6 +145,7 @@ private:
 	CNovaResource* ResourceTemplate(short id, CNovaResource* pTemplateResource, std::string resName);
 
 	int HelpAbout(void);
+	int RunNova(void);
 
 	int AskForSave(void);
 
@@ -174,6 +175,8 @@ private:
 
 	std::vector<CWindow *> m_vEditDialogs;
 	std::vector<std::string> m_szRecentPaths;
+	std::vector<std::string> m_vTemplateDisplayNames;
+	std::vector<CNovaResource*> m_vTemplateValues;
 
 	HMENU m_hMainMenu;
 	HMENU m_hWindowMenu;

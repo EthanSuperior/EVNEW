@@ -22,6 +22,7 @@ class CControl;
 #include <string>
 
 #include "Utils.h"
+#include <vector>
 
 ////////////////////////////////////////////////////////////////
 //////////////////////////  CONSTANTS  /////////////////////////
@@ -46,6 +47,7 @@ const int CCONTROL_TYPE_STRARB   = 15;
 const int CCONTROL_TYPE_CHECK    = 16;
 const int CCONTROL_TYPE_COLOR    = 17;
 const int CCONTROL_TYPE_COMBOBOX = 18;
+const int CCONTROL_TYPE_REZBOX   = 19;
 
 ////////////////////////////////////////////////////////////////
 ///////////////////////////  CLASSES  //////////////////////////
@@ -75,6 +77,8 @@ public:
 	int SetMinValue(int iMinValue);
 	int SetMaxValue(int iMaxValue);
 
+	int SetRezType(int rezNum);
+
 	int GetMinValue(void);
 	int GetMaxValue(void);
 
@@ -101,6 +105,7 @@ private:
 	int m_iIntValue;
 
 	std::string m_szStringValue;
+	std::vector<std::string> m_vRezItems;
 
 	HBITMAP m_hbmColor;
 };

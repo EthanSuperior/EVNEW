@@ -59,13 +59,13 @@ CMisnResource::CMisnResource(void)
 
 	m_iShipSubtitle = -1;
 
-	m_iBriefingDesc     = -1;
-	m_iQuickBriefDesc   = -1;
-	m_iLoadCargoDesc    = -1;
-	m_iDropoffCargoDesc = -1;
-	m_iCompletionDesc   = -1;
-	m_iFailDesc         = -1;
-	m_iShipDoneDesc     = -1;
+	m_iBriefingDesc     = 0;
+	m_iQuickBriefDesc   = 0;
+	m_iLoadCargoDesc    = 0;
+	m_iDropoffCargoDesc = 0;
+	m_iCompletionDesc   = 0;
+	m_iFailDesc         = 0;
+	m_iShipDoneDesc     = 0;
 
 	m_iCanAbort = 1;
 
@@ -80,7 +80,7 @@ CMisnResource::CMisnResource(void)
 
 	m_iAvailableShipType = -1;
 
-	m_iRefuseDesc = -1;
+	m_iRefuseDesc = 0;
 
 	memset(m_szAvailableBits, 0, 255 * sizeof(char));
 	memset(m_szOnAccept,      0, 255 * sizeof(char));
@@ -1092,6 +1092,16 @@ void CMisnResource::UpdateDynamicDefaults(CControl* controls, short oldId, short
 
 	//controls[1].SetInt(162);
 	//controls[38].SetString(("!b" + std::to_string(newId + 1100)).c_str());
-	//controls[41].SetString(("b" + std::to_string(newId + 1100)+ " o368").c_str());
+	//controls[41].SetString(("b" + std::to_string(newId + 1100)+ " o350").c_str());
 	//controls[68].SetString("New Name; $¢ M");
 } 
+
+void CMisnResource::RegisterNCB()
+{
+	NovaLib::RegisterNCB(m_szOnAccept);
+	NovaLib::RegisterNCB(m_szOnRefuse);
+	NovaLib::RegisterNCB(m_szOnSuccess);
+	NovaLib::RegisterNCB(m_szOnFailure);
+	NovaLib::RegisterNCB(m_szOnAbort);
+	NovaLib::RegisterNCB(m_szOnShipDone);
+}

@@ -440,6 +440,14 @@ int CCronResource::CloseAndDontSave(void)
 	return 1;
 }
 
+void CCronResource::RegisterNCB()
+{
+	NovaLib::RegisterNCB(m_szEnableOn);
+	NovaLib::RegisterNCB(m_szOnStart);
+	NovaLib::RegisterNCB(m_szOnEnd);
+}
+
+
 BOOL CCronResource::CronDlgProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 {
 	CWindow *pWindow;

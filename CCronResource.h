@@ -68,6 +68,8 @@ public:
 	int CloseAndSave(void);
 	int CloseAndDontSave(void);
 
+	void RegisterNCB() override;
+
 	int Save(char *pOutput);
 	int Load(char *pInput, int iSize);
 

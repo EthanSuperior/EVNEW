@@ -3131,6 +3131,8 @@
 #define ID_OPENRECENT_                  40091
 #define ID_OPEN_RECENT                  40092
 #define IDM_OPEN_RECENT                 40093
+#define ID_HELP_AVAILABLENCB            40094
+#define IDM_HELP_NCB                    40095
 #define IDM_WINDOW_1                    40100
 #define IDM_RECENT_FILE_0               40151
 #define IDM_RECENT_FILE_1               40152
@@ -3144,7 +3146,7 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        158
-#define _APS_NEXT_COMMAND_VALUE         40094
+#define _APS_NEXT_COMMAND_VALUE         40096
 #define _APS_NEXT_CONTROL_VALUE         2674
 #define _APS_NEXT_SYMED_VALUE           107
 #endif

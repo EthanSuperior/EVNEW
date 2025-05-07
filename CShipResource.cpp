@@ -959,7 +959,7 @@ int CShipResource::Initialize(HWND hwnd)
 
 	std::string s = m_szName;
 	auto sc = s.find(';'), col = s.find(':', sc);
-	if (m_iDiffID == -1 && sc != std::string::npos && col != std::string::npos) {
+	if (m_iDiffID == 0 && sc != std::string::npos && col != std::string::npos) {
 		try { 
 			m_iDiffID = std::stoi(s.substr(col + 1));
 			std::vector<CNovaResource*> values = NovaLib::GetAllOf(CNR_TYPE_SHIP);
@@ -1302,7 +1302,7 @@ BOOL CShipResource::ShipDlgProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lpara
 
 
 			if (iNotifyCode == EN_CHANGE && pResource->m_wndDiff.GetHWND() != NULL)
-				pResource->DiffUpdate(pResource->m_iDiffID);
+				pResource->DiffUpdate();
 
 			return TRUE;
 
@@ -1362,8 +1362,7 @@ BOOL CShipResource::DiffDlgProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lpara
 		int iNotifyCode = HIWORD(wparam);
 		if (LOWORD(wparam) == IDC_SHIP_DIFF_DROP1) {
 			pResource->m_diffCtrl.ProcessMessage(iNotifyCode);
-			if (iNotifyCode == CBN_SELCHANGE) 
-				pResource->DiffUpdate(pResource->m_diffCtrl.GetInt());
+			if (iNotifyCode == CBN_SELCHANGE) pResource->DiffUpdate();
 		}
 		return TRUE;
 	}
@@ -1408,7 +1407,7 @@ std::string CShipResource::NumsToString(std::string name, int shields, int shiel
 		}
 		weapStr += wName + " x" + ToString(wCnts[i]);
 		if (wAmmo[i] > 0) {
-			auto a = matchingO(3, weaps[1]);
+			auto a = matchingO(3, weaps[i]);
 			if (a != NULL) {
 				usedMass += a->m_iMass * wAmmo[i];
 				usedCost += a->m_iCost * wAmmo[i];
@@ -1421,7 +1420,7 @@ std::string CShipResource::NumsToString(std::string name, int shields, int shiel
 	std::string outfStr = "\n----Equipment----\n";
 	for (int i = 0; i < 8; ++i) {
 		if (outfs[i] < 128) continue;
-		COutfResource* r = (COutfResource*)NovaLib::At(CNR_TYPE_OUTF, outfs[i]);
+		COutfResource* r = (COutfResource*)NovaLib::Find(CNR_TYPE_OUTF, outfs[i]);
 		std::string oName = r->GetName();
 		usedMass += r->m_iMass*oCnts[i];
 		usedCost += r->m_iCost*oCnts[i];
@@ -1491,9 +1490,7 @@ std::string CShipResource::NumsToString(std::string name, int shields, int shiel
 	return result;
 }
 
-void CShipResource::DiffUpdate(int dId) {
-	std::ofstream ofstream("./log.txt", std::ios::app);
-	ofstream << dId << std::endl;
+void CShipResource::DiffUpdate(void) {
 	//Lambda function to shorthand control access
 	auto l = [ctr=m_controls](int i) { return ctr[i].GetInt(); };
 
@@ -1507,16 +1504,14 @@ void CShipResource::DiffUpdate(int dId) {
 		l(5), l(9), l(25), l(31), l(30), l(1), l(10), l(6), l(7), l(8), l(11), l(12),
 		l(14), l(18), l(19), l(20), l(21), l(22), l(26), weaps, wCnts, wAmmo, outfs, oCnts);
 	Static_SetText(ourTxt, output.c_str());
-	m_iDiffID = dId;
+
+	m_iDiffID = m_diffCtrl.GetInt();
 	HWND enemyTxt = GetDlgItem(m_wndDiff.GetHWND(), IDC_DIFF_SHIP_TEXT3);
+
 	CShipResource* comp = NULL;
-	if (m_iDiffID != -1) 
-		comp = (CShipResource*)NovaLib::GetAllOf(CNR_TYPE_SHIP)[m_iDiffID];
+	if (m_iDiffID > 0) comp = (CShipResource*)NovaLib::AtIdx(CNR_TYPE_SHIP, m_iDiffID);
 	if (comp == NULL) comp = this;
-	if (comp->GetID() < 128) {
-		Static_SetText(enemyTxt, "No ship selected");
-		return;
-	}
+
 	Static_SetText(enemyTxt, NumsToString(comp->m_szName, comp->m_iShields, comp->m_iShieldRecharge,
 		comp->m_iArmor, comp->m_iArmorRecharge, comp->m_iFuel, comp->m_iFuelRegeneration, 
 		comp->m_iMaxIonization, comp->m_iDeionize, comp->m_iCargo, comp->m_iFreeMass,
@@ -1529,15 +1524,9 @@ void CShipResource::DiffUpdate(int dId) {
 
 int CShipResource::DiffInitDialog(HWND hwnd)
 {
-	int i = m_iDiffID;
-	m_diffCtrl.Create(hwnd, IDC_SHIP_DIFF_DROP1, CCONTROL_TYPE_COMBOBOX, IDS_STRING640);
-	std::vector<CNovaResource*> values = NovaLib::GetAllOf(CNR_TYPE_SHIP);
-	std::vector<std::string> names;
-	names.reserve(values.size());
-	for (const auto& res : values)
-		names.push_back(std::to_string(res->GetID()) + ": " + res->GetName()+";"+((CShipResource*)res)->m_szSubtitle);
-	m_diffCtrl.SetComboStrings(names.size(), names.data());
-	if (!values.empty()) m_diffCtrl.SetInt(i);
-	DiffUpdate(i);
+	m_diffCtrl.Create(hwnd, IDC_SHIP_DIFF_DROP1, CCONTROL_TYPE_REZBOX, IDS_STRING640);
+	m_diffCtrl.SetRezType(CNR_TYPE_SHIP);
+	m_diffCtrl.SetInt(m_iDiffID);
+	DiffUpdate();
 	return 1;
 }

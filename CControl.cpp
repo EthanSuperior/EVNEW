@@ -10,6 +10,7 @@
 
 #include "CWindow.h"
 #include "CControl.h"
+#include "NovaLib.h"
 
 #include <commctrl.h>
 
@@ -383,12 +384,58 @@ int CControl::ProcessMessage(int iNotifyCode)
 	}
 	else if(iNotifyCode == CBN_SELCHANGE)
 	{
-		if(m_iType == CCONTROL_TYPE_COMBOBOX)
+		if (m_iType == CCONTROL_TYPE_COMBOBOX)
 		{
 			m_iIntValue = ComboBox_GetCurSel(m_hwndControl);
 
-			if(m_iIntValue == CB_ERR)
+			if (m_iIntValue == CB_ERR)
 				m_iIntValue = 0;
+		}
+		else if (m_iType == CCONTROL_TYPE_REZBOX)
+		{
+			int index = ComboBox_GetCurSel(m_hwndControl);
+			
+			if (index == CB_ERR) m_iIntValue = 0;
+			else {
+				m_iIntValue = -1;
+
+				char buffer[256] = {};
+				ComboBox_GetLBText(m_hwndControl, index, buffer);
+				for (size_t i = 0; i < m_vRezItems.size(); ++i) {
+					if (m_vRezItems[i] == buffer) {
+						m_szStringValue = buffer;
+						m_iIntValue = i;
+						break;
+					}
+				}
+			}
+		}
+	}
+	else if (iNotifyCode == CBN_EDITUPDATE)
+	{
+		if (m_iType == CCONTROL_TYPE_REZBOX)
+		{
+			char buffer[256] = {};
+			GetWindowTextA(m_hwndControl, buffer, sizeof(buffer));
+
+			DWORD selStart = 0, selEnd = 0;
+			SendMessageA(m_hwndControl, CB_GETEDITSEL, (WPARAM)&selStart, (LPARAM)&selEnd);
+
+			std::string typedText = buffer;
+
+			// Clear current items
+			ComboBox_ResetContent(m_hwndControl);
+
+			// Add matching items
+			for (const std::string& item : m_vRezItems) {
+				if (item.find(typedText) != std::string::npos) {
+					ComboBox_AddString(m_hwndControl, item.c_str());
+				}
+			}
+
+			// Restore typed text and caret
+			SetWindowTextA(m_hwndControl, typedText.c_str());
+			SendMessageA(m_hwndControl, CB_SETEDITSEL, 0, MAKELPARAM(selStart, selEnd));
 		}
 	}
 
@@ -439,6 +486,23 @@ int CControl::SetComboStrings(int iNumStrings, const std::string *pStrings)
 	int iCount = ComboBox_GetCount(m_hwndControl);
 
 	return 1;
+}
+
+int CControl::SetRezType(int rezNum)
+{
+	if (m_iType != CCONTROL_TYPE_REZBOX)
+		return 0;
+	m_vRezItems.clear();
+	ComboBox_ResetContent(m_hwndControl);
+	std::vector<CNovaResource*> values = NovaLib::GetAllOf(rezNum);
+	m_vRezItems.reserve(values.size());
+	for (const auto& res : values) {
+		std::string rezName = std::to_string(res->GetID()) + ": " + res->GetName();
+		m_vRezItems.push_back(rezName);
+		ComboBox_AddString(m_hwndControl, rezName.c_str());
+	}
+	ComboBox_GetCount(m_hwndControl);
+	SetInt(0);
 }
 
 int CControl::GetMinValue(void)
@@ -501,7 +565,7 @@ int CControl::SetInt(int iValue)
 
 		m_iIntValue = iValue;
 	}
-	else if(m_iType == CCONTROL_TYPE_COMBOBOX)
+	else if(m_iType == CCONTROL_TYPE_COMBOBOX || m_iType == CCONTROL_TYPE_REZBOX)
 	{
 		ComboBox_SetCurSel(m_hwndControl, iValue);
 

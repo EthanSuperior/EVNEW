@@ -127,7 +127,7 @@ int CNovaResource::LoadFromTextEx(std::istream & input, std::string & szFilePath
 }
 
 void CNovaResource::SetIfDefaultInt(CControl* m_controls, short controlID, short oldV, short newV, short offset) {
-	if (m_controls[controlID].GetInt() >= 0 && m_controls[controlID].GetInt() != oldV + offset) return;
+	if (m_controls[controlID].GetInt() != 0 && m_controls[controlID].GetInt() != oldV + offset) return;
 	m_controls[controlID].SetInt(newV + offset);
 }
 
@@ -138,14 +138,4 @@ void CNovaResource::SetIfDefaultStr(CControl* m_controls, short controlID, short
 	std::string newBitStr = std::to_string(newBit);
 	bitsStr.replace(bitsStr.find(oldBitStr), oldBitStr.length(), newBitStr);
 	m_controls[controlID].SetString(bitsStr.c_str());
-}
-
-SNovaResourceCompare::SNovaResourceCompare(void)
-{
-
-}
-
-bool SNovaResourceCompare::operator () (const CNovaResource *pResource1, const CNovaResource *pResource2)
-{
-	return (pResource1->m_iID < pResource2->m_iID);
 }

@@ -223,6 +223,7 @@
     <Image Include="icon1.ico" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Campaign.md" />
     <None Include="Info.md" />
     <None Include="Roadmap.md" />
   </ItemGroup>

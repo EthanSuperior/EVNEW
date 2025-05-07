@@ -4,7 +4,6 @@
 
 // File EVNEW.cpp
 
-
 // This project is OPEN SOURCE.  You may freely use, modify, and distribute
 // this source code, under the conditions that:
 // (1) The comments at the top of every file are left unaltered
@@ -32,6 +31,22 @@
 //         libs; use /NODEFAULTLIB:library"
 // You can ignore this.
 
+// How To Compile 2025:
+// Download QT SDK from https://github.com/Olde-Skuul/quicktime7windows
+// Download CE of Nova
+// Get Visual Stuido (I used 2022)
+// In Project Properies
+// Under Configuration Properties > General
+// Set Configuration Type to Application (.exe)
+// Set C++ Language Standard to ISO C++17 Standard
+// Configuration Properties > VC++ Directories
+// Add the C:\QT_SDK_PATH\CIncludes to Include Directories
+// Add the C:\QT_SDK_PATH\Libraries to Library Directories
+// Under Configuration Properties > Linker > Input
+// Add comctl32.lib and QTMLClient.lib to Additional Dependencies
+// In Ignore Specific Default Libraries add LIBCMT
+
+
 ////////////////////////////////////////////////////////////////
 //////////////////////////	INCLUDES  //////////////////////////
 ////////////////////////////////////////////////////////////////
@@ -43,7 +58,7 @@
 #include <commctrl.h>
 
 #include <algorithm>
-#include <unordered_set>
+#include <set>
 
 namespace qt
 {
@@ -635,7 +650,7 @@ int CEditor::SavePreferences(void)
 									  << ((m_iPrefRLEBackgroundColor >> 8)  & 0xFF) << ' '
 									  << ( m_iPrefRLEBackgroundColor        & 0xFF) << std::endl;
 
-	std::unordered_set<std::string> s;
+	std::set<std::string> s;
 	for (auto& p : m_szRecentPaths) {
 		if (!s.insert(p).second) continue;
 		outPrefs << "RECENTFILE " << p << std::endl;
@@ -730,7 +745,7 @@ int CEditor::FileNew(void)
 
 	m_plugIn.Clear();
 	m_plugIn.ClearFilename();
-
+	NovaLib::Get().Clear();
 	UpdateResourceList();
 
 	m_dialogMain.SetTitle("Untitled.rez - EVNEW");
@@ -906,6 +921,8 @@ int CEditor::FileSaveAs(void)
 	m_plugIn.SetFilename(szFilename);
 
 	FileSave();
+
+	EditLoadLibrary("../Nova Files", false);
 
 	std::string szTitle;
 
@@ -1247,8 +1264,15 @@ int CEditor::EditPreferences(void)
 void CEditor::EditLoadLibrary(std::string path, bool clearFirst)
 {
 	if (clearFirst) NovaLib::Get().Clear();
-	NovaLib::Get().AddFolder(std::filesystem::absolute(path).generic_string(), &m_dialogMain);
-	//std::ofstream of("./log.txt");
+
+	std::filesystem::path absPath = std::filesystem::absolute(path);
+
+	if (!std::filesystem::exists(absPath)) {
+		MessageBox(NULL, ("Could Not Load Library at:\n" + absPath.string()).c_str(), "Error", MB_ICONERROR | MB_OK);
+		return;
+	}
+
+	NovaLib::Get().AddFolder(absPath.generic_string(), &m_dialogMain);	//std::ofstream of("./log.txt");
 	//for (auto stl : NovaLib::GetAllOf(CNR_TYPE_STRL)) {
 	//	stl->SaveToText(of);
 	//	of << std::endl;
@@ -1377,7 +1401,7 @@ void CEditor::ResourceExtra(short id, std::string dfltName, int type) {
 	CNovaResource* pNovaResource = Find(type, id);
 	// If the resource is not found in the plugin - copy it from the library
 	if (pNovaResource == NULL) {
-		pNovaResource = ResourceTemplate(id, NovaLib::At(type, id), dfltName);
+		pNovaResource = ResourceTemplate(id, NovaLib::Find(type, id), dfltName);
 		if (pNovaResource != NULL) {
 			SetDirty();
 			UpdateResourceList();
@@ -1460,39 +1484,40 @@ CNovaResource* CEditor::ResourceTemplate(short iID, CNovaResource* pTemplateReso
 	int iSize = pTemplateResource->GetSize();
 
 	if (iType == CNR_TYPE_MISN) {
-		ResourceTemplate(iID + 4000 - 128, NovaLib::At(CNR_TYPE_DESC, tempID + 4000 - 128), rezName);
-		ResourceTemplate(iID + 5000 - 128, NovaLib::At(CNR_TYPE_DESC, tempID + 5000 - 128), rezName);
-		ResourceTemplate(iID + 6000 - 128, NovaLib::At(CNR_TYPE_DESC, tempID + 6000 - 128), rezName);
-		ResourceTemplate(iID + 7000 - 128, NovaLib::At(CNR_TYPE_DESC, tempID + 7000 - 128), rezName);
-		ResourceTemplate(iID + 8000 - 128, NovaLib::At(CNR_TYPE_DESC, tempID + 8000 - 128), rezName);
-		ResourceTemplate(iID + 9000 - 128, NovaLib::At(CNR_TYPE_DESC, tempID + 9000 - 128), rezName);
-		ResourceTemplate(iID + 15000 - 128, NovaLib::At(CNR_TYPE_DESC, tempID + 15000 - 128), rezName);
-		ResourceTemplate(iID + 16000 - 128, NovaLib::At(CNR_TYPE_DESC, tempID + 16000 - 128), rezName);
-		ResourceTemplate(iID + 17000 - 128, NovaLib::At(CNR_TYPE_DESC, tempID + 17000 - 128), rezName);
+		ResourceTemplate(iID + 4000 - 128, NovaLib::Find(CNR_TYPE_DESC, tempID + 4000 - 128), rezName);
+		ResourceTemplate(iID + 5000 - 128, NovaLib::Find(CNR_TYPE_DESC, tempID + 5000 - 128), rezName);
+		ResourceTemplate(iID + 6000 - 128, NovaLib::Find(CNR_TYPE_DESC, tempID + 6000 - 128), rezName);
+		ResourceTemplate(iID + 7000 - 128, NovaLib::Find(CNR_TYPE_DESC, tempID + 7000 - 128), rezName);
+		ResourceTemplate(iID + 8000 - 128, NovaLib::Find(CNR_TYPE_DESC, tempID + 8000 - 128), rezName);
+		ResourceTemplate(iID + 9000 - 128, NovaLib::Find(CNR_TYPE_DESC, tempID + 9000 - 128), rezName);
+		ResourceTemplate(iID + 15000 - 128, NovaLib::Find(CNR_TYPE_DESC, tempID + 15000 - 128), rezName);
+		ResourceTemplate(iID + 16000 - 128, NovaLib::Find(CNR_TYPE_DESC, tempID + 16000 - 128), rezName);
+		ResourceTemplate(iID + 17000 - 128, NovaLib::Find(CNR_TYPE_DESC, tempID + 17000 - 128), rezName);
 	}
 	else if (iType == CNR_TYPE_NEBU) {
 		short nebuTempID = ((tempID - 128) * 7) + 9500;
 		short nebuID = ((iID - 128) * 7) + 9500;
-		ResourceTemplate(nebuID, NovaLib::At(CNR_TYPE_PICT, nebuTempID), rezName + "; 42.1%");
-		ResourceTemplate(nebuID + 1, NovaLib::At(CNR_TYPE_PICT, nebuTempID + 1), rezName + "; 56.2%");
-		ResourceTemplate(nebuID + 2, NovaLib::At(CNR_TYPE_PICT, nebuTempID + 2), rezName + "; 75.0%");
-		ResourceTemplate(nebuID + 3, NovaLib::At(CNR_TYPE_PICT, nebuTempID + 3), rezName + "; 100.0%");
-		ResourceTemplate(nebuID + 4, NovaLib::At(CNR_TYPE_PICT, nebuTempID + 4), rezName + "; 133.3%");
-		ResourceTemplate(nebuID + 5, NovaLib::At(CNR_TYPE_PICT, nebuTempID + 5), rezName + "; 177.7%");
-		ResourceTemplate(nebuID + 6, NovaLib::At(CNR_TYPE_PICT, nebuTempID + 6), rezName + "; 237.0%");
+		ResourceTemplate(nebuID, NovaLib::Find(CNR_TYPE_PICT, nebuTempID), rezName + "; 42.1%");
+		ResourceTemplate(nebuID + 1, NovaLib::Find(CNR_TYPE_PICT, nebuTempID + 1), rezName + "; 56.2%");
+		ResourceTemplate(nebuID + 2, NovaLib::Find(CNR_TYPE_PICT, nebuTempID + 2), rezName + "; 75.0%");
+		ResourceTemplate(nebuID + 3, NovaLib::Find(CNR_TYPE_PICT, nebuTempID + 3), rezName + "; 100.0%");
+		ResourceTemplate(nebuID + 4, NovaLib::Find(CNR_TYPE_PICT, nebuTempID + 4), rezName + "; 133.3%");
+		ResourceTemplate(nebuID + 5, NovaLib::Find(CNR_TYPE_PICT, nebuTempID + 5), rezName + "; 177.7%");
+		ResourceTemplate(nebuID + 6, NovaLib::Find(CNR_TYPE_PICT, nebuTempID + 6), rezName + "; 237.0%");
 	}
 	else if (iType == CNR_TYPE_OUTF) {
-		ResourceTemplate(iID + 3000 - 128, NovaLib::At(CNR_TYPE_DESC, tempID + 3000 - 128), rezName);
-		ResourceTemplate(iID + 6000 - 128, NovaLib::At(CNR_TYPE_PICT, tempID + 6000 - 128), rezName);
+		ResourceTemplate(iID + 3000 - 128, NovaLib::Find(CNR_TYPE_DESC, tempID + 3000 - 128), rezName);
+		ResourceTemplate(iID + 6000 - 128, NovaLib::Find(CNR_TYPE_PICT, tempID + 6000 - 128), rezName);
 	}
 	else if (iType == CNR_TYPE_SHIP) {
-		ResourceTemplate(iID, NovaLib::At(CNR_TYPE_SHAN, tempID), rezName);
-		ResourceTemplate(iID + 3000 - 128, NovaLib::At(CNR_TYPE_PICT, tempID + 3000 - 128), rezName + "; Targeting");
-		ResourceTemplate(iID + 5000 - 128, NovaLib::At(CNR_TYPE_PICT, tempID + 5000 - 128), rezName);
-		ResourceTemplate(iID + 13000 - 128, NovaLib::At(CNR_TYPE_DESC, tempID + 13000 - 128), rezName);
-		ResourceTemplate(iID + 14000 - 128, NovaLib::At(CNR_TYPE_DESC, tempID + 14000 - 128), rezName + "; Escort");
+		ResourceTemplate(iID, NovaLib::Find(CNR_TYPE_SHAN, tempID), rezName);
+		ResourceTemplate(iID + 3000 - 128, NovaLib::Find(CNR_TYPE_PICT, tempID + 3000 - 128), rezName + "; Targeting");
+		ResourceTemplate(iID + 5000 - 128, NovaLib::Find(CNR_TYPE_PICT, tempID + 5000 - 128), rezName);
+		ResourceTemplate(iID + 13000 - 128, NovaLib::Find(CNR_TYPE_DESC, tempID + 13000 - 128), rezName);
+		ResourceTemplate(iID + 14000 - 128, NovaLib::Find(CNR_TYPE_DESC, tempID + 14000 - 128), rezName + "; Escort");
+		rezName += +";:" + ToString(tempID);
 	}
-	else if (iType == CNR_TYPE_SPOB) ResourceTemplate(iID, NovaLib::At(CNR_TYPE_DESC, tempID), rezName);
+	else if (iType == CNR_TYPE_SPOB) ResourceTemplate(iID, NovaLib::Find(CNR_TYPE_DESC, tempID), rezName);
 
 	char* pBuffer = new char[iSize];
 	pTemplateResource->Save(pBuffer);
@@ -1559,6 +1584,39 @@ int CEditor::HelpAbout(void)
 	m_wndAbout.CreateAsDialog(m_dialogMain.GetInstance(), IDD_ABOUT, 0, NULL);
 
 	return 1;
+}
+
+int CEditor::RunNova(void)
+{
+	std::vector<std::string> extensions = { ".nplay", ".exe", ".lnk" };
+	std::filesystem::path root = GetRootFolder();
+
+	if (!std::filesystem::exists(root) || !std::filesystem::is_directory(root)) {
+		MessageBoxA(NULL, ("Invalid root folder:\n" + root.string()).c_str(), "Error", MB_ICONERROR | MB_OK);
+		return FALSE;
+	}
+
+	try {
+		for (const auto& ext : extensions) {
+			for (const auto& entry : std::filesystem::directory_iterator(root)) {
+				if (entry.is_regular_file() && entry.path().extension() == ext) {
+					std::string pathStr = entry.path().generic_string();
+
+					HINSTANCE result = ShellExecuteA(NULL, "open", pathStr.c_str(), NULL, root.string().c_str(), SW_SHOWNORMAL);
+					if ((INT_PTR)result <= 32) {
+						std::string error = "Failed to launch:\n" + pathStr;
+						MessageBoxA(NULL, error.c_str(), "Error", MB_ICONERROR | MB_OK);
+						return FALSE;
+					}
+
+					return TRUE;
+				}
+			}
+		}
+	} catch (const std::filesystem::filesystem_error& e) {
+		MessageBoxA(NULL, e.what(), "Filesystem Error", MB_ICONERROR | MB_OK);
+	}
+	return FALSE;
 }
 
 int CEditor::SetDirty(void)
@@ -1651,13 +1709,8 @@ int CEditor::TempInitDialog(HWND hwnd)
 	m_tempControls[0].Create(hwnd, IDC_EDIT_TEMP_EDIT1, CCONTROL_TYPE_INT, IDS_STRING400);
 	m_tempControls[0].SetInt(FindUniqueResourceID(m_iCurrentResourceType, 128));
 	m_tempControls[1].Create(hwnd, IDC_EDIT_TEMP_EDIT2, CCONTROL_TYPE_STR256, IDS_STRING468);
-	m_tempControls[2].Create(hwnd, IDC_EDIT_TEMP_DROP1, CCONTROL_TYPE_COMBOBOX, IDS_STRING996);
-	std::vector<CNovaResource*> values = NovaLib::GetAllOf(m_iCurrentResourceType);
-	std::vector<std::string> names;
-	names.reserve(values.size());
-	for (const auto& res : values) names.push_back(std::to_string(res->GetID()) + ": " + res->GetName());
-	m_tempControls[2].SetComboStrings(names.size(), names.data());
-	if (!values.empty()) m_tempControls[2].SetInt(0);
+	m_tempControls[2].Create(hwnd, IDC_EDIT_TEMP_DROP1, CCONTROL_TYPE_REZBOX, IDS_STRING996);
+	m_tempControls[2].SetRezType(m_iCurrentResourceType);
 	return 1;
 }
 
@@ -1665,16 +1718,15 @@ int CEditor::TempCloseAndSave(void)
 {
 	short m_iTempID = m_tempControls[0].GetInt();
 	std::string m_szTempName = m_tempControls[1].GetString();
-	int m_iTempCombo = m_tempControls[2].GetInt();
+	short m_iTempCombo = m_tempControls[2].GetInt();
 
-	for (int i = 0; i < NUM_TEMPLATE_CONTROLS; i++)
-		m_tempControls[i].Destroy();
-
+	for (int i = 0; i < NUM_TEMPLATE_CONTROLS; i++) m_tempControls[i].Destroy();
 	m_wndTemplate.Destroy();
-	ResourceTemplate(m_iTempID, NovaLib::GetAllOf(m_iCurrentResourceType)[m_iTempCombo], m_szTempName);
+
+	if (m_iTempCombo == -1) return 0;
+	ResourceTemplate(m_iTempID, NovaLib::AtIdx(m_iCurrentResourceType, m_iTempCombo), m_szTempName);
 	UpdateResourceList();
 	HWND hwndListResources = GetDlgItem(m_dialogMain.GetHWND(), IDC_LIST_RESOURCES);
-
 	int i;
 	for (i = 0; i < m_plugIn.m_vResources[m_iCurrentResourceType].size(); i++) {
 		if (m_plugIn.m_vResources[m_iCurrentResourceType][i]->GetID() == m_iTempID) {
@@ -1696,7 +1748,6 @@ int CEditor::TempCloseAndDontSave(void)
 	m_wndTemplate.Destroy();
 	return 1;
 }
-
 
 int CEditor::RemoveEditDialog(CWindow *pWindow, int iIDOrNameChanged)
 {
@@ -2178,18 +2229,13 @@ BOOL CEditor::MainDialogProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 			{
 				pEditor->HelpAbout();
 			}
+			else if (iControlID == IDM_HELP_NCB)
+			{
+				MessageBox(NULL, NovaLib::GetAvailableNCB().c_str(), "Available NCBs", MB_OK);
+			}
 			else if (iControlID == IDM_RUNDEV)
-			{	
-				std::vector<std::string> extensions = { ".nplay", ".exe", ".lnk" };
-				for (const auto& ext : extensions) {
-					for (const auto& entry : std::filesystem::directory_iterator(pEditor->GetRootFolder())) {
-						if (entry.is_regular_file() && entry.path().extension() == ext) {
-							auto pathStr = entry.path().generic_string();
-							ShellExecute(NULL,"open", pathStr.c_str(), NULL, pEditor->GetRootFolder().c_str(), SW_SHOWNORMAL);
-							return TRUE;
-						}
-					}
-				}
+			{
+				pEditor->RunNova();
 			}
 			else if(iControlID == IDA_FILENEW)		// Ctrl+N
 			{
@@ -2558,7 +2604,6 @@ BOOL CEditor::TemplateDialogProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lpar
 				if (iControlID == pEditor->m_tempControls[i].GetControlID())
 				{
 					pEditor->m_tempControls[i].ProcessMessage(iNotifyCode);
-
 					break;
 				}
 			}

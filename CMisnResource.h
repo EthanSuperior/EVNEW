@@ -114,6 +114,8 @@ public:
 	static BOOL MisnDlgProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
 	static void UpdateDynamicDefaults(CControl* controls, short oldId, short newId);
 
+	void RegisterNCB() override;
+
 private:
 
 	int SwapEndians(void);

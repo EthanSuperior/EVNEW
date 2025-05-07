@@ -4,8 +4,7 @@
 
 // File CNovaResource.h
 
-#ifndef CNOVARESOURCE_H_INCLUDED		// Prevent multiple inclusions
-#define CNOVARESOURCE_H_INCLUDED
+#pragma once
 
 ////////////////////////////////////////////////////////////////
 ///////////////////////  CLASS FORWARDS  ///////////////////////
@@ -129,7 +128,8 @@ public:
 	virtual int CloseAndDontSave(void) = 0;
 
 	virtual int Save(char *pOutput) = 0;
-	virtual int Load(char *pInput, int iSize) = 0;
+	virtual int Load(char* pInput, int iSize) = 0;
+	virtual void RegisterNCB() {};
 
 	static void SetIfDefaultInt(CControl* m_controls, short controlID, short oldV, short newV, short offset = 0);
 	static void SetIfDefaultStr(CControl* m_controls, short controlID, short oldBit, short newBit);
@@ -150,9 +150,9 @@ protected:
 struct SNovaResourceCompare
 {
 public:
-	SNovaResourceCompare(void);
-
-	bool operator () (const CNovaResource *pResource1, const CNovaResource *pResource2);
+	SNovaResourceCompare(void) = default;
+	bool operator () (const CNovaResource *pResource1, const CNovaResource *pResource2)
+	{
+		return (pResource1->m_iID < pResource2->m_iID);
+	}
 };
-
-#endif		// #ifndef CNOVARESOURCE_H_INCLUDED

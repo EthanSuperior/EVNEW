@@ -99,13 +99,16 @@ public:
 		short wCnts[8], short wAmmo[8], short outfs[8], short oCnts[8]);
 	int DiffInitDialog(HWND hwnd);
 	void DiffOpen(void);
-	void DiffUpdate(int dID);
+	void DiffUpdate(void);
 	int DiffClose(void);
-	short m_iDiffID = -1;
+	short m_iDiffID = 0;
 	char  m_szSubtitle[64];
 
 private:
+	std::vector<CNovaResource*> diffValues = NovaLib::GetAllOf(CNR_TYPE_SHIP);
+	std::vector<std::string> diffNames;
 	CControl m_diffCtrl;
+
 	CWindow m_wndDiff;
 
 	int SwapEndians(void);
