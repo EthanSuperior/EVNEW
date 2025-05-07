@@ -33,6 +33,7 @@
 		- Import/Export Kestrel markup
 		- Add Hexadecimal/char Editor for CResourceUkn
 		- Add pilot editor (.plt) {NpïL Type}
+- Add View as Reference; Opens file from lib without saving;
 - Add Embeded Bible? FAQ? Info.md?
 	- Make Tooltips sourced from Bible?
 - Double Check Cron Timeline (some were not what I remembered)
@@ -47,7 +48,6 @@
 - Modernize UI
 	- Move most code inside of DLGProccess Functions into other functions in prep for change of ui
 	- Dark Mode
-- Add View as Reference; Opens file from lib without saving;
 
 ### Fixes
 - Modernize code (c++ 17)

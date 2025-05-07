@@ -421,20 +421,24 @@ int CControl::ProcessMessage(int iNotifyCode)
 			DWORD selStart = 0, selEnd = 0;
 			SendMessageA(m_hwndControl, CB_GETEDITSEL, (WPARAM)&selStart, (LPARAM)&selEnd);
 
-			std::string typedText = buffer;
-
 			// Clear current items
 			ComboBox_ResetContent(m_hwndControl);
-
+			auto toLower = [](const std::string& s) {
+				std::string r = s;
+				std::transform(r.begin(), r.end(), r.begin(),
+					[](unsigned char c) { return std::tolower(c); });
+				return r;
+				};
+			std::string typedText = toLower(buffer);
 			// Add matching items
 			for (const std::string& item : m_vRezItems) {
-				if (item.find(typedText) != std::string::npos) {
+				if (toLower(item).find(typedText) != std::string::npos) {
 					ComboBox_AddString(m_hwndControl, item.c_str());
 				}
 			}
 
 			// Restore typed text and caret
-			SetWindowTextA(m_hwndControl, typedText.c_str());
+			SetWindowTextA(m_hwndControl, buffer);
 			SendMessageA(m_hwndControl, CB_SETEDITSEL, 0, MAKELPARAM(selStart, selEnd));
 		}
 	}
