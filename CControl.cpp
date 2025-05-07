@@ -57,6 +57,8 @@ int CControl::Create(HWND hwndDialog, int iControlID, int iType, int iHelpString
 	m_iHelpStringID = iHelpStringID;
 
 	m_hwndControl = GetDlgItem(m_hwndDialog, m_iControlID);
+	if (m_iType >= CCONTROL_TYPE_HEXINT16 && m_iType <= CCONTROL_TYPE_STRARB)
+		g_OldEditProc = (WNDPROC)SetWindowLongPtr(m_hwndControl, GWLP_WNDPROC, (LONG_PTR)CControl::TextHelperProc);
 
 	if(m_iType == CCONTROL_TYPE_COLOR)
 		CreateBitmap(SwapColorRedBlue(m_iIntValue));
@@ -105,6 +107,19 @@ int CControl::Create(HWND hwndDialog, int iControlID, int iType, int iHelpString
 
 	return 1;
 }
+
+WNDPROC CControl::g_OldEditProc = nullptr;
+LRESULT CALLBACK CControl::TextHelperProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+	if (msg == WM_KEYDOWN) {
+		if ((GetKeyState(VK_CONTROL) & 0x8000) && wParam == 'A') {
+			SendMessage(hwnd, EM_SETSEL, 0, -1); // Select all
+			return 0; // Consume the message
+		}
+	}
+	return CallWindowProc(g_OldEditProc, hwnd, msg, wParam, lParam);
+}
+
 
 int CControl::Destroy(void)
 {
@@ -442,7 +457,14 @@ int CControl::ProcessMessage(int iNotifyCode)
 			SendMessageA(m_hwndControl, CB_SETEDITSEL, 0, MAKELPARAM(selStart, selEnd));
 		}
 	}
-
+	else if (iNotifyCode == WM_KEYDOWN)
+	{
+		if ((GetKeyState(VK_CONTROL)))
+			if(GetAsyncKeyState('A')) {
+				SendMessage(m_hwndControl, EM_SETSEL, 0, -1);  // Select all text
+				return 0; // Consume message
+			}
+	}
 	return 1;
 }
 
@@ -507,6 +529,7 @@ int CControl::SetRezType(int rezNum)
 	}
 	ComboBox_GetCount(m_hwndControl);
 	SetInt(0);
+	return 1;
 }
 
 int CControl::GetMinValue(void)

@@ -62,6 +62,9 @@ public:
 	int Create(HWND hwndDialog, int iControlID, int iType, int iHelpStringID);
 	int Destroy(void);
 
+	static WNDPROC g_OldEditProc;
+	static LRESULT CALLBACK CControl::TextHelperProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
 	int ProcessMessage(int iNotifyCode);
 
 	int GetControlID(void);

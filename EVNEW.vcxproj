@@ -137,7 +137,10 @@
     <ClCompile Include="CCharResource.cpp" />
     <ClCompile Include="CCicnResource.cpp" />
     <ClCompile Include="CColrResource.cpp" />
-    <ClCompile Include="CControl.cpp" />
+    <ClCompile Include="CControl.cpp">
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4996</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">4996</DisableSpecificWarnings>
+    </ClCompile>
     <ClCompile Include="CCronResource.cpp" />
     <ClCompile Include="CDescResource.cpp" />
     <ClCompile Include="CDudeResource.cpp" />
