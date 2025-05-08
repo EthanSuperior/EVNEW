@@ -388,7 +388,7 @@ int CEditor::Shutdown(void)
 			qt::TerminateQTML();
 
 			m_errorLog.CloseLogFile();
-			NovaLib::Clear();
+			Workspace::Clear();
 			return 1;
 		}
 
@@ -549,7 +549,7 @@ CEditor* CEditor::GetCurrentEditor(void)
 
 CPlugIn* CEditor::GetCurrentPlugin(void)
 {
-	return NovaLib::ActiveFile();
+	return Workspace::ActiveFile();
 }
 
 int CEditor::LoadPreferences(void)
@@ -758,7 +758,7 @@ int CEditor::FileNew(void)
 	GetCurrentPlugin()->Clear();
 	GetCurrentPlugin()->ClearFilename();
 	UpdateResourceList();
-	NovaLib::Clear();
+	Workspace::Clear();
 
 	m_dialogMain.SetTitle("Untitled.rez - EVNEW");
 
@@ -797,7 +797,7 @@ int CEditor::FileOpen(int iDialog, char *szFilename)
 		strcpy(szFilename2, szFilename);
 	}
 	
-	int iResult = NovaLib::Open(szFilename2, &m_dialogMain);
+	int iResult = Workspace::Open(szFilename2, &m_dialogMain);
 	szLastOpen = szFilename2;
 	m_szRecentPaths.insert(m_szRecentPaths.begin(), szFilename2);
 	UpdateResourceList();
@@ -1273,7 +1273,7 @@ int CEditor::EditPreferences(void)
 
 void CEditor::EditLoadLibrary(std::string path, bool clearFirst)
 {
-	if (clearFirst) NovaLib::Clear();
+	if (clearFirst) Workspace::Clear();
 
 	std::filesystem::path absPath = std::filesystem::absolute(path);
 
@@ -1281,7 +1281,7 @@ void CEditor::EditLoadLibrary(std::string path, bool clearFirst)
 		MessageBox(NULL, ("Could Not Load Library at:\n" + absPath.string()).c_str(), "Error", MB_ICONERROR | MB_OK);
 		return;
 	}
-	NovaLib::Open(absPath.string(), &m_dialogMain);
+	Workspace::Open(absPath.string(), &m_dialogMain);
 }
 
 int CEditor::ResourceNew(void)
@@ -1400,7 +1400,7 @@ void CEditor::ResourceExtra(short id, std::string dfltName, int type) {
 	CNovaResource* pNovaResource = FindById(type, id);
 	// If the resource is not found in the plugin - copy it from the library
 	if (pNovaResource == NULL) {
-		pNovaResource = ResourceTemplate(id, NovaLib::FindById(type, id), dfltName);
+		pNovaResource = ResourceTemplate(id, Workspace::FindById(type, id), dfltName);
 		if (pNovaResource != NULL) {
 			SetDirty();
 			UpdateResourceList();
@@ -1483,40 +1483,40 @@ CNovaResource* CEditor::ResourceTemplate(short iID, CNovaResource* pTemplateReso
 	int iSize = pTemplateResource->GetSize();
 
 	if (iType == CNR_TYPE_MISN) {
-		ResourceTemplate(iID + 4000 - 128, NovaLib::FindById(CNR_TYPE_DESC, tempID + 4000 - 128), rezName);
-		ResourceTemplate(iID + 5000 - 128, NovaLib::FindById(CNR_TYPE_DESC, tempID + 5000 - 128), rezName);
-		ResourceTemplate(iID + 6000 - 128, NovaLib::FindById(CNR_TYPE_DESC, tempID + 6000 - 128), rezName);
-		ResourceTemplate(iID + 7000 - 128, NovaLib::FindById(CNR_TYPE_DESC, tempID + 7000 - 128), rezName);
-		ResourceTemplate(iID + 8000 - 128, NovaLib::FindById(CNR_TYPE_DESC, tempID + 8000 - 128), rezName);
-		ResourceTemplate(iID + 9000 - 128, NovaLib::FindById(CNR_TYPE_DESC, tempID + 9000 - 128), rezName);
-		ResourceTemplate(iID + 15000 - 128, NovaLib::FindById(CNR_TYPE_DESC, tempID + 15000 - 128), rezName);
-		ResourceTemplate(iID + 16000 - 128, NovaLib::FindById(CNR_TYPE_DESC, tempID + 16000 - 128), rezName);
-		ResourceTemplate(iID + 17000 - 128, NovaLib::FindById(CNR_TYPE_DESC, tempID + 17000 - 128), rezName);
+		ResourceTemplate(iID + 4000 - 128, Workspace::FindById(CNR_TYPE_DESC, tempID + 4000 - 128), rezName);
+		ResourceTemplate(iID + 5000 - 128, Workspace::FindById(CNR_TYPE_DESC, tempID + 5000 - 128), rezName);
+		ResourceTemplate(iID + 6000 - 128, Workspace::FindById(CNR_TYPE_DESC, tempID + 6000 - 128), rezName);
+		ResourceTemplate(iID + 7000 - 128, Workspace::FindById(CNR_TYPE_DESC, tempID + 7000 - 128), rezName);
+		ResourceTemplate(iID + 8000 - 128, Workspace::FindById(CNR_TYPE_DESC, tempID + 8000 - 128), rezName);
+		ResourceTemplate(iID + 9000 - 128, Workspace::FindById(CNR_TYPE_DESC, tempID + 9000 - 128), rezName);
+		ResourceTemplate(iID + 15000 - 128, Workspace::FindById(CNR_TYPE_DESC, tempID + 15000 - 128), rezName);
+		ResourceTemplate(iID + 16000 - 128, Workspace::FindById(CNR_TYPE_DESC, tempID + 16000 - 128), rezName);
+		ResourceTemplate(iID + 17000 - 128, Workspace::FindById(CNR_TYPE_DESC, tempID + 17000 - 128), rezName);
 	}
 	else if (iType == CNR_TYPE_NEBU) {
 		short nebuTempID = ((tempID - 128) * 7) + 9500;
 		short nebuID = ((iID - 128) * 7) + 9500;
-		ResourceTemplate(nebuID, NovaLib::FindById(CNR_TYPE_PICT, nebuTempID), rezName + "; 42.1%");
-		ResourceTemplate(nebuID + 1, NovaLib::FindById(CNR_TYPE_PICT, nebuTempID + 1), rezName + "; 56.2%");
-		ResourceTemplate(nebuID + 2, NovaLib::FindById(CNR_TYPE_PICT, nebuTempID + 2), rezName + "; 75.0%");
-		ResourceTemplate(nebuID + 3, NovaLib::FindById(CNR_TYPE_PICT, nebuTempID + 3), rezName + "; 100.0%");
-		ResourceTemplate(nebuID + 4, NovaLib::FindById(CNR_TYPE_PICT, nebuTempID + 4), rezName + "; 133.3%");
-		ResourceTemplate(nebuID + 5, NovaLib::FindById(CNR_TYPE_PICT, nebuTempID + 5), rezName + "; 177.7%");
-		ResourceTemplate(nebuID + 6, NovaLib::FindById(CNR_TYPE_PICT, nebuTempID + 6), rezName + "; 237.0%");
+		ResourceTemplate(nebuID, Workspace::FindById(CNR_TYPE_PICT, nebuTempID), rezName + "; 42.1%");
+		ResourceTemplate(nebuID + 1, Workspace::FindById(CNR_TYPE_PICT, nebuTempID + 1), rezName + "; 56.2%");
+		ResourceTemplate(nebuID + 2, Workspace::FindById(CNR_TYPE_PICT, nebuTempID + 2), rezName + "; 75.0%");
+		ResourceTemplate(nebuID + 3, Workspace::FindById(CNR_TYPE_PICT, nebuTempID + 3), rezName + "; 100.0%");
+		ResourceTemplate(nebuID + 4, Workspace::FindById(CNR_TYPE_PICT, nebuTempID + 4), rezName + "; 133.3%");
+		ResourceTemplate(nebuID + 5, Workspace::FindById(CNR_TYPE_PICT, nebuTempID + 5), rezName + "; 177.7%");
+		ResourceTemplate(nebuID + 6, Workspace::FindById(CNR_TYPE_PICT, nebuTempID + 6), rezName + "; 237.0%");
 	}
 	else if (iType == CNR_TYPE_OUTF) {
-		ResourceTemplate(iID + 3000 - 128, NovaLib::FindById(CNR_TYPE_DESC, tempID + 3000 - 128), rezName);
-		ResourceTemplate(iID + 6000 - 128, NovaLib::FindById(CNR_TYPE_PICT, tempID + 6000 - 128), rezName);
+		ResourceTemplate(iID + 3000 - 128, Workspace::FindById(CNR_TYPE_DESC, tempID + 3000 - 128), rezName);
+		ResourceTemplate(iID + 6000 - 128, Workspace::FindById(CNR_TYPE_PICT, tempID + 6000 - 128), rezName);
 	}
 	else if (iType == CNR_TYPE_SHIP) {
-		ResourceTemplate(iID, NovaLib::FindById(CNR_TYPE_SHAN, tempID), rezName);
-		ResourceTemplate(iID + 3000 - 128, NovaLib::FindById(CNR_TYPE_PICT, tempID + 3000 - 128), rezName + "; Targeting");
-		ResourceTemplate(iID + 5000 - 128, NovaLib::FindById(CNR_TYPE_PICT, tempID + 5000 - 128), rezName);
-		ResourceTemplate(iID + 13000 - 128, NovaLib::FindById(CNR_TYPE_DESC, tempID + 13000 - 128), rezName);
-		ResourceTemplate(iID + 14000 - 128, NovaLib::FindById(CNR_TYPE_DESC, tempID + 14000 - 128), rezName + "; Escort");
+		ResourceTemplate(iID, Workspace::FindById(CNR_TYPE_SHAN, tempID), rezName);
+		ResourceTemplate(iID + 3000 - 128, Workspace::FindById(CNR_TYPE_PICT, tempID + 3000 - 128), rezName + "; Targeting");
+		ResourceTemplate(iID + 5000 - 128, Workspace::FindById(CNR_TYPE_PICT, tempID + 5000 - 128), rezName);
+		ResourceTemplate(iID + 13000 - 128, Workspace::FindById(CNR_TYPE_DESC, tempID + 13000 - 128), rezName);
+		ResourceTemplate(iID + 14000 - 128, Workspace::FindById(CNR_TYPE_DESC, tempID + 14000 - 128), rezName + "; Escort");
 		rezName += +";:" + ToString(tempID);
 	}
-	else if (iType == CNR_TYPE_SPOB) ResourceTemplate(iID, NovaLib::FindById(CNR_TYPE_DESC, tempID), rezName);
+	else if (iType == CNR_TYPE_SPOB) ResourceTemplate(iID, Workspace::FindById(CNR_TYPE_DESC, tempID), rezName);
 
 	char* pBuffer = new char[iSize];
 	pTemplateResource->Save(pBuffer);
@@ -1588,7 +1588,7 @@ int CEditor::HelpAbout(void)
 int CEditor::RunNova(void)
 {
 	std::vector<std::string> extensions = { ".nplay", ".exe", ".lnk" };
-	std::filesystem::path root = NovaLib::Get().rootPath;
+	std::filesystem::path root = Workspace::Get().rootPath;
 
 	if (!std::filesystem::exists(root) || !std::filesystem::is_directory(root)) {
 		MessageBoxA(NULL, ("Invalid root folder:\n" + root.string()).c_str(), "Error", MB_ICONERROR | MB_OK);
@@ -1723,7 +1723,7 @@ int CEditor::TempCloseAndSave(void)
 	m_wndTemplate.Destroy();
 
 	if (m_iTempCombo == -1) return 0;
-	ResourceTemplate(m_iTempID, NovaLib::FindByIdx(m_iCurrentResourceType, m_iTempCombo), m_szTempName);
+	ResourceTemplate(m_iTempID, Workspace::FindByIdx(m_iCurrentResourceType, m_iTempCombo), m_szTempName);
 	UpdateResourceList();
 	HWND hwndListResources = GetDlgItem(m_dialogMain.GetHWND(), IDC_LIST_RESOURCES);
 	int i;
@@ -2230,7 +2230,7 @@ BOOL CEditor::MainDialogProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 			}
 			else if (iControlID == IDM_HELP_NCB)
 			{
-				MessageBox(NULL, NovaLib::GetAvailableNCB().c_str(), "Available NCBs", MB_OK);
+				MessageBox(NULL, Workspace::GetAvailableNCB().c_str(), "Available NCBs", MB_OK);
 			}
 			else if (iControlID == IDM_RUNDEV)
 			{

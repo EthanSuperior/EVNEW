@@ -442,9 +442,9 @@ int CCronResource::CloseAndDontSave(void)
 
 void CCronResource::RegisterNCB()
 {
-	NovaLib::RegisterNCB(m_szEnableOn);
-	NovaLib::RegisterNCB(m_szOnStart);
-	NovaLib::RegisterNCB(m_szOnEnd);
+	Workspace::RegisterNCB(m_szEnableOn);
+	Workspace::RegisterNCB(m_szOnStart);
+	Workspace::RegisterNCB(m_szOnEnd);
 }
 
 

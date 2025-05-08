@@ -962,7 +962,7 @@ int CShipResource::Initialize(HWND hwnd)
 	if (m_iDiffID == 0 && sc != std::string::npos && col != std::string::npos) {
 		try { 
 			m_iDiffID = std::stoi(s.substr(col + 1));
-			std::vector<CNovaResource*> values = NovaLib::All(CNR_TYPE_SHIP);
+			std::vector<CNovaResource*> values = Workspace::All(CNR_TYPE_SHIP);
 			for (auto i = 0; i < values.size(); ++i)
 				if (values[i]->GetID() == m_iDiffID) {
 					m_iDiffID = i;
@@ -1396,12 +1396,12 @@ std::string CShipResource::NumsToString(std::string name, int shields, int shiel
 				return false;
 				};
 			});
-		return (COutfResource*)NovaLib::FindWhere(CNR_TYPE_OUTF, outfFilter(mod, weapId));
+		return (COutfResource*)Workspace::FindWhere(CNR_TYPE_OUTF, outfFilter(mod, weapId));
 	};
 
 	for (int i = 0; i < 8; ++i) {
 		if (weaps[i] < 128) continue;
-		std::string wName = NovaLib::RezStr(CNR_TYPE_WEAP, weaps[i]);
+		std::string wName = Workspace::RezStr(CNR_TYPE_WEAP, weaps[i]);
 		auto r = matchingO(1, weaps[i]);
 		if (r != NULL) {
 			wName += "(" + ToString(r->GetID()) + ")";
@@ -1423,7 +1423,7 @@ std::string CShipResource::NumsToString(std::string name, int shields, int shiel
 	std::string outfStr = "\n----Equipment----\n";
 	for (int i = 0; i < 8; ++i) {
 		if (outfs[i] < 128) continue;
-		COutfResource* r = (COutfResource*)NovaLib::FindById(CNR_TYPE_OUTF, outfs[i]);
+		COutfResource* r = (COutfResource*)Workspace::FindById(CNR_TYPE_OUTF, outfs[i]);
 		std::string oName = r->GetName();
 		usedMass += r->m_iMass*oCnts[i];
 		usedCost += r->m_iCost*oCnts[i];
@@ -1511,7 +1511,7 @@ void CShipResource::DiffUpdate(void) {
 	HWND enemyTxt = GetDlgItem(m_wndDiff.GetHWND(), IDC_DIFF_SHIP_TEXT3);
 
 	CShipResource* comp = NULL;
-	if (m_iDiffID > 0) comp = (CShipResource*)NovaLib::FindByIdx(CNR_TYPE_SHIP, m_iDiffID);
+	if (m_iDiffID > 0) comp = (CShipResource*)Workspace::FindByIdx(CNR_TYPE_SHIP, m_iDiffID);
 	if (comp == NULL) comp = this;
 
 	Static_SetText(enemyTxt, NumsToString(comp->m_szName, comp->m_iShields, comp->m_iShieldRecharge,

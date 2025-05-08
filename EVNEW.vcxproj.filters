@@ -117,7 +117,7 @@
     <ClCompile Include="Utils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="NovaLib.cpp">
+    <ClCompile Include="Workspace.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="CBitFieldControl.cpp">
@@ -260,7 +260,7 @@
     <ClInclude Include="Utils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="NovaLib.h">
+    <ClInclude Include="Workspace.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="NovaResourceRange.h">

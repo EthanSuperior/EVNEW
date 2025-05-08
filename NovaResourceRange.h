@@ -2,7 +2,7 @@
 #include "CNovaResource.h"
 #include <string>
 
-class NovaLib;
+class Workspace;
 
 class NovaResourceRange
 {
@@ -19,7 +19,6 @@ public:
             : ptr(ptr), rezType(type), idx(idx), onPlugins(onPlugins), i(i), pluginIdx(pluginIdx) {}
         pointer operator->() { return ptr; }
         reference operator*() const { return *ptr; }
-        reference operator[](int index) { return *ptr; }
         Iterator& operator++();
         Iterator& operator--();
         std::string PluginFilename();

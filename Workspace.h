@@ -16,10 +16,10 @@ class CEditor;
 // ofstream << iNotifyCode << std::endl;
 
 using ResourceFilter = std::function<bool(CNovaResource*, int)>;
-class NovaLib
+class Workspace
 {
 public:
-    static NovaLib& Get();
+    static Workspace& Get();
     // Add New Resource Files
     static int Open(std::string path, CWindow* pWndParent);
     static void AddFolder(std::string path, CWindow* pWndParent, std::vector<CPlugIn*>& files);
@@ -55,11 +55,11 @@ public:
     void UpdateNCBList();
     std::string rootPath = "";
 private:
-    NovaLib() = default;
-    ~NovaLib();
+    Workspace() = default;
+    ~Workspace();
     // Prevent copying and assignment
-    NovaLib(const NovaLib&) = delete;
-    NovaLib& operator=(const NovaLib&) = delete;
+    Workspace(const Workspace&) = delete;
+    Workspace& operator=(const Workspace&) = delete;
     std::set<int> usedNCB = {};
     std::vector<CPlugIn*> data;
     std::vector<CPlugIn*> plugins;

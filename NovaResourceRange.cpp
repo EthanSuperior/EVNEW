@@ -1,16 +1,16 @@
 
 #include "NovaResourceRange.h"
-#include "NovaLib.h"
+#include "Workspace.h"
 
 // Iterator Through Workspace's Plugins
 NovaResourceRange::Iterator NovaResourceRange::begin() const {
-	auto& plugins = NovaLib::GetPlugins();
+	auto& plugins = Workspace::GetPlugins();
 	for (size_t pi = 0; pi < plugins.size(); ++pi) {
 		auto& resources = plugins[pi]->m_vResources[rezType];
 		if (resources.empty()) continue;
 		return Iterator(&resources[0], rezType, 0, true, 0, pi);
 	}
-	auto& data = NovaLib::GetData();
+	auto& data = Workspace::GetData();
 	for (size_t pi = 0; pi < data.size(); ++pi) {
 		auto& resources = data[pi]->m_vResources[rezType];
 		if (resources.empty()) continue;
@@ -21,8 +21,8 @@ NovaResourceRange::Iterator NovaResourceRange::begin() const {
 
 NovaResourceRange::Iterator NovaResourceRange::end() const {
 	int total = 0;
-	for (auto* p : NovaLib::GetPlugins()) total += p->m_vResources[rezType].size();
-	auto& data = NovaLib::GetData();
+	for (auto* p : Workspace::GetPlugins()) total += p->m_vResources[rezType].size();
+	auto& data = Workspace::GetData();
 	for (auto* p : data) total += p->m_vResources[rezType].size();
 	int i = 0;
 	if (data.size() != 0) i = data.back()->m_vResources[rezType].size();
@@ -33,7 +33,7 @@ NovaResourceRange::Iterator NovaResourceRange::end() const {
 NovaResourceRange::Iterator& NovaResourceRange::Iterator::operator++()
 {
 	while (true) {
-		auto& vecs = onPlugins ? NovaLib::GetPlugins(): NovaLib::GetData();
+		auto& vecs = onPlugins ? Workspace::GetPlugins(): Workspace::GetData();
 
 		if (pluginIdx >= vecs.size()) {
 			if (onPlugins) {
@@ -64,7 +64,7 @@ NovaResourceRange::Iterator& NovaResourceRange::Iterator::operator++()
 NovaResourceRange::Iterator& NovaResourceRange::Iterator::operator--()
 {
 	while (true) {
-		auto& vecs = onPlugins ? NovaLib::GetPlugins(): NovaLib::GetData();
+		auto& vecs = onPlugins ? Workspace::GetPlugins(): Workspace::GetData();
 
 		if (i > 0) {
 			ptr = &vecs[pluginIdx]->m_vResources[rezType][--i];
@@ -81,7 +81,7 @@ NovaResourceRange::Iterator& NovaResourceRange::Iterator::operator--()
 		else {
 			if (!onPlugins) {
 				onPlugins = true;
-				pluginIdx = NovaLib::GetPlugins().size();
+				pluginIdx = Workspace::GetPlugins().size();
 				i = 0;
 				continue;
 			}
@@ -97,5 +97,5 @@ NovaResourceRange::Iterator& NovaResourceRange::Iterator::operator--()
 
 std::string NovaResourceRange::Iterator::PluginFilename()
 {
-	return std::filesystem::path((onPlugins ? NovaLib::GetPlugins() : NovaLib::GetData())[pluginIdx]->GetFilename()).filename().string();
+	return std::filesystem::path((onPlugins ? Workspace::GetPlugins() : Workspace::GetData())[pluginIdx]->GetFilename()).filename().string();
 }

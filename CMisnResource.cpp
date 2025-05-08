@@ -910,21 +910,21 @@ BOOL CMisnResource::MisnDlgProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lpara
 				int id = pResource->m_controls[1].GetInt();
 				std::string rezName = "Any Stellar";
 				
-				if (id >= 128 && id <= 2175) rezName = NovaLib::RezStr(CNR_TYPE_SPOB, id);
+				if (id >= 128 && id <= 2175) rezName = Workspace::RezStr(CNR_TYPE_SPOB, id);
 				else if (id >= 5000 && id <= 7047)
-					rezName = "AdjTo" + NovaLib::RezStr(CNR_TYPE_SYST, id - 5000, true);
+					rezName = "AdjTo" + Workspace::RezStr(CNR_TYPE_SYST, id - 5000, true);
 				else if (id >= 10000 && id <= 10255)
-					rezName = NovaLib::RezStr(CNR_TYPE_GOVT, id - 10000, true);
+					rezName = Workspace::RezStr(CNR_TYPE_GOVT, id - 10000, true);
 				else if (id >= 15000 && id <= 15255)
-					rezName = "AllyOf" + NovaLib::RezStr(CNR_TYPE_GOVT, id - 15000);
+					rezName = "AllyOf" + Workspace::RezStr(CNR_TYPE_GOVT, id - 15000);
 				else if (id >= 20000 && id <= 20255)
-					rezName = "Not" + NovaLib::RezStr(CNR_TYPE_GOVT, id - 20000);
+					rezName = "Not" + Workspace::RezStr(CNR_TYPE_GOVT, id - 20000);
 				else if (id >= 25000 && id <= 25255)
-					rezName = "EnemyOf" + NovaLib::RezStr(CNR_TYPE_GOVT, id - 25000);
+					rezName = "EnemyOf" + Workspace::RezStr(CNR_TYPE_GOVT, id - 25000);
 				else if (id >= 30000 && id <= 30255)
-					rezName = "ClassOf" + NovaLib::RezStr(CNR_TYPE_GOVT, id - 30000);
+					rezName = "ClassOf" + Workspace::RezStr(CNR_TYPE_GOVT, id - 30000);
 				else if (id >= 31000 && id <= 31255)
-					rezName = "!ClassOf" + NovaLib::RezStr(CNR_TYPE_GOVT, id - 31000);
+					rezName = "!ClassOf" + Workspace::RezStr(CNR_TYPE_GOVT, id - 31000);
 
 				Static_SetText(GetDlgItem(hwnd, IDC_EDIT_MISN_TEXT52), rezName.c_str());
 			} 
@@ -934,19 +934,19 @@ BOOL CMisnResource::MisnDlgProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lpara
 
 				if (id == -2) rezName = "Rand Inhabited";
 				else if (id == -3) rezName = "Rand Uninhabited";
-				else if (id >= 128 && id <= 2175) rezName = NovaLib::RezStr(CNR_TYPE_SPOB, id);
+				else if (id >= 128 && id <= 2175) rezName = Workspace::RezStr(CNR_TYPE_SPOB, id);
 				else if (id >= 10000 && id <= 10255)
-					rezName = "Rand " + NovaLib::RezStr(CNR_TYPE_GOVT, id - 10000);
+					rezName = "Rand " + Workspace::RezStr(CNR_TYPE_GOVT, id - 10000);
 				else if (id >= 15000 && id <= 15255)
-					rezName = "Random AllyOf " + NovaLib::RezStr(CNR_TYPE_GOVT, id - 15000);
+					rezName = "Random AllyOf " + Workspace::RezStr(CNR_TYPE_GOVT, id - 15000);
 				else if (id >= 20000 && id <= 20255)
-					rezName = "Random Not " + NovaLib::RezStr(CNR_TYPE_GOVT, id - 20000);
+					rezName = "Random Not " + Workspace::RezStr(CNR_TYPE_GOVT, id - 20000);
 				else if (id >= 25000 && id <= 25255)
-					rezName = "Random EnemyOf " + NovaLib::RezStr(CNR_TYPE_GOVT, id - 25000);
+					rezName = "Random EnemyOf " + Workspace::RezStr(CNR_TYPE_GOVT, id - 25000);
 				else if (id >= 30000 && id <= 30255)
-					rezName = "Random ClassOf " + NovaLib::RezStr(CNR_TYPE_GOVT, id - 30000);
+					rezName = "Random ClassOf " + Workspace::RezStr(CNR_TYPE_GOVT, id - 30000);
 				else if (id >= 31000 && id <= 31255)
-					rezName = "Random !ClassOf " + NovaLib::RezStr(CNR_TYPE_GOVT, id - 31000);
+					rezName = "Random !ClassOf " + Workspace::RezStr(CNR_TYPE_GOVT, id - 31000);
 
 				Static_SetText(GetDlgItem(hwnd, IDC_EDIT_MISN_TEXT56), rezName.c_str());
 			}
@@ -957,19 +957,19 @@ BOOL CMisnResource::MisnDlgProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lpara
 				if (id == -2) rezName = "Rand Inhabited";
 				else if (id == -3) rezName = "Rand Uninhabited";
 				else if (id == -4) rezName = "Initial Stellar";
-				else if (id >= 128 && id <= 2175) rezName = NovaLib::RezStr(CNR_TYPE_SPOB, id);
+				else if (id >= 128 && id <= 2175) rezName = Workspace::RezStr(CNR_TYPE_SPOB, id);
 				else if (id >= 10000 && id <= 10255)
-					rezName = "Random " + NovaLib::RezStr(CNR_TYPE_GOVT, id - 10000, true);
+					rezName = "Random " + Workspace::RezStr(CNR_TYPE_GOVT, id - 10000, true);
 				else if (id >= 15000 && id <= 15255)
-					rezName = "Random AllyOf " + NovaLib::RezStr(CNR_TYPE_GOVT, id - 15000);
+					rezName = "Random AllyOf " + Workspace::RezStr(CNR_TYPE_GOVT, id - 15000);
 				else if (id >= 20000 && id <= 20255)
-					rezName = "Random Not " + NovaLib::RezStr(CNR_TYPE_GOVT, id - 20000);
+					rezName = "Random Not " + Workspace::RezStr(CNR_TYPE_GOVT, id - 20000);
 				else if (id >= 25000 && id <= 25255)
-					rezName = "Random EnemyOf " + NovaLib::RezStr(CNR_TYPE_GOVT, id - 25000);
+					rezName = "Random EnemyOf " + Workspace::RezStr(CNR_TYPE_GOVT, id - 25000);
 				else if (id >= 30000 && id <= 30255)
-					rezName = "Random ClassOf " + NovaLib::RezStr(CNR_TYPE_GOVT, id - 30000);
+					rezName = "Random ClassOf " + Workspace::RezStr(CNR_TYPE_GOVT, id - 30000);
 				else if (id >= 31000 && id <= 31255)
-					rezName = "Random !ClassOf " + NovaLib::RezStr(CNR_TYPE_GOVT, id - 31000);
+					rezName = "Random !ClassOf " + Workspace::RezStr(CNR_TYPE_GOVT, id - 31000);
 
 				Static_SetText(GetDlgItem(hwnd, IDC_EDIT_MISN_TEXT57), rezName.c_str());
 			}
@@ -978,7 +978,7 @@ BOOL CMisnResource::MisnDlgProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lpara
 				std::string rezName = "None";
 
 				if (id == 1000) rezName = "Random Cargo";
-				else if (id >= 0 && id <= 255) rezName = NovaLib::RezStr(CNR_TYPE_JUNK, id);
+				else if (id >= 0 && id <= 255) rezName = Workspace::RezStr(CNR_TYPE_JUNK, id);
 
 				Static_SetText(GetDlgItem(hwnd, IDC_EDIT_MISN_TEXT58), rezName.c_str());
 			}
@@ -991,19 +991,19 @@ BOOL CMisnResource::MisnDlgProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lpara
 				else if (id == -4) rezName = "Return Stellar";
 				else if (id == -5) rezName = "Adjacent System";
 				else if (id == -6) rezName = "Follow Player";
-				else if (id >= 128 && id <= 2175) rezName = NovaLib::RezStr(CNR_TYPE_SYST, id);
+				else if (id >= 128 && id <= 2175) rezName = Workspace::RezStr(CNR_TYPE_SYST, id);
 				else if (id >= 10000 && id <= 10255)
-					rezName = "Random " + NovaLib::RezStr(CNR_TYPE_GOVT, id - 10000, true);
+					rezName = "Random " + Workspace::RezStr(CNR_TYPE_GOVT, id - 10000, true);
 				else if (id >= 15000 && id <= 15255)
-					rezName = "Random AllyOf " + NovaLib::RezStr(CNR_TYPE_GOVT, id - 15000);
+					rezName = "Random AllyOf " + Workspace::RezStr(CNR_TYPE_GOVT, id - 15000);
 				else if (id >= 20000 && id <= 20255)
-					rezName = "Random Not " + NovaLib::RezStr(CNR_TYPE_GOVT, id - 20000);
+					rezName = "Random Not " + Workspace::RezStr(CNR_TYPE_GOVT, id - 20000);
 				else if (id >= 25000 && id <= 25255)
-					rezName = "Random EnemyOf " + NovaLib::RezStr(CNR_TYPE_GOVT, id - 25000);
+					rezName = "Random EnemyOf " + Workspace::RezStr(CNR_TYPE_GOVT, id - 25000);
 				else if (id >= 30000 && id <= 30255)
-					rezName = "Random ClassOf " + NovaLib::RezStr(CNR_TYPE_GOVT, id - 30000);
+					rezName = "Random ClassOf " + Workspace::RezStr(CNR_TYPE_GOVT, id - 30000);
 				else if (id >= 31000 && id <= 31255)
-					rezName = "Random !ClassOf " + NovaLib::RezStr(CNR_TYPE_GOVT, id - 31000);
+					rezName = "Random !ClassOf " + Workspace::RezStr(CNR_TYPE_GOVT, id - 31000);
 
 				Static_SetText(GetDlgItem(hwnd, IDC_EDIT_MISN_TEXT62), rezName.c_str());
 			}
@@ -1011,7 +1011,7 @@ BOOL CMisnResource::MisnDlgProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lpara
 				int id = pResource->m_controls[16].GetInt();
 				std::string rezName = "None";
 
-				if (id >= 128 && id <= 639) rezName = NovaLib::RezStr(CNR_TYPE_DUDE, id);
+				if (id >= 128 && id <= 639) rezName = Workspace::RezStr(CNR_TYPE_DUDE, id);
 
 				Static_SetText(GetDlgItem(hwnd, IDC_EDIT_MISN_TEXT63), rezName.c_str());
 			}
@@ -1019,7 +1019,7 @@ BOOL CMisnResource::MisnDlgProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lpara
 				int id = pResource->m_controls[34].GetInt();
 				std::string rezName = "None";
 
-				if (id >= 128 && id <= 639) rezName = NovaLib::RezStr(CNR_TYPE_DUDE, id);
+				if (id >= 128 && id <= 639) rezName = Workspace::RezStr(CNR_TYPE_DUDE, id);
 
 				Static_SetText(GetDlgItem(hwnd, IDC_EDIT_MISN_TEXT68), rezName.c_str());
 			}
@@ -1029,19 +1029,19 @@ BOOL CMisnResource::MisnDlgProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lpara
 
 				if (id == -2) rezName = "Travel System";
 				else if (id == -3) rezName = "Return System";
-				else if (id >= 128 && id <= 2175) rezName = NovaLib::RezStr(CNR_TYPE_SYST, id);
+				else if (id >= 128 && id <= 2175) rezName = Workspace::RezStr(CNR_TYPE_SYST, id);
 				else if (id >= 10000 && id <= 10255)
-					rezName = "Rand " + NovaLib::RezStr(CNR_TYPE_GOVT, id - 10000, true);
+					rezName = "Rand " + Workspace::RezStr(CNR_TYPE_GOVT, id - 10000, true);
 				else if (id >= 15000 && id <= 15255)
-					rezName = "Rand AllyOf " + NovaLib::RezStr(CNR_TYPE_GOVT, id - 15000);
+					rezName = "Rand AllyOf " + Workspace::RezStr(CNR_TYPE_GOVT, id - 15000);
 				else if (id >= 20000 && id <= 20255)
-					rezName = "Rand Not " + NovaLib::RezStr(CNR_TYPE_GOVT, id - 20000);
+					rezName = "Rand Not " + Workspace::RezStr(CNR_TYPE_GOVT, id - 20000);
 				else if (id >= 25000 && id <= 25255)
-					rezName = "Rand EnemyOf " + NovaLib::RezStr(CNR_TYPE_GOVT, id - 25000);
+					rezName = "Rand EnemyOf " + Workspace::RezStr(CNR_TYPE_GOVT, id - 25000);
 				else if (id >= 30000 && id <= 30255)
-					rezName = "Rand ClassOf " + NovaLib::RezStr(CNR_TYPE_GOVT, id - 30000);
+					rezName = "Rand ClassOf " + Workspace::RezStr(CNR_TYPE_GOVT, id - 30000);
 				else if (id >= 31000 && id <= 31255)
-					rezName = "Rand !ClassOf " + NovaLib::RezStr(CNR_TYPE_GOVT, id - 31000);
+					rezName = "Rand !ClassOf " + Workspace::RezStr(CNR_TYPE_GOVT, id - 31000);
 
 				Static_SetText(GetDlgItem(hwnd, IDC_EDIT_MISN_TEXT69), rezName.c_str());
 			}
@@ -1049,12 +1049,12 @@ BOOL CMisnResource::MisnDlgProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lpara
 				int id = pResource->m_controls[36].GetInt();
 				std::string rezName = "Any Ship";
 
-				if (id >= 128 && id <= 255)	rezName = NovaLib::RezStr(CNR_TYPE_SHIP, id);
-				else if (id >= 1128 && id <= 1255) rezName = "Not" + NovaLib::RezStr(CNR_TYPE_SHIP, id - 1000);
+				if (id >= 128 && id <= 255)	rezName = Workspace::RezStr(CNR_TYPE_SHIP, id);
+				else if (id >= 1128 && id <= 1255) rezName = "Not" + Workspace::RezStr(CNR_TYPE_SHIP, id - 1000);
 				else if (id >= 2128 && id <= 2255)
-					rezName = "GovtOf" + NovaLib::RezStr(CNR_TYPE_GOVT, id - 2000);
+					rezName = "GovtOf" + Workspace::RezStr(CNR_TYPE_GOVT, id - 2000);
 				else if (id >= 3128 && id <= 3255)
-					rezName = "NotGovtOf" + NovaLib::RezStr(CNR_TYPE_GOVT, id - 3000);
+					rezName = "NotGovtOf" + Workspace::RezStr(CNR_TYPE_GOVT, id - 3000);
 
 				Static_SetText(GetDlgItem(hwnd, IDC_EDIT_MISN_TEXT70), rezName.c_str());
 			}
@@ -1098,10 +1098,10 @@ void CMisnResource::UpdateDynamicDefaults(CControl* controls, short oldId, short
 
 void CMisnResource::RegisterNCB()
 {
-	NovaLib::RegisterNCB(m_szOnAccept);
-	NovaLib::RegisterNCB(m_szOnRefuse);
-	NovaLib::RegisterNCB(m_szOnSuccess);
-	NovaLib::RegisterNCB(m_szOnFailure);
-	NovaLib::RegisterNCB(m_szOnAbort);
-	NovaLib::RegisterNCB(m_szOnShipDone);
+	Workspace::RegisterNCB(m_szOnAccept);
+	Workspace::RegisterNCB(m_szOnRefuse);
+	Workspace::RegisterNCB(m_szOnSuccess);
+	Workspace::RegisterNCB(m_szOnFailure);
+	Workspace::RegisterNCB(m_szOnAbort);
+	Workspace::RegisterNCB(m_szOnShipDone);
 }

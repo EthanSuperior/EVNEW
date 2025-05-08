@@ -396,7 +396,7 @@ any characters that are converted incorrectly, or anything else that might be us
 * RLE masks are now automatically generated after imports, using black as transparent pixels (but masks can still be imported separately, too)
 
 ??/25: Release Public Beta 1.1.0
-* Added NovaLib
+* Added Workspaces
 * Added Open Recent
 * Added Auto Reopen previous
 * Added Cron timeline

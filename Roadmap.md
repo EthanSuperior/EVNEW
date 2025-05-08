@@ -5,11 +5,10 @@
 - Saving w/ Nova Running should prompt to quit it
 - Update Readme to markdown
 - Workspaces
-	- Change NovaLib to Workspace
 	- Allow to switch between plugins within same EV Nova Folder
 	- Tabs for open files
 	- Make Load detect if within same folder as the plugin and not reload library
-	- Change NovaLib to CPlugin*s? For hotswaps?
+	- Change Workspace to CPlugin*s? For hotswaps?
 	- Make Linkers have Rez(Src) or at least * for outside resources
 	- Should store active plugin, not CEditor...
 	- Distinguish between current & all plugins
@@ -51,11 +50,11 @@
 
 ### Fixes
 - Modernize code (c++ 17)
-- Allow NovaLib to work with Unk
+- Allow Workspace to work with Unk
 - IMG encoding things?
 - Fix destroying CResourceUnk, such as DITL and DLOG.
 - All lints
-- Links display NovaLib before Plugin Resources
+- Links display Data before Plugin Resources
 - "CEditor::GetCurrentEditor()->ResourceExtra(...);" Loads a blank resource, even if one exists.
 
 ##### Links:
@@ -66,7 +65,7 @@
 - Outf: WeapName; Other stuff
 - Pers: ship
 - Ship: Cost; weaps;outf; do the stats
-- Shob tech lvls?
+- Shob: tech lvls?
 - Syst: Links; spobs;dudes;pers;reinforce
 - Weap: ammo;jam names;
 

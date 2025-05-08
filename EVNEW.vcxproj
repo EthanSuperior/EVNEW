@@ -173,7 +173,7 @@
     <ClCompile Include="CWeapResource.cpp" />
     <ClCompile Include="CWindow.cpp" />
     <ClCompile Include="EVNEW.cpp" />
-    <ClCompile Include="NovaLib.cpp" />
+    <ClCompile Include="Workspace.cpp" />
     <ClCompile Include="NovaResourceRange.cpp" />
     <ClCompile Include="Utils.cpp" />
   </ItemGroup>
@@ -216,7 +216,7 @@
     <ClInclude Include="CWeapResource.h" />
     <ClInclude Include="CWindow.h" />
     <ClInclude Include="EVNEW.h" />
-    <ClInclude Include="NovaLib.h" />
+    <ClInclude Include="Workspace.h" />
     <ClInclude Include="NovaResourceRange.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Utils.h" />

@@ -57,9 +57,9 @@ public:
 	int Load(char *szFilename, CWindow *pWndParent);
 	int Save(CWindow *pWndParent);
 
-	CNovaResource * AllocateResource(int iType);
+	CNovaResource* AllocateResource(int iType);
 
-	std::vector< std::vector<CNovaResource *> > m_vResources;	// Public to make interface simpler
+	std::vector< std::vector<CNovaResource*> > m_vResources;
 
 private:
 

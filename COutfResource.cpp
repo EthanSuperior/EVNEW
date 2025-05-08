@@ -872,7 +872,7 @@ BOOL COutfResource::OutfDlgProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lpara
 
 					szText = "Outfitter PICT ID: ";
 					szText += ToString(pResource->m_controls[0].GetInt() + 6000 - 128) + " - ";
-					szText += NovaLib::RezStr(CNR_TYPE_PICT, pResource->m_controls[0].GetInt() + 6000 - 128);
+					szText += Workspace::RezStr(CNR_TYPE_PICT, pResource->m_controls[0].GetInt() + 6000 - 128);
 
 					Static_SetText(GetDlgItem(hwnd, IDC_EDIT_OUTF_TEXT29), szText.c_str());
 				}
@@ -912,7 +912,7 @@ int COutfResource::OnPaint(void)
 
 	BeginPaint(m_pWindow->GetHWND(), &paintStruct);
 
-	CPictResource* pict = (CPictResource*) NovaLib::FindById(CNR_TYPE_PICT, m_iID + 6000 - 128);
+	CPictResource* pict = (CPictResource*) Workspace::FindById(CNR_TYPE_PICT, m_iID + 6000 - 128);
 	if (pict == NULL) {
 		EndPaint(m_pWindow->GetHWND(), &paintStruct);
 		return 1;

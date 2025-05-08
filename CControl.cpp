@@ -10,7 +10,7 @@
 
 #include "CWindow.h"
 #include "CControl.h"
-#include "NovaLib.h"
+#include "Workspace.h"
 
 #include <commctrl.h>
 
@@ -519,7 +519,7 @@ int CControl::SetRezType(int rezNum)
 	if (m_iType != CCONTROL_TYPE_REZBOX)
 		return 0;
 	ComboBox_ResetContent(m_hwndControl);
-	m_vRezItems = NovaLib::Names(rezNum);
+	m_vRezItems = Workspace::Names(rezNum);
 	for (const auto& name : m_vRezItems) ComboBox_AddString(m_hwndControl, name.c_str());
 	ComboBox_GetCount(m_hwndControl);
 	SetInt(0);
