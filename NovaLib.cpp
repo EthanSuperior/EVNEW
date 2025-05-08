@@ -8,80 +8,142 @@ NovaLib& NovaLib::Get()
 	static NovaLib instance;
 	return instance;
 }
-NovaLib::~NovaLib() { Clear(); }
-
-CNovaResource* NovaLib::Find(int type, int id) {
-	if (type < 0 || type >= NUM_RESOURCE_TYPES) return NULL;
-	auto it = Get().rez[type].find(id);
-	if (it != Get().rez[type].end()) return it->second;
-	// If not found, check if the ID is within the current plugin
-	return CEditor::GetCurrentEditor()->Find(type, id);
+NovaLib::~NovaLib() { 
+	Clear();
 }
 
-char* NovaLib::RezName(int type, int id) {
-	CNovaResource* ptr = Find(type, id);
-	if (ptr == NULL) return "None";
-	return ptr->GetName();
+void NovaLib::Clear()
+{
+	for (auto& p : GetData()) delete p;
+	GetData().clear();
+	for (auto& p : GetPlugins()) delete p;
+	GetPlugins().clear();
+	GetNCB().clear();
+}
+
+std::vector<CPlugIn*>& NovaLib::GetData() { return Get().data; }
+std::vector<CPlugIn*>& NovaLib::GetPlugins() { return Get().plugins; }
+std::set<int> NovaLib::GetNCB() { return Get().usedNCB; }
+
+CPlugIn* NovaLib::ActiveFile()
+{
+	return Get().active;
+}
+
+int NovaLib::Change(std::string filename, CWindow* pWndParent)
+{
+	auto path = std::filesystem::path(filename);
+	for (auto& p : GetPlugins())
+		if (std::filesystem::path(p->GetFilename()) == path) {
+			Get().active = p;
+
+			return 1;
+		}
+	for (auto& p : GetData())
+		if (std::filesystem::path(p->GetFilename()) == path) {
+			Get().active = p;
+
+			return 1;
+		}
+	CPlugIn* opened = new CPlugIn();
+	GetPlugins().push_back(opened);
+	return opened->Load(path.string().data(), pWndParent);
+}
+
+int NovaLib::Open(std::string filename, CWindow* pWndParent)
+{
+	NovaLib& instance = Get();
+	instance.rootPath = std::filesystem::path(filename).parent_path().parent_path().generic_string();
+	AddFolder(instance.rootPath + "/Nova Files", pWndParent, instance.data);
+	AddFolder(instance.rootPath + "/Nova Plug-ins", pWndParent, instance.plugins);
+	instance.gamePath = instance.rootPath + "";
+	return Change(filename, pWndParent);
+}
+
+void NovaLib::AddFolder(std::string path, CWindow* pWndParent, std::vector<CPlugIn*>& files) {
+	for (const auto& entry : std::filesystem::directory_iterator(path)) {
+		if (!entry.is_regular_file()) continue;
+		if (entry.path().extension() == ".rez") { // ADD .txt files? and .plt files?
+			AddRezFile(entry.path().string(), pWndParent, files);
+		}
+	}
+}
+
+void NovaLib::AddRezFile(std::string filename, CWindow* pWndParent, std::vector<CPlugIn*>& files)
+{
+	CPlugIn* lib = new CPlugIn();
+	lib->Load(filename.data(), pWndParent);
+	files.insert(files.begin(), lib);
+}
+
+NovaResourceRange NovaLib::Each(int type)
+{
+	return NovaResourceRange(type);
+}
+
+std::vector<CNovaResource*> NovaLib::All(int type)
+{
+	NovaResourceRange v = NovaLib::Each(type);
+	std::vector<CNovaResource*> result;
+	result.reserve(v.end().idx);
+	for (const auto& res : v) result.push_back(res);
+	return result;
+}
+
+std::vector<CNovaResource*> NovaLib::Filter(int type, ResourceFilter f)
+{
+	NovaResourceRange v = NovaLib::Each(type);
+	std::vector<CNovaResource*> result;
+	result.reserve(v.end().idx);
+	for (auto& r = v.begin(), e = v.end(); r != e; ++r)
+		if(f(*r, r.idx)) result.push_back(*r);
+	return result;
+}
+
+std::vector<std::string> NovaLib::Names(int type) {
+	NovaResourceRange v = NovaLib::Each(type);
+	std::vector<std::string> result;
+	result.reserve(v.end().idx);
+	for (auto& r = v.begin(), e = v.end(); r != e; ++r)
+		result.push_back(std::to_string((*r)->GetID()) + ": " + (*r)->GetName() + "-" + r.PluginFilename());
+	return result;
+}
+
+// Single Access
+CNovaResource* NovaLib::FindById(int type, int id) {
+	for (auto& r : NovaLib::Each(type))
+		if (r->GetID() == id) return r;
+	return NULL;
+}
+
+CNovaResource* NovaLib::FindByIdx(int type, int i)
+{
+	NovaResourceRange v = NovaLib::Each(type);
+	for (auto& r = v.begin(), e = v.end(); r != e; ++r)
+		if (r.idx == i) return *r;
+	return NULL;
+}
+
+CNovaResource* NovaLib::FindWhere(int type, ResourceFilter f)
+{
+	NovaResourceRange v = NovaLib::Each(type);
+	for (auto& r = v.begin(), e = v.end(); r != e; ++r)
+		if (f(*r, r.idx)) return *r;
+	return NULL;
 }
 
 std::string NovaLib::RezStr(int type, int id, bool addType) {
-	CNovaResource* ptr = Find(type, id);
+	CNovaResource* ptr = FindById(type, id);
 	if (ptr == NULL) return "None";
 	if (!addType) return std::string(ptr->GetName());
 	return g_szResourceTypes[type] + std::string(": ") + ptr->GetName();
 }
 
-std::vector<CNovaResource*> NovaLib::GetAllOf(int type)
-{
-	std::vector<CNovaResource*> values(CEditor::GetCurrentPlugin()->m_vResources[type]);
-	for (auto& [id, val] : Get().rez[type])	values.push_back(val);
-	return values;
-}
-CNovaResource* NovaLib::AtIdx(int type, int i)
-{
-	std::vector<CNovaResource*> values(CEditor::GetCurrentPlugin()->m_vResources[type]);
-	if (i < values.size()) return values[i];
-	for (auto& [id, val] : Get().rez[type])	values.push_back(val);
-	try { return values.at(i); }
-	catch (...) { return NULL; }
-}
-
-void NovaLib::AddFolder(std::string path, CWindow* pWndParent) {
-	for (const auto& entry : std::filesystem::directory_iterator(path)) {
-		if (entry.is_regular_file() && entry.path().extension() == ".rez")
-			AddRezFile(entry.path().lexically_normal().string(), pWndParent);
-	}
-}
-
-void NovaLib::AddRezFile(std::string filename, CWindow* pWndParent)
-{
-	CPlugIn lib;
-	lib.Load((char*)filename.c_str(), pWndParent);
-
-	for (int i = 0; i < NUM_RESOURCE_TYPES; i++) {
-		for (int j = 0; j < lib.m_vResources[i].size(); j++) {
-			if (lib.m_vResources[i][j] == NULL) continue;
-			rez[i][lib.m_vResources[i][j]->GetID()] = lib.m_vResources[i][j];
-			lib.m_vResources[i][j]->RegisterNCB();
-			lib.m_vResources[i][j] = NULL;
-		}
-	}
-}
-
-void NovaLib::Clear()
-{
-	for (int i = 0; i < NUM_RESOURCE_TYPES; ++i) {
-		for (auto& [id, ptr] : rez[i]) delete ptr;
-		rez[i].clear();
-	}
-	usedNCB.clear();
-}
-
+// NCB Helper Methods
 void NovaLib::UpdateNCBList() {
 	usedNCB.clear();
 	for (int i = 0; i < NUM_RESOURCE_TYPES; i++)
-		for each (auto r in rez[i])
-			r.second->RegisterNCB();
+		for (auto& r: NovaLib::Each(i)) r->RegisterNCB();
 }
 
 void NovaLib::RegisterNCB(const char* expression)

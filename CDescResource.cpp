@@ -177,8 +177,7 @@ int CDescResource::FixNewlines(char cReplace, int iAdd)
 {
 	int i;
 
-	if(m_szDescription.size() == 0)
-		return 1;
+	if(m_szDescription.size() == 0)	return 1;
 
 	if(iAdd == 1)
 	{

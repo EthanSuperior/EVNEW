@@ -62,7 +62,7 @@
 
 namespace qt
 {
-#include <QTML.h>
+	#include <QTML.h>
 }
 
 #include "EVNEW.h"
@@ -127,12 +127,6 @@ CEditor::CEditor(void)
 CEditor::~CEditor(void)
 {
 
-}
-
-std::string CEditor::GetRootFolder(std::string filename)
-{
-	if(filename == "") filename = m_plugIn.GetFilename();
-	return std::filesystem::path(filename).parent_path().parent_path().generic_string();
 }
 
 int CEditor::Init(HINSTANCE hInstance)
@@ -213,7 +207,7 @@ int CEditor::Init(HINSTANCE hInstance)
 				return 0;
 			}
 
-			if(m_plugIn.Load(szArg2, NULL) == 0)
+			if(GetCurrentPlugin()->Load(szArg2, NULL) == 0)
 				return 0;
 
 			char *pExtension = strrchr(szArg3, '.');
@@ -226,8 +220,8 @@ int CEditor::Init(HINSTANCE hInstance)
 			if(strcmp(pExtension, "rez") != 0)
 				strcat(szArg3, ".rez");
 
-			m_plugIn.SetFilename(szArg3);
-			m_plugIn.Save(NULL);
+			GetCurrentPlugin()->SetFilename(szArg3);
+			GetCurrentPlugin()->Save(NULL);
 
 			return 0;
 		}
@@ -251,7 +245,7 @@ int CEditor::Init(HINSTANCE hInstance)
 				return 0;
 			}
 
-			if(m_plugIn.Load(szArg2, NULL) == 0)
+			if(GetCurrentPlugin()->Load(szArg2, NULL) == 0)
 				return 0;
 
 			char *pExtension = strrchr(szArg3, '.');
@@ -264,8 +258,8 @@ int CEditor::Init(HINSTANCE hInstance)
 			if(strcmp(pExtension, "txt") != 0)
 				strcat(szArg3, ".txt");
 
-			m_plugIn.SetFilename(szArg3);
-			m_plugIn.Save(NULL);
+			GetCurrentPlugin()->SetFilename(szArg3);
+			GetCurrentPlugin()->Save(NULL);
 
 			return 0;
 		}
@@ -384,10 +378,28 @@ int CEditor::Shutdown(void)
 //			memset(&m_EVNProcessInfo, 0, sizeof(PROCESS_INFORMATION));
 //		}
 //	}
+	int i;
 
-	FileNew();
+	if (m_iIsDirty)
+	{
+		if (AskForSave() == 0) {
+			m_dialogMain.Destroy();
 
-	m_plugIn.ClearFilename();
+			qt::TerminateQTML();
+
+			m_errorLog.CloseLogFile();
+			NovaLib::Clear();
+			return 1;
+		}
+
+		m_iIsDirty = 0;
+	}
+
+	for (i = m_vEditDialogs.size() - 1; i >= 0; i--)
+		((CNovaResource*)m_vEditDialogs[i]->GetExtraData(2))->CloseAndDontSave();
+
+
+	GetCurrentPlugin()->ClearFilename();
 
 	m_dialogMain.Destroy();
 
@@ -537,7 +549,7 @@ CEditor* CEditor::GetCurrentEditor(void)
 
 CPlugIn* CEditor::GetCurrentPlugin(void)
 {
-	return &CEditor::ms_pCurrentEditor->m_plugIn;
+	return NovaLib::ActiveFile();
 }
 
 int CEditor::LoadPreferences(void)
@@ -743,10 +755,10 @@ int CEditor::FileNew(void)
 	for(i = m_vEditDialogs.size() - 1; i >= 0; i--)
 		((CNovaResource *)m_vEditDialogs[i]->GetExtraData(2))->CloseAndDontSave();
 
-	m_plugIn.Clear();
-	m_plugIn.ClearFilename();
-	NovaLib::Get().Clear();
+	GetCurrentPlugin()->Clear();
+	GetCurrentPlugin()->ClearFilename();
 	UpdateResourceList();
+	NovaLib::Clear();
 
 	m_dialogMain.SetTitle("Untitled.rez - EVNEW");
 
@@ -784,19 +796,17 @@ int CEditor::FileOpen(int iDialog, char *szFilename)
 	{
 		strcpy(szFilename2, szFilename);
 	}
-
-	int iResult = m_plugIn.Load(szFilename2, &m_dialogMain);
+	
+	int iResult = NovaLib::Open(szFilename2, &m_dialogMain);
 	szLastOpen = szFilename2;
 	m_szRecentPaths.insert(m_szRecentPaths.begin(), szFilename2);
-	
-	EditLoadLibrary(GetRootFolder(szFilename2) + "/Nova Files");
 	UpdateResourceList();
 
 	if(iResult == 0)
 	{
 		std::string szBuffer = "One or more errors occured while loading file\"";
 
-		szBuffer += m_plugIn.GetFilename();
+		szBuffer += GetCurrentPlugin()->GetFilename();
 		szBuffer += "\".";
 
 		if(m_iPrefGenerateLogFile)
@@ -809,26 +819,26 @@ int CEditor::FileOpen(int iDialog, char *szFilename)
 
 	std::string szTitle;
 
-	szTitle = m_plugIn.GetFilenameNoPath();
+	szTitle = GetCurrentPlugin()->GetFilenameNoPath();
 	szTitle += " - EVNEW";
 
 	m_dialogMain.SetTitle(szTitle.c_str());
 
 	if(m_ofnLoadSave.nFilterIndex == 2)
-		m_plugIn.SetFilename("");
+		GetCurrentPlugin()->SetFilename("");
 
 	return 1;
 }
 
 int CEditor::FileSave(void)
 {
-	if(strcmp(m_plugIn.GetFilename(), "") == 0)
+	if(strcmp(GetCurrentPlugin()->GetFilename(), "") == 0)
 	{
 		if(FileSaveAs() == 0)
 			return 0;
 	}
 
-	m_plugIn.Save(&m_dialogMain);
+	GetCurrentPlugin()->Save(&m_dialogMain);
 
 	m_iIsDirty = 0;
 
@@ -857,68 +867,68 @@ int CEditor::FileSaveAs(void)
 
 	if(m_ofnLoadSave.nFilterIndex == 2)
 	{
-		if(m_plugIn.m_vResources[CNR_TYPE_CICN].size() > 0)
+		if(GetCurrentPlugin()->m_vResources[CNR_TYPE_CICN].size() > 0)
 		{
 			AskForCicnExportFormat();
 
 			if(m_iCicnExportReturnValue == -1)
 				return 0;
 			else if(m_iCicnExportReturnValue == 0)
-				m_plugIn.SetCicnSaveOptions(0, m_szCicnExportSubdirectory, m_szCicnExportFilenamePrefix, m_szCicnExportMaskSubdirectory, m_szCicnExportMaskFilenamePrefix);
+				GetCurrentPlugin()->SetCicnSaveOptions(0, m_szCicnExportSubdirectory, m_szCicnExportFilenamePrefix, m_szCicnExportMaskSubdirectory, m_szCicnExportMaskFilenamePrefix);
 			else
-				m_plugIn.SetCicnSaveOptions(1, m_szCicnExportSubdirectory, m_szCicnExportFilenamePrefix, m_szCicnExportMaskSubdirectory, m_szCicnExportMaskFilenamePrefix);
+				GetCurrentPlugin()->SetCicnSaveOptions(1, m_szCicnExportSubdirectory, m_szCicnExportFilenamePrefix, m_szCicnExportMaskSubdirectory, m_szCicnExportMaskFilenamePrefix);
 		}
 
-		if(m_plugIn.m_vResources[CNR_TYPE_PICT].size() > 0)
+		if(GetCurrentPlugin()->m_vResources[CNR_TYPE_PICT].size() > 0)
 		{
 			AskForPictExportFormat();
 
 			if(m_iPictExportReturnValue == -1)
 				return 0;
 			else if(m_iPictExportReturnValue == 0)
-				m_plugIn.SetPictSaveOptions(0, m_szPictExportSubdirectory, m_szPictExportFilenamePrefix, m_iPictExportType);
+				GetCurrentPlugin()->SetPictSaveOptions(0, m_szPictExportSubdirectory, m_szPictExportFilenamePrefix, m_iPictExportType);
 			else
-				m_plugIn.SetPictSaveOptions(1, m_szPictExportSubdirectory, m_szPictExportFilenamePrefix, m_iPictExportType);
+				GetCurrentPlugin()->SetPictSaveOptions(1, m_szPictExportSubdirectory, m_szPictExportFilenamePrefix, m_iPictExportType);
 		}
 
-		if(m_plugIn.m_vResources[CNR_TYPE_RLE8].size() > 0)
+		if(GetCurrentPlugin()->m_vResources[CNR_TYPE_RLE8].size() > 0)
 		{
 			AskForRle8ExportFormat();
 
 			if(m_iRleExportReturnValue == -1)
 				return 0;
 			else if(m_iRleExportReturnValue == 0)
-				m_plugIn.SetRle8SaveOptions(0, m_szRleExportSubdirectory, m_szRleExportFilenamePrefix, m_szRleExportMaskSubdirectory, m_szRleExportMaskFilenamePrefix, m_iRleExportImageFileType, m_iRleExportMaskFileType, m_iRleExportFramesPerRow);
+				GetCurrentPlugin()->SetRle8SaveOptions(0, m_szRleExportSubdirectory, m_szRleExportFilenamePrefix, m_szRleExportMaskSubdirectory, m_szRleExportMaskFilenamePrefix, m_iRleExportImageFileType, m_iRleExportMaskFileType, m_iRleExportFramesPerRow);
 			else
-				m_plugIn.SetRle8SaveOptions(1, m_szRleExportSubdirectory, m_szRleExportFilenamePrefix, m_szRleExportMaskSubdirectory, m_szRleExportMaskFilenamePrefix, m_iRleExportImageFileType, m_iRleExportMaskFileType, m_iRleExportFramesPerRow);
+				GetCurrentPlugin()->SetRle8SaveOptions(1, m_szRleExportSubdirectory, m_szRleExportFilenamePrefix, m_szRleExportMaskSubdirectory, m_szRleExportMaskFilenamePrefix, m_iRleExportImageFileType, m_iRleExportMaskFileType, m_iRleExportFramesPerRow);
 		}
 
-		if(m_plugIn.m_vResources[CNR_TYPE_RLED].size() > 0)
+		if(GetCurrentPlugin()->m_vResources[CNR_TYPE_RLED].size() > 0)
 		{
 			AskForRleDExportFormat();
 
 			if(m_iRleExportReturnValue == -1)
 				return 0;
 			else if(m_iRleExportReturnValue == 0)
-				m_plugIn.SetRleDSaveOptions(0, m_szRleExportSubdirectory, m_szRleExportFilenamePrefix, m_szRleExportMaskSubdirectory, m_szRleExportMaskFilenamePrefix, m_iRleExportImageFileType, m_iRleExportMaskFileType, m_iRleExportFramesPerRow);
+				GetCurrentPlugin()->SetRleDSaveOptions(0, m_szRleExportSubdirectory, m_szRleExportFilenamePrefix, m_szRleExportMaskSubdirectory, m_szRleExportMaskFilenamePrefix, m_iRleExportImageFileType, m_iRleExportMaskFileType, m_iRleExportFramesPerRow);
 			else
-				m_plugIn.SetRleDSaveOptions(1, m_szRleExportSubdirectory, m_szRleExportFilenamePrefix, m_szRleExportMaskSubdirectory, m_szRleExportMaskFilenamePrefix, m_iRleExportImageFileType, m_iRleExportMaskFileType, m_iRleExportFramesPerRow);
+				GetCurrentPlugin()->SetRleDSaveOptions(1, m_szRleExportSubdirectory, m_szRleExportFilenamePrefix, m_szRleExportMaskSubdirectory, m_szRleExportMaskFilenamePrefix, m_iRleExportImageFileType, m_iRleExportMaskFileType, m_iRleExportFramesPerRow);
 		}
 
-		if(m_plugIn.m_vResources[CNR_TYPE_SND].size() > 0)
+		if(GetCurrentPlugin()->m_vResources[CNR_TYPE_SND].size() > 0)
 		{
 			AskForSndExportFormat();
 
 			if(m_iSndExportReturnValue == -1)
 				return 0;
 			else if(m_iSndExportReturnValue == 0)
-				m_plugIn.SetSndSaveOptions(0, m_szSndExportSubdirectory, m_szSndExportFilenamePrefix);
+				GetCurrentPlugin()->SetSndSaveOptions(0, m_szSndExportSubdirectory, m_szSndExportFilenamePrefix);
 			else
-				m_plugIn.SetSndSaveOptions(1, m_szSndExportSubdirectory, m_szSndExportFilenamePrefix);
+				GetCurrentPlugin()->SetSndSaveOptions(1, m_szSndExportSubdirectory, m_szSndExportFilenamePrefix);
 		}
 	}
 
-	m_plugIn.SetFilename(szFilename);
+	GetCurrentPlugin()->SetFilename(szFilename);
 
 	FileSave();
 
@@ -926,13 +936,13 @@ int CEditor::FileSaveAs(void)
 
 	std::string szTitle;
 
-	szTitle = m_plugIn.GetFilenameNoPath();
+	szTitle = GetCurrentPlugin()->GetFilenameNoPath();
 	szTitle += " - EVNEW";
 
 	m_dialogMain.SetTitle(szTitle.c_str());
 
 	if(m_ofnLoadSave.nFilterIndex == 2)
-		m_plugIn.SetFilename("");
+		GetCurrentPlugin()->SetFilename("");
 
 	return 1;
 }
@@ -980,13 +990,13 @@ int CEditor::FileSaveAs(void)
 
 	char szFilenameCopy[MAX_PATH];
 
-	strcpy(szFilenameCopy, m_plugIn.GetFilename());
+	strcpy(szFilenameCopy, GetCurrentPlugin()->GetFilename());
 
-	m_plugIn.SetFilename(m_szTempPluginFilename.c_str());
+	GetCurrentPlugin()->SetFilename(m_szTempPluginFilename.c_str());
 
 	FileSave();
 
-	m_plugIn.SetFilename(szFilenameCopy);
+	GetCurrentPlugin()->SetFilename(szFilenameCopy);
 
 	STARTUPINFO sui;
 
@@ -1040,17 +1050,17 @@ int CEditor::FileExit(void)
 
 char * CEditor::GetCurFilename(void)
 {
-	return m_plugIn.GetFilename();
+	return GetCurrentPlugin()->GetFilename();
 }
 
 char * CEditor::GetCurFilenameNoPath(void)
 {
-	return m_plugIn.GetFilenameNoPath();
+	return GetCurrentPlugin()->GetFilenameNoPath();
 }
 
 int CEditor::GetCurFileOffset(void)
 {
-	return m_plugIn.GetCurFileOffset();
+	return GetCurrentPlugin()->GetCurFileOffset();
 }
 
 int CEditor::EditCut(void)
@@ -1070,7 +1080,7 @@ int CEditor::EditCopy(void)
 	if(iSelected == -1)
 		return 0;
 
-	CNovaResource *pResource = m_plugIn.m_vResources[m_iCurrentResourceType][iSelected];
+	CNovaResource *pResource = GetCurrentPlugin()->m_vResources[m_iCurrentResourceType][iSelected];
 
 	if(OpenClipboard(m_dialogMain.GetHWND()) == 0)
 		return 0;
@@ -1174,25 +1184,25 @@ int CEditor::EditPaste(int iOverwrite)
 
 			if(iSelection == -1)
 			{
-				pResource = m_plugIn.AllocateResource(iType);
+				pResource = GetCurrentPlugin()->AllocateResource(iType);
 
 				iOverwrite = 0;
 			}
 			else
 			{
-				pResource = m_plugIn.m_vResources[iType][iSelection];
+				pResource = GetCurrentPlugin()->m_vResources[iType][iSelection];
 			}
 		}
 		else
 		{
-			pResource = m_plugIn.AllocateResource(iType);
+			pResource = GetCurrentPlugin()->AllocateResource(iType);
 
 			iOverwrite = 0;
 		}
 	}
 	else
 	{
-		pResource = m_plugIn.AllocateResource(iType);
+		pResource = GetCurrentPlugin()->AllocateResource(iType);
 	}
 
 	pResource->Load(pGlobalMem + 266, iSize);
@@ -1211,15 +1221,15 @@ int CEditor::EditPaste(int iOverwrite)
 	pResource->SetIsNew(0);
 
 	if(!iOverwrite)
-		m_plugIn.m_vResources[iType].push_back(pResource);
+		GetCurrentPlugin()->m_vResources[iType].push_back(pResource);
 
 	UpdateResourceList();
 
 	int i;
 
-	for(i = 0; i < m_plugIn.m_vResources[iType].size(); i++)
+	for(i = 0; i < GetCurrentPlugin()->m_vResources[iType].size(); i++)
 	{
-		if(m_plugIn.m_vResources[iType][i] == pResource)
+		if(GetCurrentPlugin()->m_vResources[iType][i] == pResource)
 		{
 			ListBox_SetCurSel(hwndListResources, i);
 
@@ -1227,7 +1237,7 @@ int CEditor::EditPaste(int iOverwrite)
 		}
 	}
 
-	if(i == m_plugIn.m_vResources[iType].size())
+	if(i == GetCurrentPlugin()->m_vResources[iType].size())
 		ListBox_SetCurSel(hwndListResources, -1);
 
 	SetDirty();
@@ -1263,7 +1273,7 @@ int CEditor::EditPreferences(void)
 
 void CEditor::EditLoadLibrary(std::string path, bool clearFirst)
 {
-	if (clearFirst) NovaLib::Get().Clear();
+	if (clearFirst) NovaLib::Clear();
 
 	std::filesystem::path absPath = std::filesystem::absolute(path);
 
@@ -1271,40 +1281,29 @@ void CEditor::EditLoadLibrary(std::string path, bool clearFirst)
 		MessageBox(NULL, ("Could Not Load Library at:\n" + absPath.string()).c_str(), "Error", MB_ICONERROR | MB_OK);
 		return;
 	}
-
-	NovaLib::Get().AddFolder(absPath.generic_string(), &m_dialogMain);	//std::ofstream of("./log.txt");
-	//for (auto stl : NovaLib::GetAllOf(CNR_TYPE_STRL)) {
-	//	stl->SaveToText(of);
-	//	of << std::endl;
-	//}
-	//of << std::endl;
-	//int n = 0;
-	//for (auto ptr : NovaLib::GetAllOf(CNR_TYPE_SPOB))
-	//	if (((CSpobResource*)ptr)->m_iGovernment == 128)
-	//		n += ((CSpobResource*)ptr)->m_iTribute;
-	//of << "TOTAL: " << n << std::endl;
+	NovaLib::Open(absPath.string(), &m_dialogMain);
 }
 
 int CEditor::ResourceNew(void)
 {
 	CNovaResource *pNovaResource = NULL;
 
-	pNovaResource = m_plugIn.AllocateResource(m_iCurrentResourceType);
+	pNovaResource = GetCurrentPlugin()->AllocateResource(m_iCurrentResourceType);
 
 	if(pNovaResource == NULL)
 		return 0;
 
-	if(m_plugIn.m_vResources[m_iCurrentResourceType].size() == 0)
+	if(GetCurrentPlugin()->m_vResources[m_iCurrentResourceType].size() == 0)
 		pNovaResource->SetID(128);
 	else
-		pNovaResource->SetID(m_plugIn.m_vResources[m_iCurrentResourceType][m_plugIn.m_vResources[m_iCurrentResourceType].size() - 1]->GetID() + 1);
-	m_plugIn.m_vResources[m_iCurrentResourceType].push_back(pNovaResource);
+		pNovaResource->SetID(GetCurrentPlugin()->m_vResources[m_iCurrentResourceType][GetCurrentPlugin()->m_vResources[m_iCurrentResourceType].size() - 1]->GetID() + 1);
+	GetCurrentPlugin()->m_vResources[m_iCurrentResourceType].push_back(pNovaResource);
 
 	UpdateResourceList();
 
 	HWND hwndListResources = GetDlgItem(m_dialogMain.GetHWND(), IDC_LIST_RESOURCES);
 
-	ListBox_SetCurSel(hwndListResources, m_plugIn.m_vResources[m_iCurrentResourceType].size() - 1);
+	ListBox_SetCurSel(hwndListResources, GetCurrentPlugin()->m_vResources[m_iCurrentResourceType].size() - 1);
 
 	ResourceEdit();
 
@@ -1320,7 +1319,7 @@ int CEditor::ResourceEdit(void)
 	if(iSelected == -1)
 		return 0;
 
-	CNovaResource *pNovaResource = m_plugIn.m_vResources[m_iCurrentResourceType][iSelected];
+	CNovaResource *pNovaResource = GetCurrentPlugin()->m_vResources[m_iCurrentResourceType][iSelected];
 
 	if(pNovaResource == NULL)
 		return 0;
@@ -1398,10 +1397,10 @@ int CEditor::ResourceEdit(void)
 }
 
 void CEditor::ResourceExtra(short id, std::string dfltName, int type) {
-	CNovaResource* pNovaResource = Find(type, id);
+	CNovaResource* pNovaResource = FindById(type, id);
 	// If the resource is not found in the plugin - copy it from the library
 	if (pNovaResource == NULL) {
-		pNovaResource = ResourceTemplate(id, NovaLib::Find(type, id), dfltName);
+		pNovaResource = ResourceTemplate(id, NovaLib::FindById(type, id), dfltName);
 		if (pNovaResource != NULL) {
 			SetDirty();
 			UpdateResourceList();
@@ -1409,10 +1408,10 @@ void CEditor::ResourceExtra(short id, std::string dfltName, int type) {
 	}
 	// If the resource is not found in the library - create a new one
 	if (pNovaResource == NULL) {
-		pNovaResource = m_plugIn.AllocateResource(type);
+		pNovaResource = GetCurrentPlugin()->AllocateResource(type);
 		pNovaResource->SetID(id);
 		pNovaResource->SetName(dfltName.c_str());
-		m_plugIn.m_vResources[type].push_back(pNovaResource);
+		GetCurrentPlugin()->m_vResources[type].push_back(pNovaResource);
 		SetDirty();
 		UpdateResourceList();
 	}
@@ -1484,48 +1483,48 @@ CNovaResource* CEditor::ResourceTemplate(short iID, CNovaResource* pTemplateReso
 	int iSize = pTemplateResource->GetSize();
 
 	if (iType == CNR_TYPE_MISN) {
-		ResourceTemplate(iID + 4000 - 128, NovaLib::Find(CNR_TYPE_DESC, tempID + 4000 - 128), rezName);
-		ResourceTemplate(iID + 5000 - 128, NovaLib::Find(CNR_TYPE_DESC, tempID + 5000 - 128), rezName);
-		ResourceTemplate(iID + 6000 - 128, NovaLib::Find(CNR_TYPE_DESC, tempID + 6000 - 128), rezName);
-		ResourceTemplate(iID + 7000 - 128, NovaLib::Find(CNR_TYPE_DESC, tempID + 7000 - 128), rezName);
-		ResourceTemplate(iID + 8000 - 128, NovaLib::Find(CNR_TYPE_DESC, tempID + 8000 - 128), rezName);
-		ResourceTemplate(iID + 9000 - 128, NovaLib::Find(CNR_TYPE_DESC, tempID + 9000 - 128), rezName);
-		ResourceTemplate(iID + 15000 - 128, NovaLib::Find(CNR_TYPE_DESC, tempID + 15000 - 128), rezName);
-		ResourceTemplate(iID + 16000 - 128, NovaLib::Find(CNR_TYPE_DESC, tempID + 16000 - 128), rezName);
-		ResourceTemplate(iID + 17000 - 128, NovaLib::Find(CNR_TYPE_DESC, tempID + 17000 - 128), rezName);
+		ResourceTemplate(iID + 4000 - 128, NovaLib::FindById(CNR_TYPE_DESC, tempID + 4000 - 128), rezName);
+		ResourceTemplate(iID + 5000 - 128, NovaLib::FindById(CNR_TYPE_DESC, tempID + 5000 - 128), rezName);
+		ResourceTemplate(iID + 6000 - 128, NovaLib::FindById(CNR_TYPE_DESC, tempID + 6000 - 128), rezName);
+		ResourceTemplate(iID + 7000 - 128, NovaLib::FindById(CNR_TYPE_DESC, tempID + 7000 - 128), rezName);
+		ResourceTemplate(iID + 8000 - 128, NovaLib::FindById(CNR_TYPE_DESC, tempID + 8000 - 128), rezName);
+		ResourceTemplate(iID + 9000 - 128, NovaLib::FindById(CNR_TYPE_DESC, tempID + 9000 - 128), rezName);
+		ResourceTemplate(iID + 15000 - 128, NovaLib::FindById(CNR_TYPE_DESC, tempID + 15000 - 128), rezName);
+		ResourceTemplate(iID + 16000 - 128, NovaLib::FindById(CNR_TYPE_DESC, tempID + 16000 - 128), rezName);
+		ResourceTemplate(iID + 17000 - 128, NovaLib::FindById(CNR_TYPE_DESC, tempID + 17000 - 128), rezName);
 	}
 	else if (iType == CNR_TYPE_NEBU) {
 		short nebuTempID = ((tempID - 128) * 7) + 9500;
 		short nebuID = ((iID - 128) * 7) + 9500;
-		ResourceTemplate(nebuID, NovaLib::Find(CNR_TYPE_PICT, nebuTempID), rezName + "; 42.1%");
-		ResourceTemplate(nebuID + 1, NovaLib::Find(CNR_TYPE_PICT, nebuTempID + 1), rezName + "; 56.2%");
-		ResourceTemplate(nebuID + 2, NovaLib::Find(CNR_TYPE_PICT, nebuTempID + 2), rezName + "; 75.0%");
-		ResourceTemplate(nebuID + 3, NovaLib::Find(CNR_TYPE_PICT, nebuTempID + 3), rezName + "; 100.0%");
-		ResourceTemplate(nebuID + 4, NovaLib::Find(CNR_TYPE_PICT, nebuTempID + 4), rezName + "; 133.3%");
-		ResourceTemplate(nebuID + 5, NovaLib::Find(CNR_TYPE_PICT, nebuTempID + 5), rezName + "; 177.7%");
-		ResourceTemplate(nebuID + 6, NovaLib::Find(CNR_TYPE_PICT, nebuTempID + 6), rezName + "; 237.0%");
+		ResourceTemplate(nebuID, NovaLib::FindById(CNR_TYPE_PICT, nebuTempID), rezName + "; 42.1%");
+		ResourceTemplate(nebuID + 1, NovaLib::FindById(CNR_TYPE_PICT, nebuTempID + 1), rezName + "; 56.2%");
+		ResourceTemplate(nebuID + 2, NovaLib::FindById(CNR_TYPE_PICT, nebuTempID + 2), rezName + "; 75.0%");
+		ResourceTemplate(nebuID + 3, NovaLib::FindById(CNR_TYPE_PICT, nebuTempID + 3), rezName + "; 100.0%");
+		ResourceTemplate(nebuID + 4, NovaLib::FindById(CNR_TYPE_PICT, nebuTempID + 4), rezName + "; 133.3%");
+		ResourceTemplate(nebuID + 5, NovaLib::FindById(CNR_TYPE_PICT, nebuTempID + 5), rezName + "; 177.7%");
+		ResourceTemplate(nebuID + 6, NovaLib::FindById(CNR_TYPE_PICT, nebuTempID + 6), rezName + "; 237.0%");
 	}
 	else if (iType == CNR_TYPE_OUTF) {
-		ResourceTemplate(iID + 3000 - 128, NovaLib::Find(CNR_TYPE_DESC, tempID + 3000 - 128), rezName);
-		ResourceTemplate(iID + 6000 - 128, NovaLib::Find(CNR_TYPE_PICT, tempID + 6000 - 128), rezName);
+		ResourceTemplate(iID + 3000 - 128, NovaLib::FindById(CNR_TYPE_DESC, tempID + 3000 - 128), rezName);
+		ResourceTemplate(iID + 6000 - 128, NovaLib::FindById(CNR_TYPE_PICT, tempID + 6000 - 128), rezName);
 	}
 	else if (iType == CNR_TYPE_SHIP) {
-		ResourceTemplate(iID, NovaLib::Find(CNR_TYPE_SHAN, tempID), rezName);
-		ResourceTemplate(iID + 3000 - 128, NovaLib::Find(CNR_TYPE_PICT, tempID + 3000 - 128), rezName + "; Targeting");
-		ResourceTemplate(iID + 5000 - 128, NovaLib::Find(CNR_TYPE_PICT, tempID + 5000 - 128), rezName);
-		ResourceTemplate(iID + 13000 - 128, NovaLib::Find(CNR_TYPE_DESC, tempID + 13000 - 128), rezName);
-		ResourceTemplate(iID + 14000 - 128, NovaLib::Find(CNR_TYPE_DESC, tempID + 14000 - 128), rezName + "; Escort");
+		ResourceTemplate(iID, NovaLib::FindById(CNR_TYPE_SHAN, tempID), rezName);
+		ResourceTemplate(iID + 3000 - 128, NovaLib::FindById(CNR_TYPE_PICT, tempID + 3000 - 128), rezName + "; Targeting");
+		ResourceTemplate(iID + 5000 - 128, NovaLib::FindById(CNR_TYPE_PICT, tempID + 5000 - 128), rezName);
+		ResourceTemplate(iID + 13000 - 128, NovaLib::FindById(CNR_TYPE_DESC, tempID + 13000 - 128), rezName);
+		ResourceTemplate(iID + 14000 - 128, NovaLib::FindById(CNR_TYPE_DESC, tempID + 14000 - 128), rezName + "; Escort");
 		rezName += +";:" + ToString(tempID);
 	}
-	else if (iType == CNR_TYPE_SPOB) ResourceTemplate(iID, NovaLib::Find(CNR_TYPE_DESC, tempID), rezName);
+	else if (iType == CNR_TYPE_SPOB) ResourceTemplate(iID, NovaLib::FindById(CNR_TYPE_DESC, tempID), rezName);
 
 	char* pBuffer = new char[iSize];
 	pTemplateResource->Save(pBuffer);
 
-	CNovaResource* pNewResource = Find(iType, iID);
+	CNovaResource* pNewResource = FindById(iType, iID);
 	if (pNewResource == NULL) {
-		pNewResource = m_plugIn.AllocateResource(iType);
-		m_plugIn.m_vResources[iType].push_back(pNewResource);
+		pNewResource = GetCurrentPlugin()->AllocateResource(iType);
+		GetCurrentPlugin()->m_vResources[iType].push_back(pNewResource);
 		UpdateResourceList();
 	}
 	pNewResource->Load(pBuffer, iSize);
@@ -1550,23 +1549,23 @@ int CEditor::ResourceDelete(void)
 
 	for(i = 0; i < m_vEditDialogs.size(); i++)
 	{
-		if(m_vEditDialogs[i]->GetExtraData(2) == (int)m_plugIn.m_vResources[m_iCurrentResourceType][iSelected])
+		if(m_vEditDialogs[i]->GetExtraData(2) == (int)GetCurrentPlugin()->m_vResources[m_iCurrentResourceType][iSelected])
 		{
-			m_plugIn.m_vResources[m_iCurrentResourceType][iSelected]->SetIsNew(0);
+			GetCurrentPlugin()->m_vResources[m_iCurrentResourceType][iSelected]->SetIsNew(0);
 
-			m_plugIn.m_vResources[m_iCurrentResourceType][iSelected]->CloseAndDontSave();
+			GetCurrentPlugin()->m_vResources[m_iCurrentResourceType][iSelected]->CloseAndDontSave();
 
 			break;
 		}
 	}
 
-	delete m_plugIn.m_vResources[m_iCurrentResourceType][iSelected];
+	delete GetCurrentPlugin()->m_vResources[m_iCurrentResourceType][iSelected];
 
-	m_plugIn.m_vResources[m_iCurrentResourceType].erase(m_plugIn.m_vResources[m_iCurrentResourceType].begin() + iSelected);
+	GetCurrentPlugin()->m_vResources[m_iCurrentResourceType].erase(GetCurrentPlugin()->m_vResources[m_iCurrentResourceType].begin() + iSelected);
 
 	UpdateResourceList();
 
-	if(iSelected < m_plugIn.m_vResources[m_iCurrentResourceType].size())
+	if(iSelected < GetCurrentPlugin()->m_vResources[m_iCurrentResourceType].size())
 		ListBox_SetCurSel(hwndListResources, iSelected);
 	else if(iSelected > 0)
 		ListBox_SetCurSel(hwndListResources, iSelected - 1);
@@ -1589,7 +1588,7 @@ int CEditor::HelpAbout(void)
 int CEditor::RunNova(void)
 {
 	std::vector<std::string> extensions = { ".nplay", ".exe", ".lnk" };
-	std::filesystem::path root = GetRootFolder();
+	std::filesystem::path root = NovaLib::Get().rootPath;
 
 	if (!std::filesystem::exists(root) || !std::filesystem::is_directory(root)) {
 		MessageBoxA(NULL, ("Invalid root folder:\n" + root.string()).c_str(), "Error", MB_ICONERROR | MB_OK);
@@ -1724,17 +1723,17 @@ int CEditor::TempCloseAndSave(void)
 	m_wndTemplate.Destroy();
 
 	if (m_iTempCombo == -1) return 0;
-	ResourceTemplate(m_iTempID, NovaLib::AtIdx(m_iCurrentResourceType, m_iTempCombo), m_szTempName);
+	ResourceTemplate(m_iTempID, NovaLib::FindByIdx(m_iCurrentResourceType, m_iTempCombo), m_szTempName);
 	UpdateResourceList();
 	HWND hwndListResources = GetDlgItem(m_dialogMain.GetHWND(), IDC_LIST_RESOURCES);
 	int i;
-	for (i = 0; i < m_plugIn.m_vResources[m_iCurrentResourceType].size(); i++) {
-		if (m_plugIn.m_vResources[m_iCurrentResourceType][i]->GetID() == m_iTempID) {
+	for (i = 0; i < GetCurrentPlugin()->m_vResources[m_iCurrentResourceType].size(); i++) {
+		if (GetCurrentPlugin()->m_vResources[m_iCurrentResourceType][i]->GetID() == m_iTempID) {
 			ListBox_SetCurSel(hwndListResources, i);
 			break;
 		}
 	}
-	if (i == m_plugIn.m_vResources[m_iCurrentResourceType].size()) ListBox_SetCurSel(hwndListResources, -1);
+	if (i == GetCurrentPlugin()->m_vResources[m_iCurrentResourceType].size()) ListBox_SetCurSel(hwndListResources, -1);
 
 	SetDirty();
 	ResourceEdit();
@@ -1807,11 +1806,11 @@ int CEditor::RemoveEditDialog(CWindow *pWindow, int iIDOrNameChanged)
 	{
 		int iType = pResource->GetType();
 
-		for(i = 0; i < m_plugIn.m_vResources[iType].size(); i++)
+		for(i = 0; i < GetCurrentPlugin()->m_vResources[iType].size(); i++)
 		{
-			if(m_plugIn.m_vResources[iType][i] == pResource)
+			if(GetCurrentPlugin()->m_vResources[iType][i] == pResource)
 			{
-				m_plugIn.m_vResources[iType].erase(m_plugIn.m_vResources[iType].begin() + i);
+				GetCurrentPlugin()->m_vResources[iType].erase(GetCurrentPlugin()->m_vResources[iType].begin() + i);
 
 				delete pResource;
 
@@ -1898,9 +1897,9 @@ short CEditor::FindUniqueResourceID(int iType, short iStart)
 	{
 		iUnique = 1;
 
-		for(j = 0; j < m_plugIn.m_vResources[iType].size(); j++)
+		for(j = 0; j < GetCurrentPlugin()->m_vResources[iType].size(); j++)
 		{
-			if(m_plugIn.m_vResources[iType][j]->GetID() == i)
+			if(GetCurrentPlugin()->m_vResources[iType][j]->GetID() == i)
 			{
 				iUnique = 0;
 
@@ -1916,9 +1915,9 @@ short CEditor::FindUniqueResourceID(int iType, short iStart)
 	{
 		iUnique = 1;
 
-		for(j = 0; j < m_plugIn.m_vResources[iType].size(); j++)
+		for(j = 0; j < GetCurrentPlugin()->m_vResources[iType].size(); j++)
 		{
-			if(m_plugIn.m_vResources[iType][j]->GetID() == i)
+			if(GetCurrentPlugin()->m_vResources[iType][j]->GetID() == i)
 			{
 				iUnique = 0;
 
@@ -1933,9 +1932,9 @@ short CEditor::FindUniqueResourceID(int iType, short iStart)
 	return -1;
 }
 
-CNovaResource* CEditor::Find(int rezType, short iID) {
+CNovaResource* CEditor::FindById(int rezType, short iID) {
 	CNovaResource* pResource = NULL;
-	for (auto* ptr : m_plugIn.m_vResources[rezType]) {
+	for (auto* ptr : GetCurrentPlugin()->m_vResources[rezType]) {
 		if (ptr->GetID() != iID) continue;
 		pResource = ptr;
 		break;
@@ -1949,9 +1948,9 @@ int CEditor::IsUniqueResourceID(CNovaResource *pResource, short iID)
 
 	int iType = pResource->GetType();
 
-	for(i = 0; i < m_plugIn.m_vResources[iType].size(); i++)
+	for(i = 0; i < GetCurrentPlugin()->m_vResources[iType].size(); i++)
 	{
-		if((m_plugIn.m_vResources[iType][i]->GetID() == iID) && (m_plugIn.m_vResources[iType][i] != pResource))
+		if((GetCurrentPlugin()->m_vResources[iType][i]->GetID() == iID) && (GetCurrentPlugin()->m_vResources[iType][i] != pResource))
 			return 0;
 	}
 
@@ -1985,7 +1984,7 @@ int CEditor::UpdateResourceList(void)
 	{
 		szBuffer = g_szResourceTypes[i];
 		szBuffer += " (";
-		szBuffer += ToString(m_plugIn.m_vResources[i].size());
+		szBuffer += ToString(GetCurrentPlugin()->m_vResources[i].size());
 		szBuffer += ")";
 
 		ListBox_AddString(hwndListResourceTypes, szBuffer.c_str());
@@ -1995,17 +1994,17 @@ int CEditor::UpdateResourceList(void)
 
 	ListBox_ResetContent(hwndListResources);
 
-	if(m_plugIn.m_vResources[m_iCurrentResourceType].size() > 0)
+	if(GetCurrentPlugin()->m_vResources[m_iCurrentResourceType].size() > 0)
 	{
-		std::sort(m_plugIn.m_vResources[m_iCurrentResourceType].begin(), m_plugIn.m_vResources[m_iCurrentResourceType].end(), SNovaResourceCompare());
+		std::sort(GetCurrentPlugin()->m_vResources[m_iCurrentResourceType].begin(), GetCurrentPlugin()->m_vResources[m_iCurrentResourceType].end(), SNovaResourceCompare());
 
-		for(i = 0; i < m_plugIn.m_vResources[m_iCurrentResourceType].size(); i++)
+		for(i = 0; i < GetCurrentPlugin()->m_vResources[m_iCurrentResourceType].size(); i++)
 		{
-			szBuffer = g_szResourceTypes[m_plugIn.m_vResources[m_iCurrentResourceType][i]->GetType()];
+			szBuffer = g_szResourceTypes[GetCurrentPlugin()->m_vResources[m_iCurrentResourceType][i]->GetType()];
 			szBuffer += ' ';
-			szBuffer += ToString(m_plugIn.m_vResources[m_iCurrentResourceType][i]->GetID());
+			szBuffer += ToString(GetCurrentPlugin()->m_vResources[m_iCurrentResourceType][i]->GetID());
 			szBuffer += " (";
-			szBuffer += m_plugIn.m_vResources[m_iCurrentResourceType][i]->GetName();
+			szBuffer += GetCurrentPlugin()->m_vResources[m_iCurrentResourceType][i]->GetName();
 			szBuffer += ')';
 
 			ListBox_AddString(hwndListResources, szBuffer.c_str());
@@ -2196,7 +2195,7 @@ BOOL CEditor::MainDialogProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 			}
 			else if (iControlID == ID_EDIT_LOADLIBRARY) 
 			{
-				pEditor->EditLoadLibrary("../Nova Files", false);
+				//pEditor->EditLoadLibrary("../Nova Files", false);
 			}
 			else if(iControlID == IDM_RESOURCE_NEW)
 			{
@@ -2454,7 +2453,7 @@ BOOL CEditor::MainDialogProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 
 				int iResourceIndex = (iYMousePos - rectListResources.top) / iListItemHeight + iTopIndex;
 
-				if((iResourceIndex >= 0) && (iResourceIndex < pEditor->m_plugIn.m_vResources[pEditor->m_iCurrentResourceType].size()))
+				if((iResourceIndex >= 0) && (iResourceIndex < pEditor->GetCurrentPlugin()->m_vResources[pEditor->m_iCurrentResourceType].size()))
 				{
 					ListBox_SetCurSel(hwndControl, iResourceIndex);
 

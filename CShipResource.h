@@ -105,11 +105,8 @@ public:
 	char  m_szSubtitle[64];
 
 private:
-	std::vector<CNovaResource*> diffValues = NovaLib::GetAllOf(CNR_TYPE_SHIP);
-	std::vector<std::string> diffNames;
-	CControl m_diffCtrl;
-
 	CWindow m_wndDiff;
+	CControl m_diffCtrl;
 
 	int SwapEndians(void);
 

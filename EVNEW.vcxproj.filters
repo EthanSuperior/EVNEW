@@ -135,6 +135,9 @@
     <ClCompile Include="CColrResource.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="NovaResourceRange.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CBitFieldControl.h">
@@ -258,6 +261,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="NovaLib.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="NovaResourceRange.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

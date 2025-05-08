@@ -96,7 +96,7 @@ public:
 
 	int IsUniqueResourceID(CNovaResource* pResource, short iID);
 
-	CNovaResource* Find(int rezType, short iID);
+	CNovaResource* FindById(int rezType, short iID);
 	
 	void ResourceExtra(short id, std::string dfltName, int type = CNR_TYPE_DESC);
 
@@ -104,9 +104,6 @@ public:
 
 
 private:
-
-	std::string GetRootFolder(std::string filename = "");
-
 	int Init(HINSTANCE hInstance);
 	int Shutdown(void);
 
@@ -168,9 +165,6 @@ private:
 	static BOOL PictExportFormatProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
 	static BOOL RleExportFormatProc( HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
 	static BOOL SndExportFormatProc( HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
-
-	CPlugIn m_plugIn;
-
 	CWindow m_dialogMain;
 
 	std::vector<CWindow *> m_vEditDialogs;

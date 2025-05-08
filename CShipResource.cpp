@@ -962,7 +962,7 @@ int CShipResource::Initialize(HWND hwnd)
 	if (m_iDiffID == 0 && sc != std::string::npos && col != std::string::npos) {
 		try { 
 			m_iDiffID = std::stoi(s.substr(col + 1));
-			std::vector<CNovaResource*> values = NovaLib::GetAllOf(CNR_TYPE_SHIP);
+			std::vector<CNovaResource*> values = NovaLib::All(CNR_TYPE_SHIP);
 			for (auto i = 0; i < values.size(); ++i)
 				if (values[i]->GetID() == m_iDiffID) {
 					m_iDiffID = i;
@@ -1385,15 +1385,18 @@ std::string CShipResource::NumsToString(std::string name, int shields, int shiel
 	long long usedCost = 0;
 	int usedCargo = 0;
 	std::string weapStr = "----LOADOUT (" + ToString(guns) + "[" + ToString(turrets) + "])----\n";
-	auto allOutf = NovaLib::GetAllOf(CNR_TYPE_OUTF);
-	auto matchingO = [all=allOutf](int mod, short weapId) {
-		for (auto& o : all) {
-			auto r = (COutfResource*)o;
-			for (int i=0;i<4;i++)
-				if (r->m_iModTypes[i] == mod && r->m_iModValues[i] == weapId)
-					return r;
-		}
-		return (COutfResource*) NULL;
+
+	auto matchingO = [](int mod, short weapId) {
+		auto outfFilter = ([](int mod, short weapId) {
+			return [mod, weapId](CNovaResource* o, int i) {
+				auto r = (COutfResource*)o;
+				for (int i = 0; i < 4; i++)
+					if (r->m_iModTypes[i] == mod && r->m_iModValues[i] == weapId)
+						return true;
+				return false;
+				};
+			});
+		return (COutfResource*)NovaLib::FindWhere(CNR_TYPE_OUTF, outfFilter(mod, weapId));
 	};
 
 	for (int i = 0; i < 8; ++i) {
@@ -1420,7 +1423,7 @@ std::string CShipResource::NumsToString(std::string name, int shields, int shiel
 	std::string outfStr = "\n----Equipment----\n";
 	for (int i = 0; i < 8; ++i) {
 		if (outfs[i] < 128) continue;
-		COutfResource* r = (COutfResource*)NovaLib::Find(CNR_TYPE_OUTF, outfs[i]);
+		COutfResource* r = (COutfResource*)NovaLib::FindById(CNR_TYPE_OUTF, outfs[i]);
 		std::string oName = r->GetName();
 		usedMass += r->m_iMass*oCnts[i];
 		usedCost += r->m_iCost*oCnts[i];
@@ -1431,7 +1434,6 @@ std::string CShipResource::NumsToString(std::string name, int shields, int shiel
 	}
 
 	std::string result = " ~~ " + name + "~~\n";
-	result += "Shields: " + ToString(shields) + " (" + ToString(shieldReg) + "/frm)\n";
 	result += "Shields: " + ToString(shields) + " (" + ToString(shieldReg) + "/frm)\n";
 	result += "Armor: " + ToString(armor) + " (" + ToString(armorReg) + "/frm)\n";
 	result += "Fuel: " + ToString(fuel) + " [" + ToString(fuel / 100) + " JMPs] (" + ToString(fuelReg) + "/frm)\n";
@@ -1509,7 +1511,7 @@ void CShipResource::DiffUpdate(void) {
 	HWND enemyTxt = GetDlgItem(m_wndDiff.GetHWND(), IDC_DIFF_SHIP_TEXT3);
 
 	CShipResource* comp = NULL;
-	if (m_iDiffID > 0) comp = (CShipResource*)NovaLib::AtIdx(CNR_TYPE_SHIP, m_iDiffID);
+	if (m_iDiffID > 0) comp = (CShipResource*)NovaLib::FindByIdx(CNR_TYPE_SHIP, m_iDiffID);
 	if (comp == NULL) comp = this;
 
 	Static_SetText(enemyTxt, NumsToString(comp->m_szName, comp->m_iShields, comp->m_iShieldRecharge,

@@ -63,7 +63,7 @@ public:
 	int Destroy(void);
 
 	static WNDPROC g_OldEditProc;
-	static LRESULT CALLBACK CControl::TextHelperProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+	static LRESULT CALLBACK TextHelperProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 	int ProcessMessage(int iNotifyCode);
 

@@ -518,15 +518,9 @@ int CControl::SetRezType(int rezNum)
 {
 	if (m_iType != CCONTROL_TYPE_REZBOX)
 		return 0;
-	m_vRezItems.clear();
 	ComboBox_ResetContent(m_hwndControl);
-	std::vector<CNovaResource*> values = NovaLib::GetAllOf(rezNum);
-	m_vRezItems.reserve(values.size());
-	for (const auto& res : values) {
-		std::string rezName = std::to_string(res->GetID()) + ": " + res->GetName();
-		m_vRezItems.push_back(rezName);
-		ComboBox_AddString(m_hwndControl, rezName.c_str());
-	}
+	m_vRezItems = NovaLib::Names(rezNum);
+	for (const auto& name : m_vRezItems) ComboBox_AddString(m_hwndControl, name.c_str());
 	ComboBox_GetCount(m_hwndControl);
 	SetInt(0);
 	return 1;
