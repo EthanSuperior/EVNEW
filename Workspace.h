@@ -35,7 +35,7 @@ public:
 
     // Active Resource File
     static CPlugIn* ActiveFile();
-    static int Change(std::string filename, CWindow* pWndParent);
+    static CPlugIn* Change(std::string filename, CWindow* pWndParent);
 
     // Bulk Access
     static NovaResourceRange Each(int type);
@@ -52,8 +52,9 @@ public:
     // NCB Helper Methods
     static void RegisterNCB(const char* expression);
     static std::string GetAvailableNCB();
-    void UpdateNCBList();
+    static void UpdateNCBList();
     std::string rootPath = "";
+    CPlugIn* active;
 private:
     Workspace() = default;
     ~Workspace();
@@ -64,5 +65,4 @@ private:
     std::vector<CPlugIn*> data;
     std::vector<CPlugIn*> plugins;
     std::string gamePath;
-    CPlugIn* active;
 };

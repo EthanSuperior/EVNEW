@@ -571,3 +571,8 @@ BOOL CCharResource::CharDlgProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lpara
 
 	return FALSE;
 }
+
+void CCharResource::RegisterNCB()
+{
+	Workspace::RegisterNCB(m_szOnStart);
+}

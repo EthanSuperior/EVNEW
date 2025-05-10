@@ -68,6 +68,7 @@ public:
 	int LoadFromText(std::istream & input);
 
 	static BOOL NebuDlgProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
+	void RegisterNCB() override;
 
 private:
 

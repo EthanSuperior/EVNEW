@@ -8,21 +8,23 @@
 	- Allow to switch between plugins within same EV Nova Folder
 	- Tabs for open files
 	- Make Load detect if within same folder as the plugin and not reload library
-	- Change Workspace to CPlugin*s? For hotswaps?
 	- Make Linkers have Rez(Src) or at least * for outside resources
-	- Should store active plugin, not CEditor...
 	- Distinguish between current & all plugins
 	- Add Plugins to Library
-- Disable run btn if no corresponding .exe/.nplay file
-- NCB usage/names(?)/as a type?
-- Check Availablity of Resource Type
-- Set/Test/Desc Parser/Checker
+	- Add run btn if corresponding .exe/.nplay file
+	- Add View as Reference; Opens file from lib without saving;
+	- Move m_iIsDirty to the plugins
+	- Custom Default Values?
 - Refactor Options (Like Move w/ Refs, and w/ Sub Resources, All Plugins)
-- Resources
-	- Allow creation of more than just desc (See Links)
+- Availability
+	- NCB usage/names(?)/as a type?
+	- Check Availablity of ID
+	- Set/Test/Desc Parser/Checker
 	- Create/Nag if you enter a resource ID that doesn't exist
 	- Add restrictions to IDs outside of the range of the resource type
-	- Add headers to reserved types; ie desc3xxx should say Outfit Description somewhere....
+- Resources
+	- Add Edit btn to more than just desc (See Links)
+	- Add dividers/headers to reserved types; ie desc3xxx should say Outfit Description somewhere....
 	- Soft enforced reserved types; Hard(?) Enforced outside of bounds
 		- See https://andrews05.github.io/evstuff/guides/resourceidguide.html
 		- (Kestrel allows for more than short....Maybe something in NovaResource for Setting/Validating?)
@@ -32,7 +34,6 @@
 		- Import/Export Kestrel markup
 		- Add Hexadecimal/char Editor for CResourceUkn
 		- Add pilot editor (.plt) {NpïL Type}
-- Add View as Reference; Opens file from lib without saving;
 - Add Embeded Bible? FAQ? Info.md?
 	- Make Tooltips sourced from Bible?
 - Double Check Cron Timeline (some were not what I remembered)
@@ -47,6 +48,7 @@
 - Modernize UI
 	- Move most code inside of DLGProccess Functions into other functions in prep for change of ui
 	- Dark Mode
+- Add misn chain viewer; like: https://escape-velocity.games/EVN_Walkthroughs/html/polaris.html
 
 ### Fixes
 - Modernize code (c++ 17)

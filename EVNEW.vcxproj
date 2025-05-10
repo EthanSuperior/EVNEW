@@ -230,6 +230,7 @@
   <ItemGroup>
     <None Include="Campaign.md" />
     <None Include="Info.md" />
+    <None Include="Outline.md" />
     <None Include="Roadmap.md" />
   </ItemGroup>
   <ItemGroup>

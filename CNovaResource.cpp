@@ -36,7 +36,7 @@ CNovaResource::~CNovaResource(void)
 int CNovaResource::SetID(short iID)
 {
 	m_iID = iID;
-
+	
 	return 1;
 }
 

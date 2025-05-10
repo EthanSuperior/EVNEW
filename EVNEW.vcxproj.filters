@@ -281,6 +281,7 @@
     <None Include="Roadmap.md" />
     <None Include="Info.md" />
     <None Include="Campaign.md" />
+    <None Include="Outline.md" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Readme.txt" />

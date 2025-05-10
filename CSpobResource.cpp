@@ -909,3 +909,11 @@ BOOL CSpobResource::SpobDlgProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lpara
 
 	return FALSE;
 }
+
+void CSpobResource::RegisterNCB()
+{
+	Workspace::RegisterNCB(m_szOnDestroy);
+	Workspace::RegisterNCB(m_szOnDominate);
+	Workspace::RegisterNCB(m_szOnRegenerate);
+	Workspace::RegisterNCB(m_szOnRelease);
+}

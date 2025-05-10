@@ -1326,6 +1326,13 @@ int CShipResource::DiffClose(void)
 	return 1;
 }
 
+void CShipResource::RegisterNCB()
+{
+	Workspace::RegisterNCB(m_szOnCapture);
+	Workspace::RegisterNCB(m_szOnPurchase);
+	Workspace::RegisterNCB(m_szOnRetire);
+}
+
 BOOL CShipResource::DiffDlgProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 {
 	CWindow* pWindow;

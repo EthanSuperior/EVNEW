@@ -442,7 +442,6 @@ int CCronResource::CloseAndDontSave(void)
 
 void CCronResource::RegisterNCB()
 {
-	Workspace::RegisterNCB(m_szEnableOn);
 	Workspace::RegisterNCB(m_szOnStart);
 	Workspace::RegisterNCB(m_szOnEnd);
 }

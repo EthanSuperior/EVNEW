@@ -2067,8 +2067,6 @@ BOOL CEditor::MainDialogProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 			HMENU hFileMenu = GetSubMenu(hMainMenu, 0); // assuming File is first
 			InsertMenuA(hFileMenu, 2, MF_BYPOSITION | MF_POPUP, (UINT_PTR)hRecentMenu, "Open Recent");
 
-			DrawMenuBar(hwnd);
-
 			return TRUE;
 
 			break;
@@ -2127,6 +2125,25 @@ BOOL CEditor::MainDialogProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 				if (GetMenuItemInfoA(hFileMenu, iControlID, FALSE, &mii)) {
 					pEditor->FileOpen(0, buffer);
 				}
+			}
+			else if (iControlID >= 50000) {
+				CPlugIn* p = Workspace::GetPlugins()[iControlID - 50000];
+				if (pEditor->m_iIsDirty)
+				{
+					if (pEditor->AskForSave() == 0)
+						return 0;
+
+					pEditor->m_iIsDirty = 0;
+				}
+				Workspace::Get().active = p;
+
+				std::string szTitle;
+
+				szTitle = p->GetFilenameNoPath();
+				szTitle += " - EVNEW";
+
+				pEditor->m_dialogMain.SetTitle(szTitle.c_str());
+				pEditor->UpdateResourceList();
 			}
 			else if(iControlID == IDC_BUTTON_EDIT)
 			{

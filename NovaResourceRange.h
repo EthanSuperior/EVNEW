@@ -1,5 +1,6 @@
 #pragma once
 #include "CNovaResource.h"
+#include "CPlugIn.h"
 #include <string>
 
 class Workspace;
@@ -28,9 +29,10 @@ public:
         friend bool operator!= (const Iterator& a, const Iterator& b) { return a.ptr != b.ptr; };
         int idx;
     private:
-        pointer ptr = nullptr;
-        bool onPlugins; int pluginIdx; int rezType;
         int i;
+        pointer ptr = nullptr;
+        std::vector<CPlugIn*>& ActiveSources();
+        bool onPlugins; int pluginIdx; int rezType;
     };
     Iterator begin() const;
     Iterator end() const;

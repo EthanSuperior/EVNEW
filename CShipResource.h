@@ -103,6 +103,7 @@ public:
 	int DiffClose(void);
 	short m_iDiffID = 0;
 	char  m_szSubtitle[64];
+	void RegisterNCB() override;
 
 private:
 	CWindow m_wndDiff;

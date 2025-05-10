@@ -24,8 +24,6 @@ NovaResourceRange::Iterator NovaResourceRange::end() const {
 	for (auto* p : Workspace::GetPlugins()) total += p->m_vResources[rezType].size();
 	auto& data = Workspace::GetData();
 	for (auto* p : data) total += p->m_vResources[rezType].size();
-	int i = 0;
-	if (data.size() != 0) i = data.back()->m_vResources[rezType].size();
 	return Iterator(NULL, rezType, total, false, 0, data.size());
 }
 
@@ -33,30 +31,25 @@ NovaResourceRange::Iterator NovaResourceRange::end() const {
 NovaResourceRange::Iterator& NovaResourceRange::Iterator::operator++()
 {
 	while (true) {
-		auto& vecs = onPlugins ? Workspace::GetPlugins(): Workspace::GetData();
-
+		auto& vecs = ActiveSources();
 		if (pluginIdx >= vecs.size()) {
 			if (onPlugins) {
 				onPlugins = false;
 				pluginIdx = 0;
 				i = -1;
 				continue;
-			}
-			else {
+			} else {
 				ptr = nullptr;
 				break;
 			}
 		}
-
 		if (++i < vecs[pluginIdx]->m_vResources[rezType].size()) {
 			ptr = &vecs[pluginIdx]->m_vResources[rezType][i];
 			break;
 		}
-
 		++pluginIdx;
 		i = -1;
 	}
-
 	++idx;
 	return *this;
 }
@@ -64,38 +57,38 @@ NovaResourceRange::Iterator& NovaResourceRange::Iterator::operator++()
 NovaResourceRange::Iterator& NovaResourceRange::Iterator::operator--()
 {
 	while (true) {
-		auto& vecs = onPlugins ? Workspace::GetPlugins(): Workspace::GetData();
-
+		auto& vecs = ActiveSources();
 		if (i > 0) {
 			ptr = &vecs[pluginIdx]->m_vResources[rezType][--i];
 			break;
 		}
-
 		if (pluginIdx > 0) {
 			i = vecs[--pluginIdx]->m_vResources[rezType].size();
 			if (i > 0) {
 				ptr = &vecs[pluginIdx]->m_vResources[rezType][--i];
 				break;
 			}
-		}
-		else {
+		} else {
 			if (!onPlugins) {
 				onPlugins = true;
 				pluginIdx = Workspace::GetPlugins().size();
 				i = 0;
 				continue;
 			}
-
 			ptr = nullptr;
 			break;
 		}
 	}
-
 	--idx;
 	return *this;
 }
 
+std::vector<CPlugIn*>& NovaResourceRange::Iterator::ActiveSources()
+{
+	return onPlugins ? Workspace::GetPlugins() : Workspace::GetData();
+}
+
 std::string NovaResourceRange::Iterator::PluginFilename()
 {
-	return std::filesystem::path((onPlugins ? Workspace::GetPlugins() : Workspace::GetData())[pluginIdx]->GetFilename()).filename().string();
+	return ActiveSources()[pluginIdx]->GetFilenameNoPath();
 }

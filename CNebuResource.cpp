@@ -334,3 +334,8 @@ BOOL CNebuResource::NebuDlgProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lpara
 
 	return FALSE;
 }
+
+void CNebuResource::RegisterNCB()
+{
+	Workspace::RegisterNCB(m_szOnExplore);
+}

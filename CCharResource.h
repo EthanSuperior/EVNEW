@@ -74,6 +74,7 @@ public:
 	int LoadFromText(std::istream & input);
 
 	static BOOL CharDlgProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
+	void RegisterNCB() override;
 
 private:
 

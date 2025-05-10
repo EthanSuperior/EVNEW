@@ -80,6 +80,7 @@ public:
 	int LoadFromText(std::istream & input);
 
 	static BOOL SpobDlgProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
+	void RegisterNCB() override;
 
 	short m_iTribute;
 	short m_iGovernment;

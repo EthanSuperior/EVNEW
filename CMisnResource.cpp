@@ -25,7 +25,7 @@
 
 CMisnResource::CMisnResource(void)
 {
-	m_iAvailableStellar  =  -1;
+	m_iAvailableStellar  =  162;
 	m_iAvailableLocation =   1;
 	m_iAvailableRecord   =   0;
 	m_iAvailableRating   =  -1;
@@ -89,9 +89,11 @@ CMisnResource::CMisnResource(void)
 	memset(m_szOnFailure,     0, 255 * sizeof(char));
 	memset(m_szOnAbort,       0, 255 * sizeof(char));
 	memset(m_szOnShipDone,    0, 255 * sizeof(char));
+	strcpy(m_szAvailableBits, ("!b" + std::to_string(128 + 1100)).c_str());
+	strcpy(m_szOnSuccess, ("b" + std::to_string(128 + 1100) + " o350").c_str());
+	strcpy(m_szName, "New Name; $tly¢rp M");
 
-	for(i = 0; i < 8; i++)
-		m_cRequire[i] = 0x00;
+	for(i = 0; i < 8; i++) m_cRequire[i] = 0x00;
 
 	m_iDateIncrement = 0;
 
@@ -621,7 +623,7 @@ int CMisnResource::Initialize(HWND hwnd)
 	m_controls[68].Create(hwnd, IDC_EDIT_MISN_EDIT51, CCONTROL_TYPE_STR256, IDS_STRING468);
 	m_controls[68].SetString(m_szName);
 
-	UpdateDynamicDefaults(m_controls, -1, m_iID);
+	UpdateDynamicDefaults(m_controls, 128, m_iID);
 
 	std::string szText = "Introduction Text:\t";
 	szText += ToString(m_iID + 4000 - 128);
@@ -1086,14 +1088,6 @@ void CMisnResource::UpdateDynamicDefaults(CControl* controls, short oldId, short
 	SetIfDefaultInt(controls, 37, oldId, newId, 17000 - 128);
 	SetIfDefaultStr(controls, 38, oldId + 1100, newId + 1100);
 	SetIfDefaultStr(controls, 41, oldId + 1100, newId + 1100);
-
-	// TODO: THIS TRIGGERS ALWAYS
-	//if (oldId != -1) return;
-
-	//controls[1].SetInt(162);
-	//controls[38].SetString(("!b" + std::to_string(newId + 1100)).c_str());
-	//controls[41].SetString(("b" + std::to_string(newId + 1100)+ " o350").c_str());
-	//controls[68].SetString("New Name; $¢ M");
 } 
 
 void CMisnResource::RegisterNCB()

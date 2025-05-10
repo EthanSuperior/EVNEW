@@ -29,24 +29,19 @@ CPlugIn* Workspace::ActiveFile()
 	return Get().active;
 }
 
-int Workspace::Change(std::string filename, CWindow* pWndParent)
+CPlugIn* Workspace::Change(std::string filename, CWindow* pWndParent)
 {
 	auto path = std::filesystem::path(filename);
 	for (auto& p : GetPlugins())
-		if (std::filesystem::path(p->GetFilename()) == path) {
-			Get().active = p;
-
-			return 1;
-		}
+		if (std::filesystem::path(p->GetFilename()) == path)
+			return (Get().active = p);
 	for (auto& p : GetData())
-		if (std::filesystem::path(p->GetFilename()) == path) {
-			Get().active = p;
-
-			return 1;
-		}
+		if (std::filesystem::path(p->GetFilename()) == path)
+			return (Get().active = p);
 	CPlugIn* opened = new CPlugIn();
 	GetPlugins().push_back(opened);
-	return opened->Load(path.string().data(), pWndParent);
+	opened->Load(path.string().data(), pWndParent);
+	return opened;
 }
 
 int Workspace::Open(std::string filename, CWindow* pWndParent)
@@ -56,7 +51,21 @@ int Workspace::Open(std::string filename, CWindow* pWndParent)
 	AddFolder(instance.rootPath + "/Nova Files", pWndParent, instance.data);
 	AddFolder(instance.rootPath + "/Nova Plug-ins", pWndParent, instance.plugins);
 	instance.gamePath = instance.rootPath + "";
-	return Change(filename, pWndParent);
+
+
+	HMENU hPluginsMenu = CreatePopupMenu();
+	for (size_t i = 0; i < Workspace::GetPlugins().size(); ++i) {
+		char* displayName = Workspace::GetPlugins()[i]->GetFilenameNoPath();
+		AppendMenuA(hPluginsMenu, MF_STRING, 50000 + static_cast<UINT>(i), displayName);
+	}
+	HWND hwnd = pWndParent->GetHWND();
+	HMENU hMainMenu = GetMenu(hwnd);
+	InsertMenuA(GetSubMenu(hMainMenu, 2), 3, MF_BYPOSITION | MF_POPUP, (UINT_PTR)hPluginsMenu, "Switch Active");
+
+	DrawMenuBar(hwnd);
+
+
+	return Change(filename, pWndParent)!=NULL?1:0;
 }
 
 void Workspace::AddFolder(std::string path, CWindow* pWndParent, std::vector<CPlugIn*>& files) {
@@ -75,10 +84,7 @@ void Workspace::AddRezFile(std::string filename, CWindow* pWndParent, std::vecto
 	files.insert(files.begin(), lib);
 }
 
-NovaResourceRange Workspace::Each(int type)
-{
-	return NovaResourceRange(type);
-}
+NovaResourceRange Workspace::Each(int type) { return NovaResourceRange(type); }
 
 std::vector<CNovaResource*> Workspace::All(int type)
 {
@@ -110,7 +116,7 @@ std::vector<std::string> Workspace::Names(int type) {
 
 // Single Access
 CNovaResource* Workspace::FindById(int type, int id) {
-	for (auto& r : Workspace::Each(type))
+	for (auto& r : Workspace::Each(type)) 
 		if (r->GetID() == id) return r;
 	return NULL;
 }
@@ -140,7 +146,7 @@ std::string Workspace::RezStr(int type, int id, bool addType) {
 
 // NCB Helper Methods
 void Workspace::UpdateNCBList() {
-	usedNCB.clear();
+	Get().usedNCB.clear();
 	for (int i = 0; i < NUM_RESOURCE_TYPES; i++)
 		for (auto& r: Workspace::Each(i)) r->RegisterNCB();
 }
@@ -160,9 +166,10 @@ void Workspace::RegisterNCB(const char* expression)
 
 std::string Workspace::GetAvailableNCB()
 {
+	UpdateNCBList();
 	std::ostringstream output;
 	int start = 0;
-
+	output << "Available:\n";
 	for (int bit : Get().usedNCB) {
 		if (bit > start) {
 			if (!output.str().empty()) output << ", ";
