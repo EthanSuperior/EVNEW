@@ -92,7 +92,7 @@ public:
 
 	static BOOL ShipDlgProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
 	static BOOL DiffDlgProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
-	std::string NumsToString(std::string name, int shields, int shieldReg, int armor,
+	std::string NumsToString(std::string name, int id, int shields, int shieldReg, int armor,
 		int armorReg, int fuel, int fuelReg, int ion, int ionReg, int cargo, int mass,
 		int accel, int speed, int turn, int guns, int turrets, int cost, int weight,
 		int gravMass, int length, int crew, int str, int skill, short weaps[8],

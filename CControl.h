@@ -23,6 +23,7 @@ class CControl;
 
 #include "Utils.h"
 #include <vector>
+#include <CommCtrl.h>
 
 ////////////////////////////////////////////////////////////////
 //////////////////////////  CONSTANTS  /////////////////////////
@@ -47,11 +48,32 @@ const int CCONTROL_TYPE_STRARB   = 15;
 const int CCONTROL_TYPE_CHECK    = 16;
 const int CCONTROL_TYPE_COLOR    = 17;
 const int CCONTROL_TYPE_COMBOBOX = 18;
-const int CCONTROL_TYPE_REZBOX   = 19;
+const int CCONTROL_TYPE_REZBOX	 = 19;
+const int CCONTROL_TYPE_REFINFO  = 20;
 
 ////////////////////////////////////////////////////////////////
 ///////////////////////////  CLASSES  //////////////////////////
 ////////////////////////////////////////////////////////////////
+
+
+struct ConstItem {
+	std::string description;
+	int value;
+};
+
+struct RefItem {
+	std::string description;
+	int CNR_TYPE;
+	int offset;
+};
+
+struct RefDialogData {
+	HWND m_iRefBox;
+	int helpStringID;
+	std::vector<ConstItem> constItems;
+	std::vector<RefItem> refItems;
+	int selectedID = -1;
+};
 
 class CControl
 {
@@ -64,6 +86,9 @@ public:
 
 	static WNDPROC g_OldEditProc;
 	static LRESULT CALLBACK TextHelperProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+	static WNDPROC CControl::g_OldButtonProc;
+	static LRESULT CALLBACK CControl::EmbeddedButtonProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+	static BOOL RezSelectDlgProc(HWND hwndDlg, UINT msg, WPARAM wParam, LPARAM lParam);
 
 	int ProcessMessage(int iNotifyCode);
 
@@ -89,7 +114,7 @@ public:
 	int SetString(const char *szValue);
 
 	int SetComboStrings(int iNumStrings, const std::string *pStrings);
-
+	void SetRefInfoMap(int refBox, std::vector<ConstItem>& constItms, std::vector<RefItem>& refItms);
 private:
 	int CreateBitmap(int iColor);
 
@@ -108,9 +133,20 @@ private:
 	int m_iIntValue;
 
 	std::string m_szStringValue;
+
 	std::vector<std::string> m_vRezItems;
 
+	RefDialogData m_rddRefInfo;
+	HWND m_iRefBox = NULL;
+	std::vector<ConstItem> m_vRefConstItems;
+	std::vector<RefItem> m_vRefMapItems;
+	void Notified();
+	
 	HBITMAP m_hbmColor;
+
+	HWND hwndTooltip;
+	TOOLINFO toolInfo;
+
 };
 
 #endif		// #ifndef CCONTROL_H_INCLUDED

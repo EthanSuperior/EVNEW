@@ -60,7 +60,9 @@ const int CNR_TYPE_STRL = 27;
 const int CNR_TYPE_SYST = 28;
 const int CNR_TYPE_WEAP = 29;
 const int CNR_TYPE_UNK  = 30;
-
+const int CNR_MAX_VALID_IDS[] = { 191, 32767, 32767, 32767,   639, 32767,   639,   383,   383, 32767,
+								  255,  1127,   159,   383,   639,  1151, 32767,   255, 32767, 32767,
+								  143,   895,   895, 32767, 32767,  2175, 32767, 32767,  2175,   383 };
 const int NUM_RESOURCE_TYPES = 30;
 
 const std::string g_szResourceTypes[] = {"boom", "char", "cicn", "colr", "cron", "desc", "dude", "flet", "govt", "intf",

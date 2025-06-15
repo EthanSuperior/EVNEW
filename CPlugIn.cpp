@@ -62,6 +62,7 @@
 
 CPlugIn::CPlugIn(void)
 {
+
 	strcpy(m_szFilename, "");
 	strcpy(m_szFilePath, "C:\\");
 	strcpy(m_szFilenameNoPath, "Untitled.rez");
@@ -165,6 +166,15 @@ int CPlugIn::SetFilename(const char *szFilename)
 	strcpy(m_szFilenameNoPath, pLastSlash);
 
 	return 1;
+}
+
+CNovaResource* CPlugIn::FindById(int rezType, short iID)
+{
+	for (auto* ptr : m_vResources[rezType]) {
+		if (ptr->GetID() != iID) continue;
+		return ptr;
+	}
+	return NULL;
 }
 
 int CPlugIn::Clear(void)

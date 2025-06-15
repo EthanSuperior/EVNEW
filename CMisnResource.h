@@ -30,7 +30,7 @@ class CMisnResource;
 //////////////////////////  CONSTANTS  /////////////////////////
 ////////////////////////////////////////////////////////////////
 
-const int NUM_MISN_CONTROLS = 69;
+const int NUM_MISN_CONTROLS = 78;
 
 const int NUM_MISN_AVAILLOCATION_CHOICES = 7;
 

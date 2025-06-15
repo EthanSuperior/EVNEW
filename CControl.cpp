@@ -1,4 +1,4 @@
-// EVNEW - Escape Velocity: Nova Editor for Windows
+﻿// EVNEW - Escape Velocity: Nova Editor for Windows
 // By Adam Rosenfield
 // (c) 2003 All Rights Reserved
 
@@ -13,6 +13,7 @@
 #include "Workspace.h"
 
 #include <commctrl.h>
+#include "resource.h"
 
 ////////////////////////////////////////////////////////////////
 ///////////////////  CLASS MEMBER FUNCTIONS  ///////////////////
@@ -59,15 +60,11 @@ int CControl::Create(HWND hwndDialog, int iControlID, int iType, int iHelpString
 	m_hwndControl = GetDlgItem(m_hwndDialog, m_iControlID);
 	if (m_iType >= CCONTROL_TYPE_HEXINT16 && m_iType <= CCONTROL_TYPE_STRARB)
 		g_OldEditProc = (WNDPROC)SetWindowLongPtr(m_hwndControl, GWLP_WNDPROC, (LONG_PTR)CControl::TextHelperProc);
-
+	SetWindowLongPtr(m_hwndControl, GWLP_USERDATA, (LONG_PTR)this);
 	if(m_iType == CCONTROL_TYPE_COLOR)
 		CreateBitmap(SwapColorRedBlue(m_iIntValue));
 
 	HINSTANCE hInstance;
-
-	HWND hwndTooltip;
-
-	TOOLINFO toolInfo;
 
 	UINT iTooltipID = 0;
 
@@ -106,6 +103,155 @@ int CControl::Create(HWND hwndDialog, int iControlID, int iType, int iHelpString
 	}
 
 	return 1;
+}
+
+WNDPROC CControl::g_OldButtonProc = nullptr;
+LRESULT CALLBACK CControl::EmbeddedButtonProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+	switch (msg)
+	{
+	case WM_PAINT:
+	{
+		LRESULT result = CallWindowProc(g_OldButtonProc, hwnd, msg, wParam, lParam);
+
+		HDC hdc = GetDC(hwnd);
+		RECT rc;
+		GetClientRect(hwnd, &rc);
+
+		RECT rcButton = rc;
+		rcButton.left = rc.right - 8;
+		rcButton.top += 2;
+		rcButton.bottom -= 2;
+		rcButton.right -= 2;
+
+		DrawTextW(hdc, L"⋮", -1, &rcButton, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+
+		ReleaseDC(hwnd, hdc);
+		return result;
+	}
+	case WM_LBUTTONDOWN:
+	{
+		RECT rc;
+		GetClientRect(hwnd, &rc);
+		int x = GET_X_LPARAM(lParam);
+
+		if (x >= rc.right - 10) {
+			CControl* pThis = (CControl*)GetWindowLongPtr(hwnd, GWLP_USERDATA);
+			auto base = CWindow::GetWindow(pThis->m_hwndDialog, 1);
+			HINSTANCE hInstance = base->GetInstance();
+			RefDialogData data;
+			data.helpStringID = pThis->m_iHelpStringID;
+			data.constItems = pThis->m_vRefConstItems;
+			data.refItems = pThis->m_vRefMapItems;
+			CWindow m_wndRefSelect;
+			m_wndRefSelect.SetExtraData(0, (int)&data);
+			m_wndRefSelect.SetDlgProc(CControl::RezSelectDlgProc);
+			m_wndRefSelect.CreateAsDialog(hInstance, IDD_REZ_SEL, 1, base);
+			pThis->SetInt(data.selectedID);
+			return 0;
+		}
+		break;
+	}
+	}
+	return CallWindowProc(g_OldButtonProc, hwnd, msg, wParam, lParam);
+}
+
+BOOL CControl::RezSelectDlgProc(HWND hwndDlg, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+	CWindow* pWindow = CWindow::GetWindow(hwndDlg, 1);
+	RefDialogData* pData;
+	if (pWindow != NULL)
+		pData = (RefDialogData*)pWindow->GetExtraData(0);
+	switch (msg)
+	{
+	case WM_INITDIALOG:
+	{
+
+		// -- 1. Populate Help Text
+		char helpBuffer[1024];
+		LoadString(GetModuleHandle(NULL), pData->helpStringID, helpBuffer, sizeof(helpBuffer));
+		SetDlgItemText(hwndDlg, IDC_REZ_DESCRIPTION, helpBuffer);
+
+		// -- 2. Populate Filter Dropdown
+		for (const RefItem& ref : pData->refItems) {
+			std::string label = ref.description + g_szResourceTypes[ref.CNR_TYPE];
+			SendDlgItemMessageA(hwndDlg, IDC_REZ_FILTER, CB_ADDSTRING, 0, (LPARAM)label.c_str());
+		}
+		SendDlgItemMessage(hwndDlg, IDC_REZ_FILTER, CB_SETCURSEL, 0, 0);
+
+		// -- 3. Populate initial list (constItems + refItems[0])
+		HWND hList = GetDlgItem(hwndDlg, IDC_REZ_LIST);
+
+		// Const items
+		for (const ConstItem& c : pData->constItems) {
+			std::string line = std::to_string(c.value) + ": " + c.description;
+			SendMessageA(hList, LB_ADDSTRING, 0, (LPARAM)line.c_str());
+		}
+
+		// Refs
+		const RefItem& firstRef = pData->refItems[0];
+		for (auto& n: Workspace::Names(firstRef.CNR_TYPE, firstRef.offset))
+			SendMessageA(hList, LB_ADDSTRING, 0, (LPARAM)n.c_str());
+
+		return TRUE;
+	}
+
+	case WM_COMMAND:
+		switch (LOWORD(wParam))
+		{
+		case IDC_REZ_FILTER:
+			if (HIWORD(wParam) == CBN_SELCHANGE) {
+				int sel = (int)SendDlgItemMessage(hwndDlg, IDC_REZ_FILTER, CB_GETCURSEL, 0, 0);
+				if (sel >= 0 && sel < pData->refItems.size()) {
+					HWND hList = GetDlgItem(hwndDlg, IDC_REZ_LIST);
+					SendMessage(hList, LB_RESETCONTENT, 0, 0);
+
+					// Consts again
+					for (const ConstItem& c : pData->constItems) {
+						std::string line = std::to_string(c.value) + ": " + c.description;
+						SendMessageA(hList, LB_ADDSTRING, 0, (LPARAM)line.c_str());
+					}
+
+					const RefItem& ref = pData->refItems[sel];
+					for (auto& n : Workspace::Names(ref.CNR_TYPE, ref.offset))
+						SendMessageA(hList, LB_ADDSTRING, 0, (LPARAM)n.c_str());
+				}
+			}
+			break;
+		case IDC_REZ_LIST:
+			if (HIWORD(wParam) == LBN_SELCHANGE) {
+				int sel = (int)SendDlgItemMessage(hwndDlg, IDC_REZ_LIST, LB_GETCURSEL, 0, 0);
+				if (sel >= 0) {
+					char buf[256];
+					SendDlgItemMessageA(hwndDlg, IDC_REZ_LIST, LB_GETTEXT, sel, (LPARAM)buf);
+					SetDlgItemText(hwndDlg, IDC_REZ_SELECTED, buf);
+				}
+			}
+			break;
+
+		case IDOK:
+		{
+			int sel = (int)SendDlgItemMessage(hwndDlg, IDC_REZ_LIST, LB_GETCURSEL, 0, 0);
+			if (sel >= 0) {
+				char buf[256];
+				SendDlgItemMessageA(hwndDlg, IDC_REZ_LIST, LB_GETTEXT, sel, (LPARAM)buf);
+
+				// Get the number before the colon
+				int id = -1;
+				sscanf(buf, "%d", &id);
+				pData->selectedID = id;
+			}
+			EndDialog(hwndDlg, IDOK);
+			return TRUE;
+		}
+
+		case IDCANCEL:
+			EndDialog(hwndDlg, IDCANCEL);
+			return TRUE;
+		}
+		break;
+	}
+	return FALSE;
 }
 
 WNDPROC CControl::g_OldEditProc = nullptr;
@@ -380,6 +526,7 @@ int CControl::ProcessMessage(int iNotifyCode)
 
 			delete [] pBuffer;
 		}
+		Notified();
 	}
 	else if(iNotifyCode == BN_CLICKED)
 	{
@@ -465,6 +612,10 @@ int CControl::ProcessMessage(int iNotifyCode)
 				return 0; // Consume message
 			}
 	}
+	else {
+		std::ofstream ofstream("log.txt", std::ios::app);
+		ofstream << iNotifyCode << std::endl;
+	}
 	return 1;
 }
 
@@ -512,6 +663,59 @@ int CControl::SetComboStrings(int iNumStrings, const std::string *pStrings)
 	int iCount = ComboBox_GetCount(m_hwndControl);
 
 	return 1;
+}
+
+void CControl::SetRefInfoMap(int refBox, std::vector<ConstItem>& constItms, std::vector<RefItem>& refItms)
+{
+	m_iRefBox = GetDlgItem(m_hwndDialog, refBox);
+
+	TOOLINFO toolInfoLabel = toolInfo;
+	toolInfoLabel.hwnd = m_iRefBox;
+	toolInfoLabel.uId = (UINT_PTR)refBox;
+	SendMessage(hwndTooltip, TTM_ADDTOOL, 0, (LPARAM)&toolInfoLabel);
+
+	m_vRefConstItems = constItms;
+	m_vRefMapItems = refItms;
+
+	CControl::g_OldButtonProc = (WNDPROC)SetWindowLongPtr(m_hwndControl, GWLP_WNDPROC, (LONG_PTR)CControl::EmbeddedButtonProc);
+	// Get position of the edit control
+	//RECT rcEdit;
+	//GetWindowRect(m_hwndControl, &rcEdit);
+	//ScreenToClient(m_hwndDialog, (LPPOINT)&rcEdit.left);
+	//ScreenToClient(m_hwndDialog, (LPPOINT)&rcEdit.right);
+
+	//// Create the "..." button next to it
+	//HWND hwndBrowse = CreateWindowEx(
+	//	0,
+	//	"BUTTON",
+	//	"...",
+	//	WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_PUSHBUTTON,
+	//	rcEdit.right + 4, rcEdit.top, 20, rcEdit.bottom - rcEdit.top,
+	//	m_hwndDialog,
+	//	(HMENU)(m_iControlID + 20000),
+	//	GetModuleHandle(NULL),
+	//	NULL
+	//);
+	Notified();
+}
+
+void CControl::Notified()
+{
+	if (m_iRefBox == NULL) return;
+	int id = GetInt();
+
+	for (auto& item : m_vRefConstItems) if (item.value == id) {
+		Static_SetText(m_iRefBox, item.description.c_str());
+		return;
+	}
+	id += 128;
+	for (auto& item : m_vRefMapItems) 
+		if ((id - item.offset) >= 128 && (id - item.offset) <= CNR_MAX_VALID_IDS[item.CNR_TYPE]) {
+			Static_SetText(m_iRefBox,
+				(item.description + Workspace::RezStr(item.CNR_TYPE, id - item.offset)).c_str());
+			return;
+		}
+	Static_SetText(m_iRefBox, "Invalid Option");
 }
 
 int CControl::SetRezType(int rezNum)

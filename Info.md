@@ -13,7 +13,7 @@
 	- Ignores All Avalibility Requirements
 	- Runs OnAccept
 	- Aborting a mission will prevent queued Dialogs and OnXXXX from running
-	- OnAccept Runs before the Breif Dialog; OnShipDone runs before Ship Dialog
+	- OnAccept Runs before the Breif Dialog; OnShipDone runs before Ship Dialog  
 	- OnShipDone runs in any system of the goal once completed.
 	- The Ship having No Goal really just means always completed.
 	- You can have multiple of the same mission at the same time.

@@ -41,7 +41,7 @@ public:
     static NovaResourceRange Each(int type);
     static std::vector<CNovaResource*> All(int type);
     static std::vector<CNovaResource*> Filter(int type, ResourceFilter f);
-    static std::vector<std::string> Names(int type);
+    static std::vector<std::string> Names(int type, int offset = 128);
 
     // Single Access
     static CNovaResource* FindById(int type, int id);

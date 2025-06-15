@@ -1397,21 +1397,17 @@ int CEditor::ResourceEdit(void)
 }
 
 void CEditor::ResourceExtra(short id, std::string dfltName, int type) {
-	CNovaResource* pNovaResource = FindById(type, id);
+	CNovaResource* pNovaResource = Workspace::Get().ActiveFile()->FindById(type, id);
 	// If the resource is not found in the plugin - copy it from the library
 	if (pNovaResource == NULL) {
+		// If the resource is not found in the library - create a new one
 		pNovaResource = ResourceTemplate(id, Workspace::FindById(type, id), dfltName);
-		if (pNovaResource != NULL) {
-			SetDirty();
-			UpdateResourceList();
+		if (pNovaResource == NULL) {
+			pNovaResource = GetCurrentPlugin()->AllocateResource(type);
+			pNovaResource->SetID(id);
+			pNovaResource->SetName(dfltName.c_str());
+			GetCurrentPlugin()->m_vResources[type].push_back(pNovaResource);
 		}
-	}
-	// If the resource is not found in the library - create a new one
-	if (pNovaResource == NULL) {
-		pNovaResource = GetCurrentPlugin()->AllocateResource(type);
-		pNovaResource->SetID(id);
-		pNovaResource->SetName(dfltName.c_str());
-		GetCurrentPlugin()->m_vResources[type].push_back(pNovaResource);
 		SetDirty();
 		UpdateResourceList();
 	}
@@ -1521,7 +1517,8 @@ CNovaResource* CEditor::ResourceTemplate(short iID, CNovaResource* pTemplateReso
 	char* pBuffer = new char[iSize];
 	pTemplateResource->Save(pBuffer);
 
-	CNovaResource* pNewResource = FindById(iType, iID);
+	// TODO: ADD SELECTION PRIORITY TO THESE FINDBYIDs
+	CNovaResource* pNewResource = Workspace::FindById(iType, iID);
 	if (pNewResource == NULL) {
 		pNewResource = GetCurrentPlugin()->AllocateResource(iType);
 		GetCurrentPlugin()->m_vResources[iType].push_back(pNewResource);
@@ -1932,16 +1929,6 @@ short CEditor::FindUniqueResourceID(int iType, short iStart)
 	return -1;
 }
 
-CNovaResource* CEditor::FindById(int rezType, short iID) {
-	CNovaResource* pResource = NULL;
-	for (auto* ptr : GetCurrentPlugin()->m_vResources[rezType]) {
-		if (ptr->GetID() != iID) continue;
-		pResource = ptr;
-		break;
-	}
-	return pResource;
-}
-
 int CEditor::IsUniqueResourceID(CNovaResource *pResource, short iID)
 {
 	int i;
@@ -1991,7 +1978,6 @@ int CEditor::UpdateResourceList(void)
 	}
 
 	ListBox_SetCurSel(hwndListResourceTypes, m_iCurrentResourceType);
-
 	ListBox_ResetContent(hwndListResources);
 
 	if(GetCurrentPlugin()->m_vResources[m_iCurrentResourceType].size() > 0)
@@ -2127,7 +2113,9 @@ BOOL CEditor::MainDialogProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 				}
 			}
 			else if (iControlID >= 50000) {
-				CPlugIn* p = Workspace::GetPlugins()[iControlID - 50000];
+				CPlugIn* p;
+				if (iControlID < 50100) p = Workspace::GetPlugins()[iControlID - 50000];
+				else p = Workspace::GetData()[iControlID - 50100];
 				if (pEditor->m_iIsDirty)
 				{
 					if (pEditor->AskForSave() == 0)

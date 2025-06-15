@@ -89,7 +89,7 @@ CMisnResource::CMisnResource(void)
 	memset(m_szOnFailure,     0, 255 * sizeof(char));
 	memset(m_szOnAbort,       0, 255 * sizeof(char));
 	memset(m_szOnShipDone,    0, 255 * sizeof(char));
-	strcpy(m_szAvailableBits, ("!b" + std::to_string(128 + 1100)).c_str());
+	strcpy(m_szAvailableBits, ("b" + ToString(127 + 1100) + " & !b" + ToString(128 + 1100)).c_str());
 	strcpy(m_szOnSuccess, ("b" + std::to_string(128 + 1100) + " o350").c_str());
 	strcpy(m_szName, "New Name; $tly¢rp M");
 
@@ -623,6 +623,50 @@ int CMisnResource::Initialize(HWND hwnd)
 	m_controls[68].Create(hwnd, IDC_EDIT_MISN_EDIT51, CCONTROL_TYPE_STR256, IDS_STRING468);
 	m_controls[68].SetString(m_szName);
 
+	m_controls[1].SetRefInfoMap(IDC_EDIT_MISN_TEXT52,
+		std::vector<ConstItem>{ {"Any Stellar", -1}},
+		std::vector<RefItem>{{"", CNR_TYPE_SPOB, 128}, { "AdjTo", CNR_TYPE_SYST, 5000 },
+		{ "Within", CNR_TYPE_GOVT, 10000 }, { "AllyOf", CNR_TYPE_GOVT, 15000 }, { "Not", CNR_TYPE_GOVT, 20000 },
+		{ "EnemyOf", CNR_TYPE_GOVT, 25000 }, { "ClassOf", CNR_TYPE_GOVT, 30000 },
+		{ "!ClassOf", CNR_TYPE_GOVT, 31000 }});
+	m_controls[6].SetRefInfoMap(IDC_EDIT_MISN_TEXT56,
+		std::vector<ConstItem>{ {"None", -1}, { "RandInhabited", -2 }, { "RandUninhab", -3 }},
+		std::vector<RefItem>{ { "", CNR_TYPE_SPOB, 128 }, { "Rand",CNR_TYPE_GOVT, 10000 },
+		{ "RandomAllyOf",CNR_TYPE_GOVT, 15000 }, { "RandomNot",CNR_TYPE_GOVT, 20000 },
+		{ "RandomEnemyOf",CNR_TYPE_GOVT, 25000 }, { "RandomClassOf",CNR_TYPE_GOVT, 30000 },
+		{ "RandomClassOf", CNR_TYPE_GOVT, 31000 }});
+	m_controls[7].SetRefInfoMap(IDC_EDIT_MISN_TEXT57,
+		std::vector<ConstItem>{ {"None", -1}, { "RandInhabited", -2 }, { "RandUninhab", -3 },
+		{ "Initial Stellar", -4 }},
+		std::vector<RefItem>{ {" ", CNR_TYPE_SPOB, 128}, { "Random ", CNR_TYPE_GOVT,10000 },
+		{ "Random AllyOf ", CNR_TYPE_GOVT,15000 }, { "Random Not ", CNR_TYPE_GOVT,20000 },
+		{ "Random EnemyOf ", CNR_TYPE_GOVT,25000 }, { "Random ClassOf ", CNR_TYPE_GOVT,30000 },
+		{ "Random !ClassOf ", CNR_TYPE_GOVT,31000 }});
+	m_controls[8].SetRefInfoMap(IDC_EDIT_MISN_TEXT58,
+		std::vector<ConstItem>{ {"None", -1}, { "RndCargo", 1000 }},
+		std::vector<RefItem>{{"", CNR_TYPE_JUNK, 128}});
+	m_controls[15].SetRefInfoMap(IDC_EDIT_MISN_TEXT62,
+		std::vector<ConstItem>{ {"Initial", -1}, { "Rnd Syst", -2 }, { "Travel Spob", -3 }, { "Return Spob", -4 },
+		{ "Adj Syst", -5 }, { "Follow Player", -6 } },
+		std::vector<RefItem>{ {"", CNR_TYPE_SYST, 128}, { "Rnd in ", CNR_TYPE_GOVT, 10000 },
+		{ "Rnd in AllyOf ", CNR_TYPE_GOVT, 15000 }, { "Rnd in !", CNR_TYPE_GOVT, 20000 },
+		{ "Rnd in EnemyOf ", CNR_TYPE_GOVT, 25000 }, { "Rnd in ClsOf ", CNR_TYPE_GOVT, 30000 },
+		{ "Rnd in !ClsOf ", CNR_TYPE_GOVT, 31000 } });
+	m_controls[16].SetRefInfoMap(IDC_EDIT_MISN_TEXT63,
+		std::vector<ConstItem>{ {"None", -1}}, std::vector<RefItem>{{"", CNR_TYPE_DUDE, 128}});
+	m_controls[34].SetRefInfoMap(IDC_EDIT_MISN_TEXT68,
+		std::vector<ConstItem>{ {"None", -1}}, std::vector<RefItem>{{"", CNR_TYPE_DUDE, 128}});
+	m_controls[35].SetRefInfoMap(IDC_EDIT_MISN_TEXT69,
+		std::vector<ConstItem>{ {"Follow Player", -1}, { "TrvlSyst", -2 }, { "RtrnSyst", -3 }},
+		std::vector<RefItem>{{"", CNR_TYPE_SYST, 128}, { "Rand", CNR_TYPE_GOVT, 10000 },
+		{ "RandAllyOf", CNR_TYPE_GOVT, 15000 }, { "Rand!", CNR_TYPE_GOVT, 20000 },
+		{ "RandEnemyOf", CNR_TYPE_GOVT, 25000 }, { "RandClassOf", CNR_TYPE_GOVT, 30000 },
+		{ "Rand!ClassOf", CNR_TYPE_GOVT, 31000 }});
+	m_controls[36].SetRefInfoMap(IDC_EDIT_MISN_TEXT70,//IDC_EDIT_MISN_TEXT70
+		std::vector<ConstItem>{ {"Any Ship", -1}},
+		std::vector<RefItem>{{"", CNR_TYPE_SHIP, 128}, { "Not", CNR_TYPE_SHIP, 1000 },
+		{ "GovtOf", CNR_TYPE_GOVT, 2000 }, { "!GovtOf", CNR_TYPE_GOVT, 3000 }});
+
 	UpdateDynamicDefaults(m_controls, 128, m_iID);
 
 	std::string szText = "Introduction Text:\t";
@@ -890,11 +934,9 @@ BOOL CMisnResource::MisnDlgProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lpara
 					CEditor::GetCurrentEditor()->ResourceExtra(id + 17000 - 128, "RJCT: " + name);
 			}
 
-			if (iNotifyCode != EN_UPDATE && iNotifyCode != EN_CHANGE) return TRUE;
-
-			if (iControlID == IDC_EDIT_MISN_EDIT1)
+			if (iNotifyCode == EN_UPDATE && iNotifyCode == EN_CHANGE && iControlID == IDC_EDIT_MISN_EDIT1)
 			{
-				if((id >= 128) && (id < 1128))
+				if(id >= 128 && id <= CNR_MAX_VALID_IDS[CNR_TYPE_MISN])
 				{
 					char* inStr = new char[255];
 					Static_GetText(GetDlgItem(hwnd, IDC_EDIT_MISN_TEXT32), inStr, 255);
@@ -908,168 +950,9 @@ BOOL CMisnResource::MisnDlgProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lpara
 					Static_SetText(GetDlgItem(hwnd, IDC_EDIT_MISN_TEXT32), szText.c_str());
 				}
 			}
-			else if (iControlID == IDC_EDIT_MISN_EDIT2 ) {
-				int id = pResource->m_controls[1].GetInt();
-				std::string rezName = "Any Stellar";
-				
-				if (id >= 128 && id <= 2175) rezName = Workspace::RezStr(CNR_TYPE_SPOB, id);
-				else if (id >= 5000 && id <= 7047)
-					rezName = "AdjTo" + Workspace::RezStr(CNR_TYPE_SYST, id - 5000, true);
-				else if (id >= 10000 && id <= 10255)
-					rezName = Workspace::RezStr(CNR_TYPE_GOVT, id - 10000, true);
-				else if (id >= 15000 && id <= 15255)
-					rezName = "AllyOf" + Workspace::RezStr(CNR_TYPE_GOVT, id - 15000);
-				else if (id >= 20000 && id <= 20255)
-					rezName = "Not" + Workspace::RezStr(CNR_TYPE_GOVT, id - 20000);
-				else if (id >= 25000 && id <= 25255)
-					rezName = "EnemyOf" + Workspace::RezStr(CNR_TYPE_GOVT, id - 25000);
-				else if (id >= 30000 && id <= 30255)
-					rezName = "ClassOf" + Workspace::RezStr(CNR_TYPE_GOVT, id - 30000);
-				else if (id >= 31000 && id <= 31255)
-					rezName = "!ClassOf" + Workspace::RezStr(CNR_TYPE_GOVT, id - 31000);
-
-				Static_SetText(GetDlgItem(hwnd, IDC_EDIT_MISN_TEXT52), rezName.c_str());
-			} 
-			else if (iControlID == IDC_EDIT_MISN_EDIT7) {
-				int id = pResource->m_controls[6].GetInt();
-				std::string rezName = "None";
-
-				if (id == -2) rezName = "Rand Inhabited";
-				else if (id == -3) rezName = "Rand Uninhabited";
-				else if (id >= 128 && id <= 2175) rezName = Workspace::RezStr(CNR_TYPE_SPOB, id);
-				else if (id >= 10000 && id <= 10255)
-					rezName = "Rand " + Workspace::RezStr(CNR_TYPE_GOVT, id - 10000);
-				else if (id >= 15000 && id <= 15255)
-					rezName = "Random AllyOf " + Workspace::RezStr(CNR_TYPE_GOVT, id - 15000);
-				else if (id >= 20000 && id <= 20255)
-					rezName = "Random Not " + Workspace::RezStr(CNR_TYPE_GOVT, id - 20000);
-				else if (id >= 25000 && id <= 25255)
-					rezName = "Random EnemyOf " + Workspace::RezStr(CNR_TYPE_GOVT, id - 25000);
-				else if (id >= 30000 && id <= 30255)
-					rezName = "Random ClassOf " + Workspace::RezStr(CNR_TYPE_GOVT, id - 30000);
-				else if (id >= 31000 && id <= 31255)
-					rezName = "Random !ClassOf " + Workspace::RezStr(CNR_TYPE_GOVT, id - 31000);
-
-				Static_SetText(GetDlgItem(hwnd, IDC_EDIT_MISN_TEXT56), rezName.c_str());
-			}
-			else if (iControlID == IDC_EDIT_MISN_EDIT8) {
-				int id = pResource->m_controls[7].GetInt();
-				std::string rezName = "None";
-
-				if (id == -2) rezName = "Rand Inhabited";
-				else if (id == -3) rezName = "Rand Uninhabited";
-				else if (id == -4) rezName = "Initial Stellar";
-				else if (id >= 128 && id <= 2175) rezName = Workspace::RezStr(CNR_TYPE_SPOB, id);
-				else if (id >= 10000 && id <= 10255)
-					rezName = "Random " + Workspace::RezStr(CNR_TYPE_GOVT, id - 10000, true);
-				else if (id >= 15000 && id <= 15255)
-					rezName = "Random AllyOf " + Workspace::RezStr(CNR_TYPE_GOVT, id - 15000);
-				else if (id >= 20000 && id <= 20255)
-					rezName = "Random Not " + Workspace::RezStr(CNR_TYPE_GOVT, id - 20000);
-				else if (id >= 25000 && id <= 25255)
-					rezName = "Random EnemyOf " + Workspace::RezStr(CNR_TYPE_GOVT, id - 25000);
-				else if (id >= 30000 && id <= 30255)
-					rezName = "Random ClassOf " + Workspace::RezStr(CNR_TYPE_GOVT, id - 30000);
-				else if (id >= 31000 && id <= 31255)
-					rezName = "Random !ClassOf " + Workspace::RezStr(CNR_TYPE_GOVT, id - 31000);
-
-				Static_SetText(GetDlgItem(hwnd, IDC_EDIT_MISN_TEXT57), rezName.c_str());
-			}
-			else if (iControlID == IDC_EDIT_MISN_EDIT9) {
-				int id = pResource->m_controls[8].GetInt();
-				std::string rezName = "None";
-
-				if (id == 1000) rezName = "Random Cargo";
-				else if (id >= 0 && id <= 255) rezName = Workspace::RezStr(CNR_TYPE_JUNK, id);
-
-				Static_SetText(GetDlgItem(hwnd, IDC_EDIT_MISN_TEXT58), rezName.c_str());
-			}
-			else if (iControlID == IDC_EDIT_MISN_EDIT16) {
-				int id = pResource->m_controls[15].GetInt();
-				std::string rezName = "Initial";
-
-				if (id == -2) rezName = "Rand System";
-				else if (id == -3) rezName = "Travel Stellar";
-				else if (id == -4) rezName = "Return Stellar";
-				else if (id == -5) rezName = "Adjacent System";
-				else if (id == -6) rezName = "Follow Player";
-				else if (id >= 128 && id <= 2175) rezName = Workspace::RezStr(CNR_TYPE_SYST, id);
-				else if (id >= 10000 && id <= 10255)
-					rezName = "Random " + Workspace::RezStr(CNR_TYPE_GOVT, id - 10000, true);
-				else if (id >= 15000 && id <= 15255)
-					rezName = "Random AllyOf " + Workspace::RezStr(CNR_TYPE_GOVT, id - 15000);
-				else if (id >= 20000 && id <= 20255)
-					rezName = "Random Not " + Workspace::RezStr(CNR_TYPE_GOVT, id - 20000);
-				else if (id >= 25000 && id <= 25255)
-					rezName = "Random EnemyOf " + Workspace::RezStr(CNR_TYPE_GOVT, id - 25000);
-				else if (id >= 30000 && id <= 30255)
-					rezName = "Random ClassOf " + Workspace::RezStr(CNR_TYPE_GOVT, id - 30000);
-				else if (id >= 31000 && id <= 31255)
-					rezName = "Random !ClassOf " + Workspace::RezStr(CNR_TYPE_GOVT, id - 31000);
-
-				Static_SetText(GetDlgItem(hwnd, IDC_EDIT_MISN_TEXT62), rezName.c_str());
-			}
-			else if (iControlID == IDC_EDIT_MISN_EDIT17) {
-				int id = pResource->m_controls[16].GetInt();
-				std::string rezName = "None";
-
-				if (id >= 128 && id <= 639) rezName = Workspace::RezStr(CNR_TYPE_DUDE, id);
-
-				Static_SetText(GetDlgItem(hwnd, IDC_EDIT_MISN_TEXT63), rezName.c_str());
-			}
-			else if (iControlID == IDC_EDIT_MISN_EDIT35) {
-				int id = pResource->m_controls[34].GetInt();
-				std::string rezName = "None";
-
-				if (id >= 128 && id <= 639) rezName = Workspace::RezStr(CNR_TYPE_DUDE, id);
-
-				Static_SetText(GetDlgItem(hwnd, IDC_EDIT_MISN_TEXT68), rezName.c_str());
-			}
-			else if (iControlID == IDC_EDIT_MISN_EDIT36) {
-				int id = pResource->m_controls[35].GetInt();
-				std::string rezName = "Follow Player";
-
-				if (id == -2) rezName = "Travel System";
-				else if (id == -3) rezName = "Return System";
-				else if (id >= 128 && id <= 2175) rezName = Workspace::RezStr(CNR_TYPE_SYST, id);
-				else if (id >= 10000 && id <= 10255)
-					rezName = "Rand " + Workspace::RezStr(CNR_TYPE_GOVT, id - 10000, true);
-				else if (id >= 15000 && id <= 15255)
-					rezName = "Rand AllyOf " + Workspace::RezStr(CNR_TYPE_GOVT, id - 15000);
-				else if (id >= 20000 && id <= 20255)
-					rezName = "Rand Not " + Workspace::RezStr(CNR_TYPE_GOVT, id - 20000);
-				else if (id >= 25000 && id <= 25255)
-					rezName = "Rand EnemyOf " + Workspace::RezStr(CNR_TYPE_GOVT, id - 25000);
-				else if (id >= 30000 && id <= 30255)
-					rezName = "Rand ClassOf " + Workspace::RezStr(CNR_TYPE_GOVT, id - 30000);
-				else if (id >= 31000 && id <= 31255)
-					rezName = "Rand !ClassOf " + Workspace::RezStr(CNR_TYPE_GOVT, id - 31000);
-
-				Static_SetText(GetDlgItem(hwnd, IDC_EDIT_MISN_TEXT69), rezName.c_str());
-			}
-			else if (iControlID == IDC_EDIT_MISN_EDIT37) {
-				int id = pResource->m_controls[36].GetInt();
-				std::string rezName = "Any Ship";
-
-				if (id >= 128 && id <= 255)	rezName = Workspace::RezStr(CNR_TYPE_SHIP, id);
-				else if (id >= 1128 && id <= 1255) rezName = "Not" + Workspace::RezStr(CNR_TYPE_SHIP, id - 1000);
-				else if (id >= 2128 && id <= 2255)
-					rezName = "GovtOf" + Workspace::RezStr(CNR_TYPE_GOVT, id - 2000);
-				else if (id >= 3128 && id <= 3255)
-					rezName = "NotGovtOf" + Workspace::RezStr(CNR_TYPE_GOVT, id - 3000);
-
-				Static_SetText(GetDlgItem(hwnd, IDC_EDIT_MISN_TEXT70), rezName.c_str());
-			}
-			
 			return TRUE;
-
-			break;
 		}
-
-		default:
-		{
-			break;
-		}
+		default: { break; }
 	}
 
 	return FALSE;
@@ -1086,6 +969,7 @@ void CMisnResource::UpdateDynamicDefaults(CControl* controls, short oldId, short
 	SetIfDefaultInt(controls, 29, oldId, newId, 15000 - 128);
 	SetIfDefaultInt(controls, 30, oldId, newId, 16000 - 128);
 	SetIfDefaultInt(controls, 37, oldId, newId, 17000 - 128);
+	SetIfDefaultStr(controls, 38, oldId + 1099, newId + 1099);
 	SetIfDefaultStr(controls, 38, oldId + 1100, newId + 1100);
 	SetIfDefaultStr(controls, 41, oldId + 1100, newId + 1100);
 } 

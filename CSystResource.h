@@ -85,6 +85,8 @@ public:
 
 	static BOOL SystDlgProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
 
+	short m_iDudeTypes[8];
+	short m_iDudeProbabilities[8];
 private:
 
 	int SwapEndians(void);
@@ -95,9 +97,6 @@ private:
 	short m_iHyperlinks[16];
 
 	short m_iStellars[16];
-
-	short m_iDudeTypes[8];
-	short m_iDudeProbabilities[8];
 
 	short m_iNumShips;
 

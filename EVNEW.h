@@ -95,8 +95,6 @@ public:
 	int RemoveEditDialog(CWindow *pWindow, int iIDOrNameChanged);
 
 	int IsUniqueResourceID(CNovaResource* pResource, short iID);
-
-	CNovaResource* FindById(int rezType, short iID);
 	
 	void ResourceExtra(short id, std::string dfltName, int type = CNR_TYPE_DESC);
 

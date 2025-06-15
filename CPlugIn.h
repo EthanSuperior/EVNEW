@@ -45,6 +45,8 @@ public:
 
 	int SetFilename(const char *szFilename);
 
+	CNovaResource* FindById(int rezType, short iID);
+
 	int SetOptions(int iShowErrorMessages, int iShowProgressBar);
 	int SetCicnSaveOptions(int iSave, char *szSubdirectory, char *szFilenamePrefix, char *szMaskSubdirectory, char *szMaskFilenamePrefix);
 	int SetPictSaveOptions(int iSave, char *szSubdirectory, char *szFilenamePrefix, int iImageFileType);

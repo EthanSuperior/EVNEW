@@ -77,6 +77,8 @@ public:
 
 	static BOOL DudeDlgProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
 
+	double PercentAppear(short id);
+
 private:
 
 	int SwapEndians(void);

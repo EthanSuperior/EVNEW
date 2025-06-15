@@ -19,6 +19,8 @@
 
 #include "resource.h"
 #include "COutfResource.h"
+#include "CDudeResource.h"
+#include "CSystResource.h"
 
 ////////////////////////////////////////////////////////////////
 ///////////////////  CLASS MEMBER FUNCTIONS  ///////////////////
@@ -1383,7 +1385,7 @@ BOOL CShipResource::DiffDlgProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lpara
 	return FALSE;
 }
 
-std::string CShipResource::NumsToString(std::string name, int shields, int shieldReg,
+std::string CShipResource::NumsToString(std::string name, int id, int shields, int shieldReg,
 	int armor, int armorReg, int fuel, int fuelReg, int ion, int ionReg, int cargo,
 	int mass, int accel, int speed, int turn, int guns, int turrets, int cost,
 	int weight,	int gravMass, int length, int crew, int str, int skill, short weaps[8],
@@ -1405,6 +1407,22 @@ std::string CShipResource::NumsToString(std::string name, int shields, int shiel
 			});
 		return (COutfResource*)Workspace::FindWhere(CNR_TYPE_OUTF, outfFilter(mod, weapId));
 	};
+	auto dudes = Workspace::Filter(CNR_TYPE_DUDE, [id](CNovaResource* r,int i) {
+		return ((CDudeResource*)r)->PercentAppear(id) > 0;
+	});
+	std::vector<std::string> systs;
+	std::vector<double> systPerc;
+	Workspace::Filter(CNR_TYPE_SYST, [&systs,&systPerc,dudes,id](CNovaResource* r, int i) {
+		auto s = (CSystResource*)r;
+		for(auto d:dudes)
+			for (int i = 0; i < 8; i++)
+				if (s->m_iDudeTypes[i] == d->GetID())
+				{
+					systs.push_back(ToString(s->GetName()));
+					systPerc.push_back(((CDudeResource*)d)->PercentAppear(id) * s->m_iDudeProbabilities[i]);
+				}
+		return false;
+	});
 
 	for (int i = 0; i < 8; ++i) {
 		if (weaps[i] < 128) continue;
@@ -1471,6 +1489,8 @@ std::string CShipResource::NumsToString(std::string name, int shields, int shiel
 	});
 	result += "\n-----------------\n";
 	result += "Cost: $" + FormatNumberShort(cost) + " [BASE: " + FormatNumberShort(cost-usedCost) + "]" + "\n"; //CALC TOTAL
+	result += "-----------------\n";
+	for (int i = 0; i < systs.size(); i++) result += systs[i] + " (" + ToString(systPerc[i]/100) + "%), ";
 	/*
 	Sheilds: Val (Regen=(Val/1000)/Frame)
 	Armor: Val (Regen=(Val/1000)/Frame)
@@ -1509,7 +1529,7 @@ void CShipResource::DiffUpdate(void) {
 	short wAmmo[8] = { l(65), l(66), l(67), l(68), l(69), l(70), l(71), l(72) };
 	short outfs[8] = { l(73), l(74), l(75), l(76), l(77), l(78), l(79), l(80) };
 	short oCnts[8] = { l(81), l(82), l(83), l(84), l(85), l(86), l(87), l(88) };
-	std::string output = NumsToString(m_controls[126].GetString(), l(2), l(3), l(4),
+	std::string output = NumsToString(m_controls[126].GetString(), l(0), l(2), l(3), l(4),
 		l(5), l(9), l(25), l(31), l(30), l(1), l(10), l(6), l(7), l(8), l(11), l(12),
 		l(14), l(18), l(19), l(20), l(21), l(22), l(26), weaps, wCnts, wAmmo, outfs, oCnts);
 	Static_SetText(ourTxt, output.c_str());
@@ -1521,7 +1541,7 @@ void CShipResource::DiffUpdate(void) {
 	if (m_iDiffID > 0) comp = (CShipResource*)Workspace::FindByIdx(CNR_TYPE_SHIP, m_iDiffID);
 	if (comp == NULL) comp = this;
 
-	Static_SetText(enemyTxt, NumsToString(comp->m_szName, comp->m_iShields, comp->m_iShieldRecharge,
+	Static_SetText(enemyTxt, NumsToString(comp->m_szName, comp->m_iID, comp->m_iShields, comp->m_iShieldRecharge,
 		comp->m_iArmor, comp->m_iArmorRecharge, comp->m_iFuel, comp->m_iFuelRegeneration, 
 		comp->m_iMaxIonization, comp->m_iDeionize, comp->m_iCargo, comp->m_iFreeMass,
 		comp->m_iAcceleration, comp->m_iMaxSpeed, comp->m_iTurning, comp->m_iMaxGuns,

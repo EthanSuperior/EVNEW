@@ -1,9 +1,45 @@
 # ROADMAP (No Set Order):
 
+### TODO NEXT
+- Make CPlugin's m\_vResources be a std::vector< std::map<short, CNovaResource*> > rather than a vector
+- Have it keep track of it's own m\_iIsDirty
+- Get ID of selected resource
+- Add Multiple ways to fetch from Workspace::All;
+	- IE ALL(CNR_SHIP\_TYPE, LOAD\_ORDER) -> Which has the plugins > data, id order, no dups
+	- IE ALL(CNR_SHIP\_TYPE, LOAD\_ALL) -> Which has the data < plugins, id order, yes dups
+	- IE ALL(CNR_SHIP\_TYPE, LOAD\_DATA) -> Which has only data, id order, no dups
+	- IE ALL(CNR_SHIP\_TYPE, LOAD\_PLUGIN) -> Which has only plugins, id order, no dups
+- Add a Create Workspace from Existing button to the main menu; And make it no longer auto open a plugin...
+- Fix the bugs where I can't open a plugin by itself
+
 ### Features
+- Make a .REZA_(rchive)_ type which is the entire workspace folder, then it exports out to:
+	- WORKSPACE\_NAME\_data1.rez, ''\_data2.rez, ''\_data3.rez, etc
+		- How does Nova export the data? How do TC's like WhiteDwarf and AAPRIA
+		- What is the size limit that they are avoiding?
+	- Add the workspace specific settings to the .REZA file
+	- Have it do the same for plugins, so a workspace is represented by a single file
+	- Assume Nova does not load -ids and use that to split between plugin/data files
+	- Find what is in Nova.rez and see if we need to deal with that (Seems like a bunch of Unkn's)
+	- Have an add Existing Data/Plugin btn to the workspace
+	- Split Adds into Data and Plugin; Make dflt be a setting
+- Add a Create Workspace button to the main menu
+- Add a Create TC button to the main menu? which is the base tc
+- Add ability to open and edit pilot files (.plt) directly and in a workspace
+
 - Finish Links
 - Saving w/ Nova Running should prompt to quit it
 - Update Readme to markdown
+- Templating thigs from out of plugin broken
+	- Templeting Missions from wethere they are in a string; 
+	- ie if my mission is Auroran 1; naming it Auroran 2 should auto chain
+- Do Bit Sets check work for ( [(b1&b2) b3 b4]>3)
+- Govt Map (implied Allies)
+	- Implied Meaning G1 Enemies w/2 G2 will atk (back?) G1
+	- If G2 will atk G1 unprovoked
+	- Implied Allies? What if both?
+- Search Bar for Rez List
+- Auto Sandbox?
 - Workspaces
 	- Allow to switch between plugins within same EV Nova Folder
 	- Tabs for open files
@@ -16,12 +52,17 @@
 	- Move m_iIsDirty to the plugins
 	- Custom Default Values?
 - Refactor Options (Like Move w/ Refs, and w/ Sub Resources, All Plugins)
+- Seceret Mission btn; Make more boxes searchable....
 - Availability
 	- NCB usage/names(?)/as a type?
 	- Check Availablity of ID
 	- Set/Test/Desc Parser/Checker
 	- Create/Nag if you enter a resource ID that doesn't exist
 	- Add restrictions to IDs outside of the range of the resource type
+	- Be able to ask who uses XXXX
+- Syst -> Spob & Spob -> Syst; 
+- Tech Tracker; Give Lvlv see Outf Ship Spob/Syst etc
+- Trades; if syst contains a trade route within it
 - Resources
 	- Add Edit btn to more than just desc (See Links)
 	- Add dividers/headers to reserved types; ie desc3xxx should say Outfit Description somewhere....

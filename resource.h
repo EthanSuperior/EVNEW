@@ -180,6 +180,7 @@
 #define IDS_STRING155                   155
 #define IDD_SHIP_DIFF                   155
 #define IDS_STRING156                   156
+#define IDD_REZ_SEL		                156
 #define IDS_STRING157                   157
 #define IDS_STRING158                   158
 #define IDS_STRING159                   159
@@ -3055,6 +3056,11 @@
 #define IDC_DIFF_SHIP_TEXT3             2673
 #define IDC_EDIT_CRON_TEXT36            2673
 #define IDC_DIFF_SHIP_TEXT2             2674
+#define IDC_REZ_DESCRIPTION				2675
+#define IDC_REZ_FILTER					2676
+#define IDC_REZ_LIST					2677
+#define IDC_REZ_SELECTED				2678
+#define IDC_REZ_SEARCH					2679
 #define IDM_FILE_NEW                    40001
 #define IDM_FILE_OPEN                   40002
 #define IDM_FILE_SAVE                   40003
@@ -3147,7 +3153,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        158
 #define _APS_NEXT_COMMAND_VALUE         40096
-#define _APS_NEXT_CONTROL_VALUE         2674
+#define _APS_NEXT_CONTROL_VALUE         2680
 #define _APS_NEXT_SYMED_VALUE           107
 #endif
 #endif

@@ -26,12 +26,16 @@ std::set<int> Workspace::GetNCB() { return Get().usedNCB; }
 
 CPlugIn* Workspace::ActiveFile()
 {
+	if (Get().active == NULL)
+		Get().active = new CPlugIn();
 	return Get().active;
 }
 
 CPlugIn* Workspace::Change(std::string filename, CWindow* pWndParent)
 {
 	auto path = std::filesystem::path(filename);
+	if (ActiveFile() != NULL && std::filesystem::path(Get().active->GetFilename()) == path)
+		return Get().active;
 	for (auto& p : GetPlugins())
 		if (std::filesystem::path(p->GetFilename()) == path)
 			return (Get().active = p);
@@ -62,6 +66,13 @@ int Workspace::Open(std::string filename, CWindow* pWndParent)
 	HMENU hMainMenu = GetMenu(hwnd);
 	InsertMenuA(GetSubMenu(hMainMenu, 2), 3, MF_BYPOSITION | MF_POPUP, (UINT_PTR)hPluginsMenu, "Switch Active");
 
+	hPluginsMenu = CreatePopupMenu();
+	for (size_t i = 0; i < Workspace::GetData().size(); ++i) {
+		char* displayName = Workspace::GetData()[i]->GetFilenameNoPath();
+		AppendMenuA(hPluginsMenu, MF_STRING, 50100 + static_cast<UINT>(i), displayName);
+	}
+	InsertMenuA(GetSubMenu(hMainMenu, 2), 4, MF_BYPOSITION | MF_POPUP, (UINT_PTR)hPluginsMenu, "Switch Data");
+
 	DrawMenuBar(hwnd);
 
 
@@ -79,9 +90,14 @@ void Workspace::AddFolder(std::string path, CWindow* pWndParent, std::vector<CPl
 
 void Workspace::AddRezFile(std::string filename, CWindow* pWndParent, std::vector<CPlugIn*>& files)
 {
-	CPlugIn* lib = new CPlugIn();
-	lib->Load(filename.data(), pWndParent);
-	files.insert(files.begin(), lib);
+	auto path = std::filesystem::path(filename);
+	if (ActiveFile() != NULL && std::filesystem::path(ActiveFile()->GetFilename()) == path) {
+		files.insert(files.begin(), Get().active);
+	} else {
+		CPlugIn* lib = new CPlugIn();
+		lib->Load(filename.data(), pWndParent);
+		files.insert(files.begin(), lib);
+	}
 }
 
 NovaResourceRange Workspace::Each(int type) { return NovaResourceRange(type); }
@@ -105,12 +121,12 @@ std::vector<CNovaResource*> Workspace::Filter(int type, ResourceFilter f)
 	return result;
 }
 
-std::vector<std::string> Workspace::Names(int type) {
+std::vector<std::string> Workspace::Names(int type, int offset) {
 	NovaResourceRange v = Workspace::Each(type);
 	std::vector<std::string> result;
 	result.reserve(v.end().idx);
 	for (auto& r = v.begin(), e = v.end(); r != e; ++r)
-		result.push_back(std::to_string((*r)->GetID()) + ": " + (*r)->GetName() + "-" + r.PluginFilename());
+		result.push_back(std::to_string((*r)->GetID() + offset - 128) + ": " + (*r)->GetName() + "-" + r.PluginFilename());
 	return result;
 }
 

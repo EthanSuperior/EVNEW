@@ -600,3 +600,11 @@ BOOL CDudeResource::DudeDlgProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lpara
 
 	return FALSE;
 }
+
+double CDudeResource::PercentAppear(short id)
+{
+	for (int i = 0; i < 16; i++)
+		if (m_iShipTypes[i] == id)
+			return m_iShipProbabilities[i];
+	return 0;
+}
