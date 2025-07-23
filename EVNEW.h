@@ -182,8 +182,6 @@ private:
 
 	OPENFILENAME m_ofnLoadSave;
 
-	int m_iIsDirty;
-
 	CWindow m_wndPreferences;
 	CWindow m_wndAbout;
 	CWindow m_wndTemplate;

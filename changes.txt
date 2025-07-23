@@ -1,0 +1,7 @@
+1. Modified CPlugIn.h to use std::string for filenames instead of char arrays.
+2. Modified CPlugIn.cpp to implement the changes from CPlugIn.h.
+3. Modified EVNEW.h to add the FileClose function to the CEditor class.
+4. Modified Workspace.h to add the Close function.
+5. Modified Workspace.cpp to implement the Close function.
+6. Modified EVNEW.cpp to add the FileClose function and tab switching logic.
+7. Modified Resources.rc to add a "Close" menu item.
