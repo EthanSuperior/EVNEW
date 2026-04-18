@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>17.0</VCProjectVersion>
+    <ProjectGuid>{FD4A49B8-A06D-46B5-BC24-2A66EF5DED82}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <IncludePath>C:\Users\User\Downloads\quicktime7windows-main\CIncludes;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\User\Downloads\quicktime7windows-main\Libraries;$(LibraryPath)</LibraryPath>
+    <OutDir>..\..\EVNova\Tools\EVNEW\</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+    <IncludePath>C:\Users\User\Downloads\quicktime7windows-main\CIncludes;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\User\Downloads\quicktime7windows-main\Libraries;$(LibraryPath)</LibraryPath>
+    <OutDir>..\..\EVNova\Tools\EVNEW\</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <WarningLevel>Level3</WarningLevel>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <AdditionalDependencies>comctl32.lib;QTMLClient.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <IgnoreSpecificDefaultLibraries>LIBCMT</IgnoreSpecificDefaultLibraries>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <WarningLevel>Level3</WarningLevel>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <AdditionalDependencies>comctl32.lib;QTMLClient.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <IgnoreSpecificDefaultLibraries>LIBCMT</IgnoreSpecificDefaultLibraries>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <WarningLevel>Level3</WarningLevel>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <PreprocessorDefinitions>NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <WarningLevel>Level3</WarningLevel>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="CBitFieldControl.cpp" />
+    <ClCompile Include="CBoomResource.cpp" />
+    <ClCompile Include="CCharResource.cpp" />
+    <ClCompile Include="CCicnResource.cpp" />
+    <ClCompile Include="CColrResource.cpp" />
+    <ClCompile Include="CControl.cpp" />
+    <ClCompile Include="CCronResource.cpp" />
+    <ClCompile Include="CDescResource.cpp" />
+    <ClCompile Include="CDudeResource.cpp" />
+    <ClCompile Include="CErrorLog.cpp" />
+    <ClCompile Include="CException.cpp" />
+    <ClCompile Include="CFletResource.cpp" />
+    <ClCompile Include="CGovtResource.cpp" />
+    <ClCompile Include="CIntfResource.cpp" />
+    <ClCompile Include="CJunkResource.cpp" />
+    <ClCompile Include="CMisnResource.cpp" />
+    <ClCompile Include="CNebuResource.cpp" />
+    <ClCompile Include="CNovaResource.cpp" />
+    <ClCompile Include="COopsResource.cpp" />
+    <ClCompile Include="COutfResource.cpp" />
+    <ClCompile Include="CPersResource.cpp" />
+    <ClCompile Include="CPictResource.cpp" />
+    <ClCompile Include="CPlugIn.cpp" />
+    <ClCompile Include="CRankResource.cpp" />
+    <ClCompile Include="CRLEResource.cpp" />
+    <ClCompile Include="CRoidResource.cpp" />
+    <ClCompile Include="CShanResource.cpp" />
+    <ClCompile Include="CShipResource.cpp" />
+    <ClCompile Include="CSndResource.cpp" />
+    <ClCompile Include="CSpinResource.cpp" />
+    <ClCompile Include="CSpobResource.cpp" />
+    <ClCompile Include="CStrlResource.cpp" />
+    <ClCompile Include="CStrResource.cpp" />
+    <ClCompile Include="CSystResource.cpp" />
+    <ClCompile Include="CUnkResource.cpp" />
+    <ClCompile Include="CWeapResource.cpp" />
+    <ClCompile Include="CWindow.cpp" />
+    <ClCompile Include="EVNEW.cpp" />
+    <ClCompile Include="Utils.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="CBitFieldControl.h" />
+    <ClInclude Include="CBoomResource.h" />
+    <ClInclude Include="CCharResource.h" />
+    <ClInclude Include="CCicnResource.h" />
+    <ClInclude Include="CColrResource.h" />
+    <ClInclude Include="CControl.h" />
+    <ClInclude Include="CCronResource.h" />
+    <ClInclude Include="CDescResource.h" />
+    <ClInclude Include="CDudeResource.h" />
+    <ClInclude Include="CErrorLog.h" />
+    <ClInclude Include="CException.h" />
+    <ClInclude Include="CFletResource.h" />
+    <ClInclude Include="CGovtResource.h" />
+    <ClInclude Include="CIntfResource.h" />
+    <ClInclude Include="CJunkResource.h" />
+    <ClInclude Include="CMisnResource.h" />
+    <ClInclude Include="CNebuResource.h" />
+    <ClInclude Include="CNovaResource.h" />
+    <ClInclude Include="COopsResource.h" />
+    <ClInclude Include="COutfResource.h" />
+    <ClInclude Include="CPersResource.h" />
+    <ClInclude Include="CPictResource.h" />
+    <ClInclude Include="CPlugIn.h" />
+    <ClInclude Include="CRankResource.h" />
+    <ClInclude Include="CRLEResource.h" />
+    <ClInclude Include="CRoidResource.h" />
+    <ClInclude Include="CShanResource.h" />
+    <ClInclude Include="CShipResource.h" />
+    <ClInclude Include="CSndResource.h" />
+    <ClInclude Include="CSpinResource.h" />
+    <ClInclude Include="CSpobResource.h" />
+    <ClInclude Include="CStrlResource.h" />
+    <ClInclude Include="CStrResource.h" />
+    <ClInclude Include="CSystResource.h" />
+    <ClInclude Include="CUnkResource.h" />
+    <ClInclude Include="CWeapResource.h" />
+    <ClInclude Include="CWindow.h" />
+    <ClInclude Include="EVNEW.h" />
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="Utils.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Resources.rc" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
