@@ -938,7 +938,7 @@ int CPlugIn::Save(CWindow *pWndParent)
 	if(m_iSaveAsText)
 	{
 		fileout << "\"Format\""              "\t\"EVNEW text 1.0.1\""        "\n"
-				   "\"Created by\""          "\t\"EVNEW 1.0.4\"" "\n"
+				   "\"Created by\""          "\t\"EVNEW 1.0.5\"" "\n"
 				   "\"Number of resources\"" "\t"
 
 				<< iNumResources << "\n\n";

@@ -2975,7 +2975,7 @@ BEGIN
     CTEXT           "Created by Adam Rosenfield",IDC_ABOUT_TEXT3,8,80,144,8,
                     SS_CENTERIMAGE | WS_TABSTOP
     DEFPUSHBUTTON   "OK",IDC_ABOUT_OK,56,106,48,16
-    CTEXT           "v1.0.4",IDC_ABOUT_TEXT4,8,62,144,8,SS_CENTERIMAGE | 
+    CTEXT           "v1.0.5",IDC_ABOUT_TEXT4,8,62,144,8,SS_CENTERIMAGE | 
                     WS_TABSTOP
 END
 
@@ -3873,7 +3873,7 @@ BEGIN
             VALUE "FileDescription", "EVNEW\0"
             VALUE "FileVersion", "1, 0, 4, 0\0"
             VALUE "InternalName", "EVNEW\0"
-            VALUE "LegalCopyright", "Copyright © 2003\0"
+            VALUE "LegalCopyright", "Copyright ï¿½ 2003\0"
             VALUE "LegalTrademarks", "\0"
             VALUE "OriginalFilename", "EVNEW.exe\0"
             VALUE "PrivateBuild", "\0"
