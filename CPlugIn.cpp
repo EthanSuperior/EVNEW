@@ -1242,9 +1242,9 @@ int CPlugIn::Save(CWindow *pWndParent)
 					{
 						iTemp = SwapEndianInt(iCount); fileout.write((char *)&iTemp, sizeof(int));
 
-						iMapOffset += 266 * m_vResources[i].size();
+						iMapOffset += 266 * iCount;
 
-						iCurIndex += m_vResources[i].size();
+						iCurIndex += iCount;
 
 						fileout.write(((CUnkResource *)m_vResources[i][j])->GetTypeCode(), 4 * sizeof(char));
 
@@ -1258,9 +1258,9 @@ int CPlugIn::Save(CWindow *pWndParent)
 
 				iTemp = SwapEndianInt(iCount); fileout.write((char *)&iTemp, sizeof(int));
 
-				iMapOffset += 266 * m_vResources[i].size();
+				iMapOffset += 266 * iCount;
 
-				iCurIndex += m_vResources[i].size();
+				iCurIndex += iCount;
 			}
 		}
 	}
