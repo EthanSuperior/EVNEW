@@ -464,6 +464,7 @@ any characters that are converted incorrectly, or anything else that might be us
  
 * Fixed an issue where UnkResources would not write back data
 * Fixed an issue where resource offsets were being ignored when reading in data
+* Fixed some missing windows encodings (#3)
 
 
 +-------------+
