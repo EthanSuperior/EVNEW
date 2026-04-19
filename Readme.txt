@@ -3,7 +3,7 @@
 *                    EVNEW                     *
 *                                              *
 *   Escape Velocity: Nova Editor for Windows   *
-*                Release 1.0.4                 *
+*                Release 1.0.5                 *
 *                                              *
 ************************************************
 
@@ -250,129 +250,129 @@ Characters that can be converted into Mac fonts:
 
  Char   Windows code
  -------------------
-  ¡      Alt+0161
+  ï¿½      Alt+0161
 
-  ¢      Alt+0162
+  ï¿½      Alt+0162
 
-  £      Alt+0163
+  ï¿½      Alt+0163
 
-  ¥      Alt+0165
+  ï¿½      Alt+0165
 
-  §      Alt+0167
+  ï¿½      Alt+0167
 
-  ©      Alt+0169
+  ï¿½      Alt+0169
 
-  «      Alt+0171
+  ï¿½      Alt+0171
 
-  ¬      Alt+0172
+  ï¿½      Alt+0172
 
-  ®      Alt+0174
+  ï¿½      Alt+0174
 
-  ¯      Alt+0175
+  ï¿½      Alt+0175
 
-  ±      Alt+0177
+  ï¿½      Alt+0177
 
-  ´      Alt+0180
+  ï¿½      Alt+0180
 
-  µ      Alt+0181
+  ï¿½      Alt+0181
 
-  »      Alt+0187
+  ï¿½      Alt+0187
 
-  ¿      Alt+0191
+  ï¿½      Alt+0191
 
-  À      Alt+0192
+  ï¿½      Alt+0192
 
-  Á      Alt+0193
+  ï¿½      Alt+0193
 
-  Â      Alt+0194
+  ï¿½      Alt+0194
 
-  Ä      Alt+0196
+  ï¿½      Alt+0196
 
-  Ç      Alt+0199
+  ï¿½      Alt+0199
 
-  È      Alt+0200
+  ï¿½      Alt+0200
 
-  É      Alt+0201
+  ï¿½      Alt+0201
 
-  Ê      Alt+0202
+  ï¿½      Alt+0202
 
-  Ë      Alt+0203
+  ï¿½      Alt+0203
 
-  Ì      Alt+0204
+  ï¿½      Alt+0204
 
-  Í      Alt+0205
+  ï¿½      Alt+0205
 
-  Î      Alt+0206
+  ï¿½      Alt+0206
 
-  Ï      Alt+0207
+  ï¿½      Alt+0207
 
-  Ñ      Alt+0209
+  ï¿½      Alt+0209
 
-  Ò      Alt+0210
+  ï¿½      Alt+0210
 
-  Ó      Alt+0211
+  ï¿½      Alt+0211
 
-  Ô      Alt+0212
+  ï¿½      Alt+0212
 
-  Õ      Alt+0213
+  ï¿½      Alt+0213
 
-  Ö      Alt+0214
+  ï¿½      Alt+0214
 
-  Ø      Alt+0216
+  ï¿½      Alt+0216
 
-  Ù      Alt+0217
+  ï¿½      Alt+0217
 
-  Û      Alt+0219
+  ï¿½      Alt+0219
 
-  Ü      Alt+0220
+  ï¿½      Alt+0220
 
-  à      Alt+0224
+  ï¿½      Alt+0224
 
-  á      Alt+0225
+  ï¿½      Alt+0225
 
-  â      Alt+0226
+  ï¿½      Alt+0226
 
-  ã      Alt+0227
+  ï¿½      Alt+0227
 
-  ä      Alt+0228
+  ï¿½      Alt+0228
 
-  å      Alt+0229
+  ï¿½      Alt+0229
 
-  æ      Alt+0230
+  ï¿½      Alt+0230
 
-  ç      Alt+0231
+  ï¿½      Alt+0231
 
-  è      Alt+0232
+  ï¿½      Alt+0232
 
-  é      Alt+0233
+  ï¿½      Alt+0233
 
-  ê      Alt+0234
+  ï¿½      Alt+0234
 
-  ë      Alt+0235
+  ï¿½      Alt+0235
 
-  ì      Alt+0236
+  ï¿½      Alt+0236
 
-  í      Alt+0237
+  ï¿½      Alt+0237
 
-  î      Alt+0238
+  ï¿½      Alt+0238
 
-  ï      Alt+0239
+  ï¿½      Alt+0239
 
-  ñ      Alt+0241
+  ï¿½      Alt+0241
 
-  ò      Alt+0242
+  ï¿½      Alt+0242
 
-  ó      Alt+0243
+  ï¿½      Alt+0243
 
-  ô      Alt+0244
+  ï¿½      Alt+0244
 
-  ö      Alt+0246
+  ï¿½      Alt+0246
 
-  ÷      Alt+0247
+  ï¿½      Alt+0247
 
-  ø      Alt+0248
+  ï¿½      Alt+0248
 
-  ü      Alt+0252
+  ï¿½      Alt+0252
 
 
 
@@ -458,6 +458,14 @@ any characters that are converted incorrectly, or anything else that might be us
 * RLE masks are now automatically generated after imports, using black as transparent pixels (but masks can still be imported separately, too)
 
 
+4/18/26: Release 1.0.5
+
+ -- Bug Fixes --
+ 
+* Fixed an issue where UnkResources would not write back data
+* Fixed an issue where resource offsets were being ignored when reading in data
+
+
 +-------------+
 | 6. Legalese |
 +-------------+
@@ -477,4 +485,4 @@ I cannot thank Ambrosia, ATMOS, and Contraband Entertainment enough for making E
 
 Mehrunes of the Ambrosia webboards, who posted a lot of detailed information on the rez file format
 The makers of the open-source projects SpriteWorld and BlitPixie, who helped me understand and work with the RLE image data format
-All of the beta testers who have been especially helpful in finding bugs and suggesting new features
+All of the beta testers who have been especially helpful in finding bugs and suggesting new features
