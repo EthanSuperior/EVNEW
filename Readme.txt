@@ -12,12 +12,45 @@
 | Table of Contents |
 +-------------------+
 
+0. Building from source (QuickTime SDK)
 1. About EVN Plugins
 2. Using EVNEW
 3. EVN Resources
 4. Miscellaneous
 5. History
 6. Legalese
+
+
++----------------------------------------+
+| 0. Building from source (QuickTime SDK) |
++----------------------------------------+
+
+EVNEW is built against the QuickTime 7 Windows headers and import libraries from the
+Olde-Skuul project (MIT license), wired in as a Git submodule so the dependency is
+explicit on GitHub:
+
+  https://github.com/Olde-Skuul/quicktime7windows
+
+After cloning EVNEW, fetch the submodule (required for CIncludes and Libraries):
+
+  git submodule update --init --recursive
+
+The Visual Studio project expects the SDK at:
+
+  external\quicktime7windows\
+
+If you keep the SDK somewhere else, set the environment variable QUICKTIME_SDK_ROOT to
+that folder before opening Visual Studio or running MSBuild, for example:
+
+  set QUICKTIME_SDK_ROOT=C:\Program Files (x86)\QuickTime
+
+That directory must contain the same layout (CIncludes\ with QTML.h, Libraries\ with
+QTMLClient.lib). A normal QuickTime Player install often does not ship this full SDK
+tree; copying the CIncludes and Libraries folders from the submodule into your chosen
+path, or using the submodule path above, is the reliable approach.
+
+At runtime, end users still need QuickTime components available to the application
+(typically a QuickTime install or a documented bundle of the same DLLs the game uses).
 
 
 +----------------------+

@@ -63,17 +63,25 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Label="LocalPaths">
+    <OutDir>$(ProjectDir)bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(ProjectDir)obj\$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <!-- QuickTime SDK: Git submodule at external/quicktime7windows → https://github.com/Olde-Skuul/quicktime7windows -->
+  <!-- Override search path: environment QUICKTIME_SDK_ROOT, or MSBuild /p:QuickTimeSdkRoot="C:\path" (folder must contain CIncludes\ and Libraries\). -->
+  <PropertyGroup Label="QuickTimeSdk">
+    <QuickTimeSdkRoot Condition="'$(QUICKTIME_SDK_ROOT)' != ''">$(QUICKTIME_SDK_ROOT)</QuickTimeSdkRoot>
+    <QuickTimeSdkRoot Condition="'$(QuickTimeSdkRoot)' == ''">$(ProjectDir)external\quicktime7windows</QuickTimeSdkRoot>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(QuickTimeSdkRoot)' != ''">
+    <IncludePath>$(QuickTimeSdkRoot)\CIncludes;$(IncludePath)</IncludePath>
+    <LibraryPath>$(QuickTimeSdkRoot)\Libraries;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>C:\Users\User\Downloads\quicktime7windows-main\CIncludes;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\User\Downloads\quicktime7windows-main\Libraries;$(LibraryPath)</LibraryPath>
-    <OutDir>..\..\EVNova\Tools\EVNEW\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>C:\Users\User\Downloads\quicktime7windows-main\CIncludes;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\User\Downloads\quicktime7windows-main\Libraries;$(LibraryPath)</LibraryPath>
-    <OutDir>..\..\EVNova\Tools\EVNEW\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>true</LinkIncremental>
@@ -115,6 +123,8 @@
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>comctl32.lib;QTMLClient.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <IgnoreSpecificDefaultLibraries>LIBCMT</IgnoreSpecificDefaultLibraries>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -127,6 +137,14 @@
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>comctl32.lib;QTMLClient.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <IgnoreSpecificDefaultLibraries>LIBCMT</IgnoreSpecificDefaultLibraries>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup>
+    <Link>
+      <!-- Prefer loading dependent DLLs from the directory containing the EXE (and default dirs). Does not replace QuickTime registry paths for .qtx/.qts. -->
+      <AdditionalOptions>/DEPENDENTLOADFLAG:0x00001200 %(AdditionalOptions)</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -218,4 +236,7 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
+  <Target Name="EnsureQuickTimeSdk" BeforeTargets="PrepareForBuild">
+    <Error Text="QuickTime SDK headers not found under $(QuickTimeSdkRoot). Run: git submodule update --init --recursive  (adds external/quicktime7windows). Or set QUICKTIME_SDK_ROOT / /p:QuickTimeSdkRoot= to a tree with CIncludes and Libraries. Upstream: https://github.com/Olde-Skuul/quicktime7windows" Condition="!Exists('$(QuickTimeSdkRoot)\CIncludes\QTML.h')" />
+  </Target>
 </Project>
