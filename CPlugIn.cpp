@@ -777,6 +777,9 @@ int CPlugIn::Load(char *szFilename, CWindow *pWndParent)
 				else
 					iIndex = j;
 
+
+				filein.seekg(vResourceOffsets[iCurIndex]);
+
 				if(m_vResources[vListTypes[i]][iIndex]->ShouldLoadDirect() == 0)
 				{
 					pResourceData = new char[vResourceLengths[iCurIndex]];
