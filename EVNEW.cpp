@@ -143,14 +143,15 @@ int CEditor::Init(HINSTANCE hInstance)
 		m_errorLog.OpenLogFile(szBuffer, 0);
 		m_errorLog.EnableLogFileAutoFlush();
 	}
-
-	m_errorLog.SetAsCurrentErrorLog();
+	
+    m_errorLog.SetAsCurrentErrorLog();
+	long qtInitFlags = qt::kInitializeQTMLUseGDIFlag | qt::kInitializeQTMLDisableDDClippers;
 
 	CEditor::ms_pCurrentEditor = this;
 
 	LoadPreferences();
 
-	qt::OSErr qtErr = qt::InitializeQTML(0);
+	qt::OSErr qtErr = qt::InitializeQTML(qtInitFlags);
 
 	if(qtErr != qt::noErr)
 	{
