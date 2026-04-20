@@ -25,32 +25,26 @@
 | 0. Building from source (QuickTime SDK) |
 +----------------------------------------+
 
-EVNEW is built against the QuickTime 7 Windows headers and import libraries from the
-Olde-Skuul project (MIT license), wired in as a Git submodule so the dependency is
-explicit on GitHub:
+EVNEW is built against the Apple QuickTime 6 Windows SDK (headers and import libraries),
+vendored under:
 
-  https://github.com/Olde-Skuul/quicktime7windows
+  external\QT6 SDK (Win)\Interfaces & Libraries\QTDevWin\
 
-After cloning EVNEW, fetch the submodule (required for CIncludes and Libraries):
+That tree must contain CIncludes\ (including QTML.h) and Libraries\ with
+qtmlClient.lib (the import library the project links against; the project file lists it
+as QTMLClient.lib).
 
-  git submodule update --init --recursive
+If you keep an equivalent SDK somewhere else, set the environment variable
+QUICKTIME_SDK_ROOT to that folder before opening Visual Studio or running MSBuild, for
+example:
 
-The Visual Studio project expects the SDK at:
+  set QUICKTIME_SDK_ROOT=C:\path\to\QTDevWin
 
-  external\quicktime7windows\
-
-If you keep the SDK somewhere else, set the environment variable QUICKTIME_SDK_ROOT to
-that folder before opening Visual Studio or running MSBuild, for example:
-
-  set QUICKTIME_SDK_ROOT=C:\Program Files (x86)\QuickTime
-
-That directory must contain the same layout (CIncludes\ with QTML.h, Libraries\ with
-QTMLClient.lib). A normal QuickTime Player install often does not ship this full SDK
-tree; copying the CIncludes and Libraries folders from the submodule into your chosen
-path, or using the submodule path above, is the reliable approach.
-
-At runtime, end users still need QuickTime components available to the application
-(typically a QuickTime install or a documented bundle of the same DLLs the game uses).
+At runtime, Windows loads QuickTime the same way as other applications: from an
+installed QuickTime (legacy QuickTime 7 on Windows is the usual case) and the system’s
+DLL search order. EVNEW does not run a post-build step that copies QuickTime binaries
+into the output folder; arrange QuickTime on the machine (or PATH) as you would for any
+other app that still uses these APIs.
 
 
 +----------------------+
