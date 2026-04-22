@@ -85,8 +85,6 @@ public:
 
 private:
 
-	int FindBPP(void);
-
 	int InitializePicture(HWND hwnd);
 
 	/** Rasterize the active PictHandle to a BMP (QuickTime) and cache for GDI painting. */
@@ -104,14 +102,16 @@ private:
 	/** Full-size preview DIB; scaled in OnPaint with GDI. QuickTime is not used for scaling. */
 	HBITMAP m_hPreviewBitmap;
 
-	qt::Handle m_hPicture;
+	/** Raw PICT data; empty means none. */
+	std::vector<UCHAR> m_vPicture;
 
 	qt::Rect m_rectDest;
 
 	short m_iTempWidth;
 	short m_iTempHeight;
 
-	qt::Handle m_hTempPicture;
+	/** In-progress PICT from import; empty means use m_vPicture for preview/export. */
+	std::vector<UCHAR> m_vTempPicture;
 
 	qt::Rect m_tempRectDest;
 

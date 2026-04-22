@@ -90,8 +90,70 @@ int SaveImageWithGDIPlus(const char *szInputFilename, const char *szOutputFilena
 	return (saveStatus == Gdiplus::Ok);
 }
 
-int ExportPictToBmpFile(qt::Handle hPic, const char *szBmpPath)
+// Same contract as QuickDraw PackBits(Ptr *srcPtr, Ptr *dstPtr, short srcBytes).
+static void EvPackBits(unsigned char **srcPtr, unsigned char **dstPtr, short srcBytes)
 {
+	unsigned char *src = *srcPtr;
+	unsigned char *dst = *dstPtr;
+	int remaining = (int)(unsigned short)srcBytes;
+
+	while(remaining > 0)
+	{
+		if(remaining >= 3 && src[0] == src[1] && src[1] == src[2])
+		{
+			unsigned char val = src[0];
+			int run = 0;
+
+			while(run < remaining && run < 128 && src[run] == val)
+				run++;
+
+			if(run >= 3)
+			{
+				*dst++ = (unsigned char)(257 - run);
+				*dst++ = val;
+				src     += run;
+				remaining -= run;
+				continue;
+			}
+		}
+
+		int lit = 0;
+
+		while(lit < remaining && lit < 128)
+		{
+			if(remaining - lit >= 3 && src[lit] == src[lit + 1] && src[lit] == src[lit + 2])
+				break;
+
+			lit++;
+		}
+
+		if(lit == 0)
+			lit = 1;
+
+		*dst++ = (unsigned char)(lit - 1);
+		memcpy(dst, src, lit);
+		dst     += lit;
+		src     += lit;
+		remaining -= lit;
+	}
+
+	*srcPtr = src;
+	*dstPtr = dst;
+}
+
+/** Copies PICT bytes into a temporary Mac handle for QuickTime, then exports to BMP. */
+static int ExportPictToBmpFile(const std::vector<UCHAR> &pictData, const char *szBmpPath)
+{
+	if(pictData.empty())
+		return 0;
+
+	qt::Handle hPic = qt::NewHandle((long)pictData.size());
+
+	if(hPic == NULL)
+		return 0;
+
+	memcpy(*hPic, &pictData[0], pictData.size());
+
 	qt::FSSpec fileSpec;
 
 	qt::CopyCStringToPascal(szBmpPath, fileSpec.name);
@@ -104,13 +166,18 @@ int ExportPictToBmpFile(qt::Handle hPic, const char *szBmpPath)
 	qt::OSErr qtErr = qt::OpenADefaultComponent(qt::GraphicsExporterComponentType, qt::kQTFileTypeBMP, &geComponent);
 
 	if(qtErr != qt::noErr)
+	{
+		qt::DisposeHandle(hPic);
 		return 0;
+	}
 
 	qtErr = qt::GraphicsExportSetInputPicture(geComponent, (qt::PicHandle)hPic);
 	qtErr = qt::GraphicsExportSetOutputFile(geComponent, &fileSpec);
 	qtErr = qt::GraphicsExportDoExport(geComponent, nil);
 
 	qt::CloseComponent(geComponent);
+
+	qt::DisposeHandle(hPic);
 
 	return (qtErr == qt::noErr);
 }
@@ -183,10 +250,6 @@ CPictResource::CPictResource(void)
 	m_iWidth  = 0;
 	m_iHeight = 0;
 
-	m_hPicture = NULL;
-
-	m_hTempPicture = NULL;
-
 	m_hPreviewBitmap = NULL;
 
 	m_rectDest.left   = 0;
@@ -199,12 +262,6 @@ CPictResource::CPictResource(void)
 
 CPictResource::~CPictResource(void)
 {
-	if(m_hPicture != NULL)
-		qt::DisposeHandle(m_hPicture);
-
-	if(m_hTempPicture != NULL)
-		qt::DisposeHandle(m_hTempPicture);
-
 	if(m_hPreviewBitmap != NULL)
 		DeleteObject(m_hPreviewBitmap);
 }
@@ -216,10 +273,7 @@ int CPictResource::GetType(void)
 
 int CPictResource::GetSize(void)
 {
-	if(m_hPicture == NULL)
-		return 0;
-	else
-		return (qt::GetHandleSize(m_hPicture));
+	return (int)m_vPicture.size();
 }
 
 int CPictResource::GetDialogID(void)
@@ -249,54 +303,46 @@ int CPictResource::ShouldLoadDirect(void)
 
 int CPictResource::SaveDirect(std::ostream & output)
 {
-	if((m_hPicture != NULL) && (qt::GetHandleSize(m_hPicture) > 0))
-		output.write(*m_hPicture, qt::GetHandleSize(m_hPicture));
+	if(m_vPicture.size() > 0)
+		output.write((char *)&m_vPicture[0], m_vPicture.size());
 
 	return 1;
 }
 
 int CPictResource::LoadDirect(std::istream & input, int iSize)
 {
-	if(m_hPicture == NULL)
-		m_hPicture = qt::NewHandle(iSize);
-	else
-		qt::SetHandleSize(m_hPicture, iSize);
+	m_vPicture.resize(iSize);
 
-	input.read(*m_hPicture, iSize);
+	input.read((char *)&m_vPicture[0], iSize);
 
-	Load(*m_hPicture, iSize);
+	Load((char *)&m_vPicture[0], iSize);
 
 	return 1;
 }
 
 int CPictResource::Save(char *pOutput)
 {
-	if((m_hPicture != NULL) && (qt::GetHandleSize(m_hPicture) > 0))
-		memcpy(pOutput, *m_hPicture, qt::GetHandleSize(m_hPicture));;
+	if(m_vPicture.size() > 0)
+		memcpy(pOutput, &m_vPicture[0], m_vPicture.size());
 
 	return 1;
 }
 
 int CPictResource::Load(char *pInput, int iSize)
 {
-	if((m_hPicture != NULL) && (pInput != *m_hPicture))
+	if(m_vPicture.empty() || pInput != (char *)&m_vPicture[0] || m_vPicture.size() != (size_t)iSize)
 	{
-		qt::SetHandleSize(m_hPicture, iSize);
+		m_vPicture.resize(iSize);
 
-		memcpy(*m_hPicture, pInput, iSize);
-	}
-	else
-	{
-		if(m_hPicture == NULL)
-		{
-			m_hPicture = qt::NewHandle(iSize);
-
-			memcpy(*m_hPicture, pInput, iSize);
-		}
+		if(pInput != (char *)&m_vPicture[0])
+			memcpy(&m_vPicture[0], pInput, iSize);
 	}
 
-	m_iWidth  = SwapEndianShort(*(short *)(*m_hPicture + 8)) - SwapEndianShort(*(short *)(*m_hPicture + 4));
-	m_iHeight = SwapEndianShort(*(short *)(*m_hPicture + 6)) - SwapEndianShort(*(short *)(*m_hPicture + 2));
+	if(m_vPicture.size() >= 10)
+	{
+		m_iWidth  = SwapEndianShort(*(short *)(&m_vPicture[0] + 8)) - SwapEndianShort(*(short *)(&m_vPicture[0] + 4));
+		m_iHeight = SwapEndianShort(*(short *)(&m_vPicture[0] + 6)) - SwapEndianShort(*(short *)(&m_vPicture[0] + 2));
+	}
 
 	m_rectDest.left   = 48;
 	m_rectDest.top    = 120;
@@ -361,12 +407,7 @@ int CPictResource::Initialize(HWND hwnd)
 	m_iTempWidth  = 0;
 	m_iTempHeight = 0;
 
-	if(m_hTempPicture != NULL)
-	{
-		qt::DisposeHandle(m_hTempPicture);
-
-		m_hTempPicture = NULL;
-	}
+	m_vTempPicture.clear();
 
 	InitializePicture(hwnd);
 
@@ -532,17 +573,13 @@ int CPictResource::CloseAndSave(void)
 
 	strcpy(m_szName, m_controls[1].GetString());
 
-	if(m_hTempPicture != NULL)
+	if(!m_vTempPicture.empty())
 	{
 		if(!m_iIsDirty)
 			m_iIsDirty = 1;
 
-		if(m_hPicture != NULL)
-			qt::DisposeHandle(m_hPicture);
-
-		m_hPicture = m_hTempPicture;
-
-		m_hTempPicture = NULL;
+		m_vPicture.swap(m_vTempPicture);
+		m_vTempPicture.clear();
 
 		m_iWidth  = m_iTempWidth;
 		m_iHeight = m_iTempHeight;
@@ -585,15 +622,10 @@ int CPictResource::CloseAndDontSave(void)
 
 	InvalidatePictPreview();
 
-	if(m_hTempPicture != NULL)
-	{
-		qt::DisposeHandle(m_hTempPicture);
+	m_vTempPicture.clear();
 
-		m_hTempPicture = NULL;
-
-		m_iTempWidth  = 0;
-		m_iTempHeight = 0;
-	}
+	m_iTempWidth  = 0;
+	m_iTempHeight = 0;
 
 	CEditor::GetCurrentEditor()->RemoveEditDialog(m_pWindow, 0);
 
@@ -616,9 +648,9 @@ int CPictResource::EnsurePictPreview(void)
 	if(m_hPreviewBitmap != NULL)
 		return 1;
 
-	qt::Handle hPict = m_hTempPicture != NULL ? m_hTempPicture : m_hPicture;
+	const std::vector<UCHAR> *pPict = !m_vTempPicture.empty() ? &m_vTempPicture : (!m_vPicture.empty() ? &m_vPicture : NULL);
 
-	if(hPict == NULL)
+	if(pPict == NULL)
 		return 0;
 
 	CEditor *pEditor = CEditor::GetCurrentEditor();
@@ -640,7 +672,7 @@ int CPictResource::EnsurePictPreview(void)
 		return 0;
 	}
 
-	if(ExportPictToBmpFile(hPict, szTempFilename) == 0)
+	if(ExportPictToBmpFile(*pPict, szTempFilename) == 0)
 	{
 		if(pEditor->PrefGenerateLogFile())
 			*pLog << "Error: Unable to rasterize PICT for preview." << CErrorLog::endl;
@@ -671,13 +703,13 @@ int CPictResource::OnPaint(void)
 
 	BeginPaint(m_pWindow->GetHWND(), &ps);
 
-	if((m_hTempPicture == NULL) && (m_hPicture == NULL))
+	if(m_vTempPicture.empty() && m_vPicture.empty())
 	{
 		EndPaint(m_pWindow->GetHWND(), &ps);
 		return 1;
 	}
 
-	qt::Rect const *pR = m_hTempPicture != NULL ? &m_tempRectDest : &m_rectDest;
+	qt::Rect const *pR = !m_vTempPicture.empty() ? &m_tempRectDest : &m_rectDest;
 
 	RECT rcDest;
 	rcDest.left   = (LONG)pR->left;
@@ -792,17 +824,14 @@ int CPictResource::FileImport(char *szFilename, int iShowErrorMessages)
 
 		filein.seekg(512, std::ios::beg);
 
-		if(m_hTempPicture != NULL)
-			qt::DisposeHandle(m_hTempPicture);
+		m_vTempPicture.resize(iSize);
 
-		m_hTempPicture = qt::NewHandle(iSize);
-
-		filein.read(*m_hTempPicture, iSize);
+		filein.read((char *)&m_vTempPicture[0], iSize);
 
 		filein.close();
 
-		m_iTempWidth  = SwapEndianShort(*(short *)(*m_hTempPicture + 8));
-		m_iTempHeight = SwapEndianShort(*(short *)(*m_hTempPicture + 6));
+		m_iTempWidth  = SwapEndianShort(*(short *)(&m_vTempPicture[0] + 8));
+		m_iTempHeight = SwapEndianShort(*(short *)(&m_vTempPicture[0] + 6));
 
 		m_tempRectDest.left   = 48;
 		m_tempRectDest.top    = 120;
@@ -892,12 +921,9 @@ int CPictResource::FileImport(char *szFilename, int iShowErrorMessages)
 
 	iMaxSize += (4 - (iMaxSize & 3)) & 3;
 
-	if(m_hTempPicture != NULL)
-		qt::DisposeHandle(m_hTempPicture);
+	m_vTempPicture.resize(iMaxSize);
 
-	m_hTempPicture = qt::NewHandleClear(iMaxSize);
-
-	UCHAR *pOutput = (UCHAR *)*m_hTempPicture;
+	UCHAR *pOutput = &m_vTempPicture[0];
 
 	UCHAR *pPictSize = pOutput; pOutput += sizeof(USHORT);	// Picture size
 
@@ -1018,7 +1044,7 @@ int CPictResource::FileImport(char *szFilename, int iShowErrorMessages)
 			{
 				pPixel = &vBMPData[(i * 3 + j) * m_iTempWidth];
 
-				qt::PackBits((char **)&pPixel, (char **)&pOutput, m_iTempWidth);
+				EvPackBits(&pPixel, &pOutput, m_iTempWidth);
 			}
 
 			if(iRowBytes <= 250)
@@ -1037,11 +1063,11 @@ int CPictResource::FileImport(char *szFilename, int iShowErrorMessages)
 
 	*(short *)pOutput = SwapEndianShort(0x00FF); pOutput += sizeof(short);	// End-of-picture opcode
 
-	int iPictSize = pOutput - (UCHAR *)*m_hTempPicture;
+	int iPictSize = pOutput - &m_vTempPicture[0];
 
 	*(USHORT *)pPictSize = SwapEndianShort((USHORT)iPictSize);
 
-	qt::SetHandleSize(m_hTempPicture, iPictSize);
+	m_vTempPicture.resize((size_t)iPictSize);
 
 	DeleteFile(szTempFilename);
 
@@ -1055,12 +1081,8 @@ int CPictResource::FileImport(char *szFilename, int iShowErrorMessages)
 	}
 	else
 	{
-		if(m_hPicture != NULL)
-			qt::DisposeHandle(m_hPicture);
-
-		m_hPicture = m_hTempPicture;
-
-		m_hTempPicture = NULL;
+		m_vPicture.swap(m_vTempPicture);
+		m_vTempPicture.clear();
 
 		m_iWidth  = m_iTempWidth;
 		m_iHeight = m_iTempHeight;
@@ -1078,7 +1100,7 @@ int CPictResource::FileImport(char *szFilename, int iShowErrorMessages)
 
 int CPictResource::FileExport(const char *szFilename, int iImageType, int iShowErrorMessages)
 {
-	if((m_hTempPicture == NULL) && (m_hPicture == NULL))
+	if(m_vTempPicture.empty() && m_vPicture.empty())
 	{
 		if(iShowErrorMessages)
 			MessageBox(m_pWindow->GetHWND(), "No picture to export.", "Error", MB_OK | MB_ICONEXCLAMATION);
@@ -1141,9 +1163,9 @@ int CPictResource::FileExport(const char *szFilename, int iImageType, int iShowE
 		szBmpFilename = szTempFilename;
 	}
 
-	qt::Handle hPict = m_hTempPicture != NULL ? m_hTempPicture : m_hPicture;
+	const std::vector<UCHAR> &pictRef = !m_vTempPicture.empty() ? m_vTempPicture : m_vPicture;
 
-	if(ExportPictToBmpFile(hPict, szBmpFilename) == 0)
+	if(ExportPictToBmpFile(pictRef, szBmpFilename) == 0)
 	{
 		if(pEditor->PrefGenerateLogFile())
 			*pLog << "Error: Unable to export PICT to bitmap for FileExport!" << CErrorLog::endl;
