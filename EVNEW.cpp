@@ -15,22 +15,8 @@
 
 // How to compile EVNEW:
 
-// EVNEW uses the QuickTime Software Development Kit (SDK) for several things.
-// You can download the SDK from 
-// <http://developer.apple.com/quicktime>
-// Once the SDK is installed, add to your compiler's search paths for headers
-// and libraries the locations of the QT SDK headers and libraries, or just
-// copy them into your compiler's header and library directories.  Using
-// Microsoft Visual C++, you do this by going to Tools -> Options, clicking
-// the Directories tab, and adding the QT directories to the lists under
-// Include files and Library files.  Finally, you have to link the project
-// to qtmlClient.lib and comctl32.lib .  In MSVC, you do this by going to
-// Project -> Settings, clicking the Link tab, and adding qtmlClient.lib to the
-// Object/library modules box.  When the project is being linked, you may get a
-// warning:
-// "LINK : warning LNK4098: defaultlib "LIBCMT" conflicts with use of other
-//         libs; use /NODEFAULTLIB:library"
-// You can ignore this.
+// Build and dependency notes are maintained in Readme.txt.
+
 
 ////////////////////////////////////////////////////////////////
 //////////////////////////	INCLUDES  //////////////////////////
@@ -43,11 +29,6 @@
 #include <commctrl.h>
 
 #include <algorithm>
-
-namespace qt
-{
-#include <QTML.h>
-}
 
 #include "EVNEW.h"
 #include "CPlugIn.h"
@@ -145,22 +126,10 @@ int CEditor::Init(HINSTANCE hInstance)
 	}
 	
     m_errorLog.SetAsCurrentErrorLog();
-	long qtInitFlags = qt::kInitializeQTMLUseGDIFlag | qt::kInitializeQTMLDisableDDClippers;
 
 	CEditor::ms_pCurrentEditor = this;
 
 	LoadPreferences();
-
-	qt::OSErr qtErr = qt::InitializeQTML(qtInitFlags);
-
-	if(qtErr != qt::noErr)
-	{
-		m_errorLog << "Error: Unable to initialize QTML!" << CErrorLog::endl;
-
-		MessageBox(NULL, "QuickTime is not installed on this computer.\nEVNEW requires QuickTime to run.", "Error", MB_OK | MB_ICONEXCLAMATION);
-
-		return 0;
-	}
 
 	char szArg1[MAX_PATH], szArg2[MAX_PATH], szArg3[MAX_PATH];
 
@@ -364,8 +333,6 @@ int CEditor::Shutdown(void)
 	m_plugIn.ClearFilename();
 
 	m_dialogMain.Destroy();
-
-	qt::TerminateQTML();
 
 	m_errorLog.CloseLogFile();
 

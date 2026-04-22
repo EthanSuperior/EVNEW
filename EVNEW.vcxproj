@@ -67,15 +67,8 @@
     <OutDir>$(ProjectDir)bin\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(ProjectDir)obj\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
-  <PropertyGroup Label="QuickTimeSdk">
-    <QuickTimeSdk6DevWin>$(ProjectDir)external\QT6 SDK (Win)\Interfaces &amp; Libraries\QTDevWin</QuickTimeSdk6DevWin>
-    <QuickTimeSdkRoot Condition="'$(QUICKTIME_SDK_ROOT)' != ''">$(QUICKTIME_SDK_ROOT)</QuickTimeSdkRoot>
-    <QuickTimeSdkRoot Condition="'$(QuickTimeSdkRoot)' == ''">$(QuickTimeSdk6DevWin)</QuickTimeSdkRoot>
-  </PropertyGroup>
-  <Import Project="$(ProjectDir)EVNEW.QuickTime.local.props" Condition="Exists('$(ProjectDir)EVNEW.QuickTime.local.props')" />
-  <PropertyGroup Condition="'$(QuickTimeSdkRoot)' != ''">
-    <IncludePath>$(QuickTimeSdkRoot)\CIncludes;$(IncludePath)</IncludePath>
-    <LibraryPath>$(QuickTimeSdkRoot)\Libraries;$(LibraryPath)</LibraryPath>
+  <PropertyGroup>
+    <IncludePath>$(ProjectDir)external\Graphite;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
@@ -93,25 +86,25 @@
     <ClCompile>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <WarningLevel>Level3</WarningLevel>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
-      <AdditionalDependencies>comctl32.lib;QTMLClient.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>comctl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <IgnoreSpecificDefaultLibraries>LIBCMT</IgnoreSpecificDefaultLibraries>
-      <!-- Apple QT 6 qtmlClient.lib has no SAFESEH metadata; required to link with modern MSVC. -->
-      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <WarningLevel>Level3</WarningLevel>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
-      <AdditionalDependencies>comctl32.lib;QTMLClient.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>comctl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <IgnoreSpecificDefaultLibraries>LIBCMT</IgnoreSpecificDefaultLibraries>
     </Link>
   </ItemDefinitionGroup>
@@ -119,28 +112,29 @@
     <ClCompile>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <WarningLevel>Level3</WarningLevel>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>comctl32.lib;QTMLClient.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>comctl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <IgnoreSpecificDefaultLibraries>LIBCMT</IgnoreSpecificDefaultLibraries>
-      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <WarningLevel>Level3</WarningLevel>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>comctl32.lib;QTMLClient.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>comctl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <IgnoreSpecificDefaultLibraries>LIBCMT</IgnoreSpecificDefaultLibraries>
     </Link>
   </ItemDefinitionGroup>
@@ -183,6 +177,33 @@
     <ClCompile Include="CWeapResource.cpp" />
     <ClCompile Include="CWindow.cpp" />
     <ClCompile Include="EVNEW.cpp" />
+    <ClCompile Include="external\Graphite\libGraphite\data\data.cpp" />
+    <ClCompile Include="external\Graphite\libGraphite\data\reader.cpp" />
+    <ClCompile Include="external\Graphite\libGraphite\data\writer.cpp" />
+    <ClCompile Include="external\Graphite\libGraphite\encoding\macroman\macroman.cpp" />
+    <ClCompile Include="external\Graphite\libGraphite\quickdraw\cicn.cpp" />
+    <ClCompile Include="external\Graphite\libGraphite\quickdraw\clut.cpp" />
+    <ClCompile Include="external\Graphite\libGraphite\quickdraw\geometry.cpp" />
+    <ClCompile Include="external\Graphite\libGraphite\quickdraw\internal\color.cpp" />
+    <ClCompile Include="external\Graphite\libGraphite\quickdraw\internal\packbits.cpp" />
+    <ClCompile Include="external\Graphite\libGraphite\quickdraw\internal\surface.cpp" />
+    <ClCompile Include="external\Graphite\libGraphite\quickdraw\pict.cpp" />
+    <ClCompile Include="external\Graphite\libGraphite\quickdraw\pixmap.cpp" />
+    <ClCompile Include="external\Graphite\libGraphite\quickdraw\ppat.cpp" />
+    <ClCompile Include="external\Graphite\libGraphite\quickdraw\rle.cpp" />
+    <ClCompile Include="external\Graphite\libGraphite\quicktime\animation.cpp" />
+    <ClCompile Include="external\Graphite\libGraphite\quicktime\imagedesc.cpp" />
+    <ClCompile Include="external\Graphite\libGraphite\quicktime\planar.cpp" />
+    <ClCompile Include="external\Graphite\libGraphite\quicktime\raw.cpp" />
+    <ClCompile Include="external\Graphite\libGraphite\resources\sound.cpp" />
+    <ClCompile Include="external\Graphite\libGraphite\resources\string.cpp" />
+    <ClCompile Include="external\Graphite\libGraphite\rsrc\classic.cpp" />
+    <ClCompile Include="external\Graphite\libGraphite\rsrc\extended.cpp" />
+    <ClCompile Include="external\Graphite\libGraphite\rsrc\file.cpp" />
+    <ClCompile Include="external\Graphite\libGraphite\rsrc\manager.cpp" />
+    <ClCompile Include="external\Graphite\libGraphite\rsrc\resource.cpp" />
+    <ClCompile Include="external\Graphite\libGraphite\rsrc\rez.cpp" />
+    <ClCompile Include="external\Graphite\libGraphite\rsrc\type.cpp" />
     <ClCompile Include="Utils.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -233,7 +254,4 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
-  <Target Name="EnsureQuickTimeSdk" BeforeTargets="PrepareForBuild">
-    <Error Text="QuickTime SDK headers not found under $(QuickTimeSdkRoot) (expected CIncludes\QTML.h). Add external\QT6 SDK (Win)\Interfaces &amp; Libraries\QTDevWin, or set QUICKTIME_SDK_ROOT / QuickTimeSdkRoot to a folder with CIncludes and Libraries." Condition="!Exists('$(QuickTimeSdkRoot)\CIncludes\QTML.h')" />
-  </Target>
 </Project>

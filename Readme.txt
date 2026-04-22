@@ -12,7 +12,7 @@
 | Table of Contents |
 +-------------------+
 
-0. Building from source (QuickTime SDK)
+0. Building from source
 1. About EVN Plugins
 2. Using EVNEW
 3. EVN Resources
@@ -22,29 +22,22 @@
 
 
 +----------------------------------------+
-| 0. Building from source (QuickTime SDK) |
+| 0. Building from source                 |
 +----------------------------------------+
 
-EVNEW is built against the Apple QuickTime 6 Windows SDK (headers and import libraries),
-vendored under:
+EVNEW now builds without the Apple QuickTime SDK, instead using Win32/GDI+ plus libGraphite.
 
-  external\QT6 SDK (Win)\Interfaces & Libraries\QTDevWin\
+To build:
 
-That tree must contain CIncludes\ (including QTML.h) and Libraries\ with
-qtmlClient.lib (the import library the project links against; the project file lists it
-as QTMLClient.lib).
+1) Initialize submodules:
 
-If you keep an equivalent SDK somewhere else, set the environment variable
-QUICKTIME_SDK_ROOT to that folder before opening Visual Studio or running MSBuild, for
-example:
+  git submodule update --init --recursive
 
-  set QUICKTIME_SDK_ROOT=C:\path\to\QTDevWin
+2) Open EVNEW.sln in Visual Studio (or build EVNEW.vcxproj with MSBuild).
 
-At runtime, Windows loads QuickTime the same way as other applications: from an
-installed QuickTime (legacy QuickTime 7 on Windows is the usual case) and the system’s
-DLL search order. EVNEW does not run a post-build step that copies QuickTime binaries
-into the output folder; arrange QuickTime on the machine (or PATH) as you would for any
-other app that still uses these APIs.
+The project already includes libGraphite sources from:
+
+  external\Graphite\libGraphite\
 
 
 +----------------------+
@@ -140,8 +133,9 @@ imported from monochrome (1-bit) bitmaps.
 ii. pict
 
 Pict resources are single-frame images stored in a Mac-native format.  They do not have masks, but they often exist in pairs, of which
-one is the image and the other is the mask for that image.  You can import any image file the QuickTime can read into a pict, and you can
-export to .bmp, .png, .jpg, .pic, .tiff, and .tga.  Picts are used for almost all still images, buttons, menu items, and other things.
+one is the image and the other is the mask for that image.  You can import common image
+formats into a pict, and you can export to .bmp, .png, .jpg, and .tiff.  Picts are used
+for almost all still images, buttons, menu items, and other things.
 
 iii. rle8 / rleD
 
@@ -154,7 +148,8 @@ layed out in three separate files, where each file contains a 6x6 grid of 100x10
 Width and Height to 100 and X Frames and Y Frames to 6 for all three imports.  For the first file, you'd enter 1 as the first frame, For
 the second, you'd enter 37 as the first frame, and for the third you'd enter 73 as the first frame.  You'd enter 36 as the number of
 frames for all of them.  You then do likewise for the masks.  Exporting works very similarly to importing.  Like picts, rle resources can
-be imported from any image file QuickTime can read, and they can be exported to a variety of different formats.
+be imported from common image formats, and they can be exported to a variety of
+different formats.
 
 Many rle resources will have too many frames to fit on one screen.  You can enter different values in the X Frames and Y Frames fields and
 hit the Update button to rearrange the frames.  This does not affect the internal storage of the frames, as they are all stored as a bunch
@@ -238,7 +233,8 @@ on one computer or between multiple computers and they will still load correctly
 
 A note of caution: batch exporting graphics and sounds via the EVNEW text feature will take a huge amount of memory and time.  It takes a
 lot of memory and computing power to perform these operations.  This is the most apparent when exporting rle8s and rleDs.  First the RLE data
-has to be decompressed into raw data, it has to be arranged into tiles, and then QuickTime has to change that back into the image file.  Most
+has to be decompressed into raw data, it has to be arranged into tiles, and then encoded
+back into image files.  Most
 of the time spent performing these operations is actually spent just allocating the memory needed.  If you're having trouble batch exporting
 rle8s and rleDs, try breaking up your plugin into several smaller files.  This shouldn't take too long using cut and paste (Ctrl+X and
 Ctrl+V).
@@ -485,7 +481,10 @@ any characters that are converted incorrectly, or anything else that might be us
 * RLE masks are now automatically generated after imports, using black as transparent pixels (but masks can still be imported separately, too)
 
 
-4/18/26: Release 1.0.5
+4/18/26: Release 1.1.0
+
+ -- Features --
+ * Remove QuickTime in favor of libGraphite
 
  -- Bug Fixes --
  
