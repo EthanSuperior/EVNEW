@@ -22,15 +22,6 @@ class CPictResource;
 #include <vector>
 #include <string>
 
-namespace qt
-{
-#include <QTML.h>
-#include <QuickDraw.h>
-#include <ImageCompression.h>
-#include <QuickTimeComponents.h>
-#include <TextUtils.h>
-}
-
 #include "CControl.h"
 #include "CNovaResource.h"
 #include "Utils.h"
@@ -45,6 +36,17 @@ const int NUM_PICT_FIELDS = 3;
 
 const std::string g_szPictFields[NUM_PICT_FIELDS] =
 	{"Width", "Height", "Filename"};
+
+/** Mac QuickDraw `Rect` layout (top, left, bottom, right) for PICT bounds and GDI destination. */
+#pragma pack(push, 2)
+struct MacPictRect
+{
+	short top;
+	short left;
+	short bottom;
+	short right;
+};
+#pragma pack(pop)
 
 ////////////////////////////////////////////////////////////////
 ///////////////////////////  CLASSES  //////////////////////////
@@ -105,7 +107,7 @@ private:
 	/** Raw PICT data; empty means none. */
 	std::vector<UCHAR> m_vPicture;
 
-	qt::Rect m_rectDest;
+	MacPictRect m_rectDest;
 
 	short m_iTempWidth;
 	short m_iTempHeight;
@@ -113,7 +115,7 @@ private:
 	/** In-progress PICT from import; empty means use m_vPicture for preview/export. */
 	std::vector<UCHAR> m_vTempPicture;
 
-	qt::Rect m_tempRectDest;
+	MacPictRect m_tempRectDest;
 
 	int m_iIsDirty;
 

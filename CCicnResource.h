@@ -22,12 +22,6 @@ class CCicnResource;
 #include <vector>
 #include <string>
 
-namespace qt
-{
-#include <QTML.h>
-#include <Icons.h>
-}
-
 #include "CControl.h"
 #include "CNovaResource.h"
 #include "Utils.h"

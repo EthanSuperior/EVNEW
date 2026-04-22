@@ -22,6 +22,15 @@
 
 #include "resource.h"
 
+namespace qt
+{
+#include <QTML.h>
+#include <QuickDraw.h>
+#include <ImageCompression.h>
+#include <QuickTimeComponents.h>
+#include <TextUtils.h>
+}
+
 namespace
 {
 int GetEncoderClsid(const WCHAR *pMimeType, CLSID *pClsid)
@@ -709,7 +718,7 @@ int CPictResource::OnPaint(void)
 		return 1;
 	}
 
-	qt::Rect const *pR = !m_vTempPicture.empty() ? &m_tempRectDest : &m_rectDest;
+	MacPictRect const *pR = !m_vTempPicture.empty() ? &m_tempRectDest : &m_rectDest;
 
 	RECT rcDest;
 	rcDest.left   = (LONG)pR->left;
@@ -927,14 +936,14 @@ int CPictResource::FileImport(char *szFilename, int iShowErrorMessages)
 
 	UCHAR *pPictSize = pOutput; pOutput += sizeof(USHORT);	// Picture size
 
-	qt::Rect rectImage;
+	MacPictRect rectImage;
 
-	rectImage.left   = SwapEndianShort(0x0000);
 	rectImage.top    = SwapEndianShort(0x0000);
-	rectImage.right  = SwapEndianShort(m_iTempWidth);
+	rectImage.left   = SwapEndianShort(0x0000);
 	rectImage.bottom = SwapEndianShort(m_iTempHeight);
+	rectImage.right  = SwapEndianShort(m_iTempWidth);
 
-	*(qt::Rect *)pOutput = rectImage; pOutput += sizeof(qt::Rect);	// Bounding rectangle
+	*(MacPictRect *)pOutput = rectImage; pOutput += sizeof(MacPictRect);	// Bounding rectangle
 
 	*(short *)pOutput = SwapEndianShort(0x0011); pOutput += sizeof(short);	// Version opcode
 	*(short *)pOutput = SwapEndianShort(0x02FF); pOutput += sizeof(short);	// Extended version 2 picture
@@ -944,14 +953,14 @@ int CPictResource::FileImport(char *szFilename, int iShowErrorMessages)
 	*(short *)pOutput = SwapEndianShort(0x0000); pOutput += sizeof(short);	// Reserved
 	*(int   *)pOutput = SwapEndianInt(0x00480000); pOutput += sizeof(int);	// Horizontal resolution (72 dpi)
 	*(int   *)pOutput = SwapEndianInt(0x00480000); pOutput += sizeof(int);	// Vertical resolution (72 dpi)
-	*(qt::Rect *)pOutput = rectImage;            pOutput += sizeof(qt::Rect);	// Bounding rectangle
+	*(MacPictRect *)pOutput = rectImage;            pOutput += sizeof(MacPictRect);	// Bounding rectangle
 	*(int   *)pOutput = SwapEndianInt(0x00000000); pOutput += sizeof(int);	// Reserved
 
 	*(short *)pOutput = SwapEndianShort(0x001E); pOutput += sizeof(short);	// Default highlight opcode
 
 	*(short *)pOutput = SwapEndianShort(0x0001); pOutput += sizeof(short);	// Clipping region opcode
 	*(short *)pOutput = SwapEndianShort(0x000A); pOutput += sizeof(short);	// Clipping region size (10 bytes)
-	*(qt::Rect *)pOutput = rectImage;            pOutput += sizeof(qt::Rect);	// Clipping rectangle
+	*(MacPictRect *)pOutput = rectImage;            pOutput += sizeof(MacPictRect);	// Clipping rectangle
 
 	*(short *)pOutput = SwapEndianShort(0x009A); pOutput += sizeof(short);	// Direct bits opcode
 
@@ -961,7 +970,7 @@ int CPictResource::FileImport(char *szFilename, int iShowErrorMessages)
 
 	*(USHORT *)pOutput = SwapEndianShort(0x8000 | iRowBytes); pOutput += sizeof(USHORT); // PixMap.rowBytes
 
-	*(qt::Rect *)pOutput = rectImage;            pOutput += sizeof(qt::Rect);	// PixMap.bounds
+	*(MacPictRect *)pOutput = rectImage;            pOutput += sizeof(MacPictRect);	// PixMap.bounds
 	*(short *)pOutput = SwapEndianShort(0x0000); pOutput += sizeof(short);	// PixMap.pmVersion
 	*(short *)pOutput = SwapEndianShort(0x0004); pOutput += sizeof(short);	// PixMap.packType (PackBits)
 	*(int   *)pOutput = SwapEndianInt(0x00000000); pOutput += sizeof(int);	// PixMap.packSize
@@ -975,8 +984,8 @@ int CPictResource::FileImport(char *szFilename, int iShowErrorMessages)
 	*(int   *)pOutput = SwapEndianInt(0x00000000); pOutput += sizeof(int);	// PixMap.pmTable
 	*(int   *)pOutput = SwapEndianInt(0x00000000); pOutput += sizeof(int);	// PixMap.pmReserved
 
-	*(qt::Rect *)pOutput = rectImage; pOutput += sizeof(qt::Rect);	// Source rectangle
-	*(qt::Rect *)pOutput = rectImage; pOutput += sizeof(qt::Rect);	// Destination rectangle
+	*(MacPictRect *)pOutput = rectImage; pOutput += sizeof(MacPictRect);	// Source rectangle
+	*(MacPictRect *)pOutput = rectImage; pOutput += sizeof(MacPictRect);	// Destination rectangle
 
 	*(short *)pOutput = SwapEndianShort(0x0000); pOutput += sizeof(short);	// Transfer mode (source copy)
 

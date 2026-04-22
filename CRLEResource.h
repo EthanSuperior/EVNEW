@@ -22,14 +22,6 @@ class CRLEResource;
 #include <vector>
 #include <string>
 
-namespace qt
-{
-#include <QTML.h>
-#include <ImageCompression.h>
-#include <QuickTimeComponents.h>
-#include <TextUtils.h>
-}
-
 #include "CControl.h"
 #include "CNovaResource.h"
 #include "Utils.h"
