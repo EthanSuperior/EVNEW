@@ -3,7 +3,7 @@
 *                    EVNEW                     *
 *                                              *
 *   Escape Velocity: Nova Editor for Windows   *
-*                Release 1.0.5                 *
+*                Release 1.1.0                 *
 *                                              *
 ************************************************
 
