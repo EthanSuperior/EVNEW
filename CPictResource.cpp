@@ -10,6 +10,9 @@
 
 #include <windows.h>
 #include <windowsx.h>
+#include <gdiplus.h>
+
+#pragma comment(lib, "gdiplus.lib")
 
 #include "CWindow.h"
 
@@ -18,6 +21,133 @@
 #include "CPictResource.h"
 
 #include "resource.h"
+
+namespace
+{
+int GetEncoderClsid(const WCHAR *pMimeType, CLSID *pClsid)
+{
+	UINT iNumEncoders = 0;
+	UINT iEncoderInfoSize = 0;
+
+	if(Gdiplus::GetImageEncodersSize(&iNumEncoders, &iEncoderInfoSize) != Gdiplus::Ok || iEncoderInfoSize == 0)
+		return 0;
+
+	std::vector<UCHAR> vEncoderInfo(iEncoderInfoSize);
+	Gdiplus::ImageCodecInfo *pEncoderInfo = (Gdiplus::ImageCodecInfo *)&vEncoderInfo[0];
+
+	if(Gdiplus::GetImageEncoders(iNumEncoders, iEncoderInfoSize, pEncoderInfo) != Gdiplus::Ok)
+		return 0;
+
+	for(UINT i = 0; i < iNumEncoders; i++)
+	{
+		if(wcscmp(pEncoderInfo[i].MimeType, pMimeType) == 0)
+		{
+			*pClsid = pEncoderInfo[i].Clsid;
+			return 1;
+		}
+	}
+
+	return 0;
+}
+
+int SaveImageWithGDIPlus(const char *szInputFilename, const char *szOutputFilename, const WCHAR *pMimeType)
+{
+	WCHAR szInputFilenameW[MAX_PATH];
+	WCHAR szOutputFilenameW[MAX_PATH];
+
+	if(MultiByteToWideChar(CP_ACP, 0, szInputFilename, -1, szInputFilenameW, MAX_PATH) == 0)
+		return 0;
+
+	if(MultiByteToWideChar(CP_ACP, 0, szOutputFilename, -1, szOutputFilenameW, MAX_PATH) == 0)
+		return 0;
+
+	Gdiplus::GdiplusStartupInput startupInput;
+	ULONG_PTR iToken = 0;
+
+	if(Gdiplus::GdiplusStartup(&iToken, &startupInput, NULL) != Gdiplus::Ok)
+		return 0;
+
+	Gdiplus::Bitmap image(szInputFilenameW);
+
+	if(image.GetLastStatus() != Gdiplus::Ok)
+	{
+		Gdiplus::GdiplusShutdown(iToken);
+		return 0;
+	}
+
+	CLSID encoderClsid;
+
+	if(GetEncoderClsid(pMimeType, &encoderClsid) == 0)
+	{
+		Gdiplus::GdiplusShutdown(iToken);
+		return 0;
+	}
+
+	Gdiplus::Status saveStatus = image.Save(szOutputFilenameW, &encoderClsid, NULL);
+
+	Gdiplus::GdiplusShutdown(iToken);
+
+	return (saveStatus == Gdiplus::Ok);
+}
+
+int ConvertImageTo24BppBmp(const char *szInputFilename, const char *szOutputFilename)
+{
+	WCHAR szInputFilenameW[MAX_PATH];
+	WCHAR szOutputFilenameW[MAX_PATH];
+
+	if(MultiByteToWideChar(CP_ACP, 0, szInputFilename, -1, szInputFilenameW, MAX_PATH) == 0)
+		return 0;
+
+	if(MultiByteToWideChar(CP_ACP, 0, szOutputFilename, -1, szOutputFilenameW, MAX_PATH) == 0)
+		return 0;
+
+	Gdiplus::GdiplusStartupInput startupInput;
+	ULONG_PTR iToken = 0;
+
+	if(Gdiplus::GdiplusStartup(&iToken, &startupInput, NULL) != Gdiplus::Ok)
+		return 0;
+
+	Gdiplus::Bitmap sourceImage(szInputFilenameW);
+
+	if(sourceImage.GetLastStatus() != Gdiplus::Ok)
+	{
+		Gdiplus::GdiplusShutdown(iToken);
+		return 0;
+	}
+
+	UINT iWidth = sourceImage.GetWidth();
+	UINT iHeight = sourceImage.GetHeight();
+
+	if((iWidth == 0) || (iHeight == 0))
+	{
+		Gdiplus::GdiplusShutdown(iToken);
+		return 0;
+	}
+
+	Gdiplus::Bitmap bmp24(iWidth, iHeight, PixelFormat24bppRGB);
+	Gdiplus::Graphics graphics(&bmp24);
+
+	if(graphics.DrawImage(&sourceImage, 0, 0, iWidth, iHeight) != Gdiplus::Ok)
+	{
+		Gdiplus::GdiplusShutdown(iToken);
+		return 0;
+	}
+
+	CLSID bmpClsid;
+
+	if(GetEncoderClsid(L"image/bmp", &bmpClsid) == 0)
+	{
+		Gdiplus::GdiplusShutdown(iToken);
+		return 0;
+	}
+
+	Gdiplus::Status saveStatus = bmp24.Save(szOutputFilenameW, &bmpClsid, NULL);
+
+	Gdiplus::GdiplusShutdown(iToken);
+
+	return (saveStatus == Gdiplus::Ok);
+}
+}
 
 ////////////////////////////////////////////////////////////////
 ///////////////////  CLASS MEMBER FUNCTIONS  ///////////////////
@@ -498,7 +628,7 @@ int CPictResource::FileImport(char *szFilename, int iShowErrorMessages)
 		ofn.nMaxFile      = MAX_PATH;
 		ofn.nMaxFileTitle = MAX_PATH;
 		ofn.lpstrTitle    = "Import Picture";
-		ofn.lpstrFilter   = "Image Files\0*.bmp;*.png;*.jpg;*.jpeg;*.gif;*.pic;*.tiff;*.tga\0All Files (*.*)\0*.*\0";
+		ofn.lpstrFilter   = "Image Files\0*.bmp;*.png;*.jpg;*.jpeg;*.gif;*.pic;*.tiff\0All Files (*.*)\0*.*\0";
 		ofn.nFilterIndex  = 1;
 		ofn.lpstrDefExt   = "bmp";
 		ofn.Flags         = OFN_HIDEREADONLY | OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST;
@@ -576,36 +706,6 @@ int CPictResource::FileImport(char *szFilename, int iShowErrorMessages)
 		return 1;
 	}
 
-	qt::FSSpec fileSpec1, fileSpec2;
-
-	qt::CopyCStringToPascal(szFilename2, fileSpec1.name);
-
-	fileSpec1.vRefNum = 0;
-	fileSpec1.parID   = 0;
-
-	qt::GraphicsImportComponent giComponent;
-	qt::GraphicsExportComponent geComponent;
-
-	qt::OSErr qtErr;
-
-	qtErr = qt::GetGraphicsImporterForFile(&fileSpec1, &giComponent);
-
-	if(qtErr != qt::noErr)
-	{
-		if(pEditor->PrefGenerateLogFile())
-			*pLog << "Error: Unable to get a graphics importer for PICT resource!" << CErrorLog::endl;
-
-		std::string szError = "\"";
-
-		szError += szFilename2;
-		szError += "\" is not a supported image file!";
-
-		if(iShowErrorMessages)
-			MessageBox(m_pWindow->GetHWND(), szError.c_str(), "Error", MB_OK | MB_ICONEXCLAMATION);
-
-		return 0;
-	}
-
 	char szTempFilename[MAX_PATH];
 
 	strcpy(szTempFilename, "PICT");
@@ -618,56 +718,29 @@ int CPictResource::FileImport(char *szFilename, int iShowErrorMessages)
 		if(pEditor->PrefGenerateLogFile())
 			*pLog << "Error: Unable to make temporary file for importing PICT resource!" << CErrorLog::endl;
 
-		qt::CloseComponent(giComponent);
-
 		if(iShowErrorMessages)
 			MessageBox(m_pWindow->GetHWND(), "Import failed!", "Error", MB_OK | MB_ICONEXCLAMATION);
 
 		return 0;
 	}
 
-//	*pLog << "Temporary filename: " << szTempFilename << "\nBeginning QuickTime stuff...\n";
-
-	qt::CopyCStringToPascal(szTempFilename, fileSpec2.name);
-
-	fileSpec2.vRefNum = 0;
-	fileSpec2.parID   = 0;
-
-	qtErr = qt::OpenADefaultComponent(qt::GraphicsExporterComponentType, qt::kQTFileTypeBMP, &geComponent);
-
-	if(qtErr != qt::noErr)
+	if(ConvertImageTo24BppBmp(szFilename2, szTempFilename) == 0)
 	{
 		if(pEditor->PrefGenerateLogFile())
-			*pLog << "Error: Unable to open default QuickTime bitmap component!" << CErrorLog::endl;
+			*pLog << "Error: Unable to load image \"" << szFilename2 << "\" for PICT resource!" << CErrorLog::endl;
 
-		qt::CloseComponent(giComponent);
-
+		DeleteFile(szTempFilename);
+		
 		if(iShowErrorMessages)
-			MessageBox(m_pWindow->GetHWND(), "Import failed!", "Error", MB_OK | MB_ICONEXCLAMATION);
+		{
+			std::string szError = "\"";
+			szError += szFilename2;
+			szError += "\" is not a supported image file!";
+			MessageBox(m_pWindow->GetHWND(), szError.c_str(), "Error", MB_OK | MB_ICONEXCLAMATION);
+		}
 
 		return 0;
 	}
-
-//	*pLog << "OpenADefaultComponent(): " << qtErr << '\n';
-
-	qtErr = qt::GraphicsExportSetInputGraphicsImporter(geComponent, giComponent);
-
-//	*pLog << "GraphicsExportSetInputGraphicsImporter(): " << qtErr << '\n';
-
-	qtErr = qt::GraphicsExportSetOutputFile(geComponent, &fileSpec2);
-
-//	*pLog << "GraphicsExportSetOutputFile(): " << qtErr << '\n';
-
-	qtErr = qt::GraphicsExportSetDepth(geComponent, 24);
-
-//	*pLog << "GraphicsExportSetDepth(): " << qtErr << '\n';
-
-	qtErr = qt::GraphicsExportDoExport(geComponent, nil);
-
-//	*pLog << "GraphicsExportDoExport(): " << qtErr << '\n';
-
-	qt::CloseComponent(geComponent);
-	qt::CloseComponent(giComponent);
 
 	BITMAPFILEHEADER bmfh;
 	BITMAPINFOHEADER bmih;
@@ -917,7 +990,7 @@ int CPictResource::FileExport(const char *szFilename, int iImageType, int iShowE
 		ofn.nMaxFile      = MAX_PATH;
 		ofn.nMaxFileTitle = MAX_PATH;
 		ofn.lpstrTitle    = "Export Picture";
-		ofn.lpstrFilter   = "Bitmap (*.bmp)\0*.bmp\0Portable Network Graphics (*.png)\0*.png\0JPEG (*.jpg)\0*.jpg;*.jpeg\0Mac PICT (*.pic)\0*.pic\0TIFF (*.tiff)\0*.tiff\0Targa (*.tga)\0*.tga\0";
+		ofn.lpstrFilter   = "Bitmap (*.bmp)\0*.bmp\0Portable Network Graphics (*.png)\0*.png\0JPEG (*.jpg)\0*.jpg;*.jpeg\0TIFF (*.tiff)\0*.tiff\0";
 		ofn.nFilterIndex  = 1;
 		ofn.lpstrDefExt   = "bmp";
 		ofn.Flags         = OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT;
@@ -934,54 +1007,37 @@ int CPictResource::FileExport(const char *szFilename, int iImageType, int iShowE
 		strcpy(szFilename2, szFilename);
 	}
 
-	if(iImageType == 3)
+	char szTempFilename[MAX_PATH];
+	const char *szBmpFilename = szFilename2;
+
+	if(iImageType != 0)
 	{
-		std::ofstream outfile;
+		strcpy(szTempFilename, "PICT");
 
-		outfile.open(szFilename2, std::ios::out | std::ios::trunc | std::ios::binary);
+		if(pEditor->GenerateTempFilename(szTempFilename) == 0)
+		{
+			if(pEditor->PrefGenerateLogFile())
+				*pLog << "Error: Unable to make temporary file for exporting PICT resource!" << CErrorLog::endl;
 
-		char cJunk = 0x00;
+			if(iShowErrorMessages)
+				MessageBox(m_pWindow->GetHWND(), "Export failed!", "Error", MB_OK | MB_ICONEXCLAMATION);
 
-		int i;
+			return 0;
+		}
 
-		for(i = 0; i < 512; i++)
-			outfile.write(&cJunk, sizeof(char));
-
-		if(m_hTempPicture != NULL)
-			outfile.write(*m_hTempPicture, qt::GetHandleSize(m_hTempPicture));
-		else
-			outfile.write(*m_hPicture, qt::GetHandleSize(m_hPicture));
-
-		outfile.close();
-
-		return 1;
+		szBmpFilename = szTempFilename;
 	}
 
 	qt::FSSpec fileSpec;
-
 	qt::OSErr qtErr;
-
 	qt::GraphicsExportComponent geComponent;
 
-	qt::CopyCStringToPascal(szFilename2, fileSpec.name);
+	qt::CopyCStringToPascal(szBmpFilename, fileSpec.name);
 
 	fileSpec.vRefNum = 0;
 	fileSpec.parID   = 0;
 
-	int iComponentType;
-
-	if(iImageType == 0)
-		iComponentType = qt::kQTFileTypeBMP;
-	else if(iImageType == 1)
-		iComponentType = qt::kQTFileTypePNG;
-	else if(iImageType == 2)
-		iComponentType = qt::kQTFileTypeJPEG;
-	else if(iImageType == 4)
-		iComponentType = qt::kQTFileTypeTIFF;
-	else
-		iComponentType = qt::kQTFileTypeTargaImage;
-
-	qtErr = qt::OpenADefaultComponent(qt::GraphicsExporterComponentType, iComponentType, &geComponent);
+	qtErr = qt::OpenADefaultComponent(qt::GraphicsExporterComponentType, qt::kQTFileTypeBMP, &geComponent);
 
 	if(m_hTempPicture != NULL)
 		qtErr = qt::GraphicsExportSetInputPicture(geComponent, (qt::PicHandle)m_hTempPicture);
@@ -989,10 +1045,36 @@ int CPictResource::FileExport(const char *szFilename, int iImageType, int iShowE
 		qtErr = qt::GraphicsExportSetInputPicture(geComponent, (qt::PicHandle)m_hPicture);
 
 	qtErr = qt::GraphicsExportSetOutputFile(geComponent, &fileSpec);
-
 	qtErr = qt::GraphicsExportDoExport(geComponent, nil);
 
 	qt::CloseComponent(geComponent);
+
+	if(iImageType != 0)
+	{
+		const WCHAR *pMimeType;
+
+		if(iImageType == 1)
+			pMimeType = L"image/png";
+		else if(iImageType == 2)
+			pMimeType = L"image/jpeg";
+		else
+			pMimeType = L"image/tiff";
+
+		if(SaveImageWithGDIPlus(szBmpFilename, szFilename2, pMimeType) == 0)
+		{
+			if(pEditor->PrefGenerateLogFile())
+				*pLog << "Error: Unable to save exported PICT image using GDI+!" << CErrorLog::endl;
+
+			DeleteFile(szTempFilename);
+
+			if(iShowErrorMessages)
+				MessageBox(m_pWindow->GetHWND(), "Export failed!", "Error", MB_OK | MB_ICONEXCLAMATION);
+
+			return 0;
+		}
+
+		DeleteFile(szTempFilename);
+	}
 
 	return 1;
 }

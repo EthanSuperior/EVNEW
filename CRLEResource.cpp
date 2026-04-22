@@ -10,6 +10,9 @@
 
 #include <windows.h>
 #include <windowsx.h>
+#include <gdiplus.h>
+
+#pragma comment(lib, "gdiplus.lib")
 
 #include "CWindow.h"
 
@@ -18,6 +21,139 @@
 #include "CRLEResource.h"
 
 #include "resource.h"
+
+namespace
+{
+int GetEncoderClsid(const WCHAR *pMimeType, CLSID *pClsid)
+{
+	UINT iNumEncoders = 0;
+	UINT iEncoderInfoSize = 0;
+
+	if(Gdiplus::GetImageEncodersSize(&iNumEncoders, &iEncoderInfoSize) != Gdiplus::Ok || iEncoderInfoSize == 0)
+		return 0;
+
+	std::vector<UCHAR> vEncoderInfo(iEncoderInfoSize);
+	Gdiplus::ImageCodecInfo *pEncoderInfo = (Gdiplus::ImageCodecInfo *)&vEncoderInfo[0];
+
+	if(Gdiplus::GetImageEncoders(iNumEncoders, iEncoderInfoSize, pEncoderInfo) != Gdiplus::Ok)
+		return 0;
+
+	for(UINT i = 0; i < iNumEncoders; i++)
+	{
+		if(wcscmp(pEncoderInfo[i].MimeType, pMimeType) == 0)
+		{
+			*pClsid = pEncoderInfo[i].Clsid;
+			return 1;
+		}
+	}
+
+	return 0;
+}
+
+int SaveImageWithGDIPlus(const char *szInputFilename, const char *szOutputFilename, const WCHAR *pMimeType)
+{
+	WCHAR szInputFilenameW[MAX_PATH];
+	WCHAR szOutputFilenameW[MAX_PATH];
+
+	if(MultiByteToWideChar(CP_ACP, 0, szInputFilename, -1, szInputFilenameW, MAX_PATH) == 0)
+		return 0;
+
+	if(MultiByteToWideChar(CP_ACP, 0, szOutputFilename, -1, szOutputFilenameW, MAX_PATH) == 0)
+		return 0;
+
+	Gdiplus::GdiplusStartupInput startupInput;
+	ULONG_PTR iToken = 0;
+
+	if(Gdiplus::GdiplusStartup(&iToken, &startupInput, NULL) != Gdiplus::Ok)
+		return 0;
+
+	Gdiplus::Bitmap image(szInputFilenameW);
+
+	if(image.GetLastStatus() != Gdiplus::Ok)
+	{
+		Gdiplus::GdiplusShutdown(iToken);
+		return 0;
+	}
+
+	CLSID encoderClsid;
+
+	if(GetEncoderClsid(pMimeType, &encoderClsid) == 0)
+	{
+		Gdiplus::GdiplusShutdown(iToken);
+		return 0;
+	}
+
+	Gdiplus::Status saveStatus = image.Save(szOutputFilenameW, &encoderClsid, NULL);
+
+	Gdiplus::GdiplusShutdown(iToken);
+
+	return (saveStatus == Gdiplus::Ok);
+}
+
+int ConvertImageTo24BppBmp(const char *szInputFilename, const char *szOutputFilename, int *pWidth, int *pHeight)
+{
+	WCHAR szInputFilenameW[MAX_PATH];
+	WCHAR szOutputFilenameW[MAX_PATH];
+
+	if(MultiByteToWideChar(CP_ACP, 0, szInputFilename, -1, szInputFilenameW, MAX_PATH) == 0)
+		return 0;
+
+	if(MultiByteToWideChar(CP_ACP, 0, szOutputFilename, -1, szOutputFilenameW, MAX_PATH) == 0)
+		return 0;
+
+	Gdiplus::GdiplusStartupInput startupInput;
+	ULONG_PTR iToken = 0;
+
+	if(Gdiplus::GdiplusStartup(&iToken, &startupInput, NULL) != Gdiplus::Ok)
+		return 0;
+
+	Gdiplus::Bitmap sourceImage(szInputFilenameW);
+
+	if(sourceImage.GetLastStatus() != Gdiplus::Ok)
+	{
+		Gdiplus::GdiplusShutdown(iToken);
+		return 0;
+	}
+
+	UINT iWidth = sourceImage.GetWidth();
+	UINT iHeight = sourceImage.GetHeight();
+
+	if((iWidth == 0) || (iHeight == 0))
+	{
+		Gdiplus::GdiplusShutdown(iToken);
+		return 0;
+	}
+
+	Gdiplus::Bitmap bmp24(iWidth, iHeight, PixelFormat24bppRGB);
+	Gdiplus::Graphics graphics(&bmp24);
+
+	if(graphics.DrawImage(&sourceImage, 0, 0, iWidth, iHeight) != Gdiplus::Ok)
+	{
+		Gdiplus::GdiplusShutdown(iToken);
+		return 0;
+	}
+
+	CLSID bmpClsid;
+
+	if(GetEncoderClsid(L"image/bmp", &bmpClsid) == 0)
+	{
+		Gdiplus::GdiplusShutdown(iToken);
+		return 0;
+	}
+
+	Gdiplus::Status saveStatus = bmp24.Save(szOutputFilenameW, &bmpClsid, NULL);
+
+	Gdiplus::GdiplusShutdown(iToken);
+
+	if(saveStatus != Gdiplus::Ok)
+		return 0;
+
+	*pWidth = (int)iWidth;
+	*pHeight = (int)iHeight;
+
+	return 1;
+}
+}
 
 ////////////////////////////////////////////////////////////////
 ///////////////////  CLASS MEMBER FUNCTIONS  ///////////////////
@@ -1019,7 +1155,7 @@ int CRLEResource::DoImportBrowse(void)
 	ofn.nMaxFile      = MAX_PATH;
 	ofn.nMaxFileTitle = MAX_PATH;
 	ofn.lpstrTitle    = "Import RLE Resource";
-	ofn.lpstrFilter   = "Image Files\0*.bmp;*.png;*.jpg;*.jpeg;*.gif;*.pic;*.tiff;*.tga\0All Files (*.*)\0*.*\0";
+	ofn.lpstrFilter   = "Image Files\0*.bmp;*.png;*.jpg;*.jpeg;*.gif;*.tiff\0All Files (*.*)\0*.*\0";
 	ofn.nFilterIndex  = 1;
 	ofn.lpstrDefExt   = "bmp";
 	ofn.Flags         = OFN_HIDEREADONLY | OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST;
@@ -1115,43 +1251,6 @@ int CRLEResource::DoImport(const char *szFilename, int iIsImage, int iNumFramesT
 		return 0;
 	}
 
-	qt::FSSpec fileSpec;
-
-	qt::OSErr qtErr;
-
-	qt::GraphicsImportComponent giComponent;
-	qt::GraphicsExportComponent geComponent;
-
-	qt::CopyCStringToPascal(szFilename, fileSpec.name);
-
-	fileSpec.vRefNum = 0;
-	fileSpec.parID   = 0;
-
-	qtErr = qt::GetGraphicsImporterForFile(&fileSpec, &giComponent);
-
-	if(qtErr != qt::noErr)
-	{
-		if(pEditor->PrefGenerateLogFile())
-			*pLog << "Error: Unable to get graphics importer for \"" << szFilename << "\" for RLE resource!" << CErrorLog::endl;
-
-		szError = "Unable to open file \"";
-		szError += szFilename;
-		szError += "\"!";
-
-		if(iShowErrorMessages)
-			MessageBox(m_wndImport.GetHWND(), szError.c_str(), "Error", MB_OK | MB_ICONEXCLAMATION);
-
-		if(m_wndImport.IsCreated())
-		{
-			for(i = 0; i < NUM_RLE_IMPORT_CONTROLS; i++)
-				m_importControls[i].Destroy();
-
-			m_wndImport.Destroy();
-		}
-
-		return 0;
-	}
-
 	m_iWidth  = iWidth;
 	m_iHeight = iHeight;
 
@@ -1174,21 +1273,6 @@ int CRLEResource::DoImport(const char *szFilename, int iIsImage, int iNumFramesT
 		}
 	}
 
-	qt::Rect rectImage;
-
-	qtErr = qt::GraphicsImportGetNaturalBounds(giComponent, &rectImage);
-
-	rectImage.right  -= rectImage.left;
-	rectImage.bottom -= rectImage.top;
-	rectImage.left    = 0;
-	rectImage.top     = 0;
-
-	if(m_iWidth * iFramesPerRow > rectImage.right)
-		iFramesPerRow = rectImage.right / m_iWidth;
-
-	if(m_iHeight * iFramesPerColumn > rectImage.bottom)
-		iFramesPerColumn = rectImage.bottom / m_iHeight;
-
 	char szTempFilename[MAX_PATH];
 
 	strcpy(szTempFilename, "RLE");
@@ -1200,8 +1284,6 @@ int CRLEResource::DoImport(const char *szFilename, int iIsImage, int iNumFramesT
 	{
 		if(pEditor->PrefGenerateLogFile())
 			*pLog << "Error: Unable to make temporary file for RLE resource!" << CErrorLog::endl;
-
-		qt::CloseComponent(giComponent);
 
 		if(iShowErrorMessages)
 			MessageBox(m_wndImport.GetHWND(), "Import failed!", "Error", MB_OK | MB_ICONEXCLAMATION);
@@ -1217,21 +1299,33 @@ int CRLEResource::DoImport(const char *szFilename, int iIsImage, int iNumFramesT
 		return 0;
 	}
 
-	qtErr = qt::OpenADefaultComponent(qt::GraphicsExporterComponentType, qt::kQTFileTypeBMP, &geComponent);
+	int iSourceWidth = 0;
+	int iSourceHeight = 0;
 
-	qtErr = qt::GraphicsExportSetInputGraphicsImporter(geComponent, giComponent);
+	if(ConvertImageTo24BppBmp(szFilename, szTempFilename, &iSourceWidth, &iSourceHeight) == 0)
+	{
+		if(pEditor->PrefGenerateLogFile())
+			*pLog << "Error: Unable to load image \"" << szFilename << "\" for RLE resource!" << CErrorLog::endl;
 
-	qt::CopyCStringToPascal(szTempFilename, fileSpec.name);
+		DeleteFile(szTempFilename);
 
-	qtErr = qt::GraphicsExportSetOutputFile(geComponent, &fileSpec);
+		szError = "Unable to open file \"";
+		szError += szFilename;
+		szError += "\"!";
 
-	qtErr = qt::GraphicsExportSetDepth(geComponent, 24);
+		if(iShowErrorMessages)
+			MessageBox(m_wndImport.GetHWND(), szError.c_str(), "Error", MB_OK | MB_ICONEXCLAMATION);
 
-	qtErr = qt::GraphicsExportDoExport(geComponent, nil);
+		if(m_wndImport.IsCreated())
+		{
+			for(i = 0; i < NUM_RLE_IMPORT_CONTROLS; i++)
+				m_importControls[i].Destroy();
 
-	qt::CloseComponent(geComponent);
+			m_wndImport.Destroy();
+		}
 
-	qt::CloseComponent(giComponent);
+		return 0;
+	}
 
 	BITMAPFILEHEADER bmfh;
 	BITMAPINFOHEADER bmih;
@@ -1266,10 +1360,22 @@ int CRLEResource::DoImport(const char *szFilename, int iIsImage, int iNumFramesT
 	infile.read((char *)&bmfh, sizeof(BITMAPFILEHEADER));
 	infile.read((char *)&bmih, sizeof(BITMAPINFOHEADER));
 
-	int iAlignment = (4 - ((rectImage.right * 3) & 3)) & 3;
+	int iBmpWidth = bmih.biWidth;
+	int iBmpHeight = bmih.biHeight;
 
-	for(i = iFramesPerColumn * m_iHeight; i < rectImage.bottom; i++)
-		infile.seekg(rectImage.right * 3 + iAlignment, std::ios::cur);
+	if(iBmpHeight < 0)
+		iBmpHeight = -iBmpHeight;
+
+	if(m_iWidth * iFramesPerRow > iBmpWidth)
+		iFramesPerRow = iBmpWidth / m_iWidth;
+
+	if(m_iHeight * iFramesPerColumn > iBmpHeight)
+		iFramesPerColumn = iBmpHeight / m_iHeight;
+
+	int iAlignment = (4 - ((iBmpWidth * 3) & 3)) & 3;
+
+	for(i = iFramesPerColumn * m_iHeight; i < iBmpHeight; i++)
+		infile.seekg(iBmpWidth * 3 + iAlignment, std::ios::cur);
 
 	int iCurFrame;
 
@@ -1300,7 +1406,7 @@ int CRLEResource::DoImport(const char *szFilename, int iIsImage, int iNumFramesT
 				}
 			}
 
-			infile.seekg((rectImage.right - iFramesPerRow * m_iWidth) * 3 + iAlignment, std::ios::cur);
+			infile.seekg((iBmpWidth - iFramesPerRow * m_iWidth) * 3 + iAlignment, std::ios::cur);
 		}
 	}
 
@@ -1619,28 +1725,21 @@ int CRLEResource::DoExport(const char *szFilename, int iIsImage, int iNumFramesT
 
 	if(m_iExportFilter != 1)
 	{
-		qt::FSSpec fileSpec;
+		const WCHAR *pMimeType;
 
-		qt::OSErr qtErr;
+		if(m_iExportFilter == 2)
+			pMimeType = L"image/png";
+		else if(m_iExportFilter == 3)
+			pMimeType = L"image/jpeg";
+		else
+			pMimeType = L"image/tiff";
 
-		qt::GraphicsImportComponent giComponent;
-		qt::GraphicsExportComponent geComponent;
-
-		qt::CopyCStringToPascal(szTempFilename, fileSpec.name);
-
-		fileSpec.vRefNum = 0;
-		fileSpec.parID   = 0;
-
-		qtErr = qt::GetGraphicsImporterForFile(&fileSpec, &giComponent);
-
-		if(qtErr != qt::noErr)
+		if(SaveImageWithGDIPlus(szTempFilename, szFilename, pMimeType) == 0)
 		{
 			if(pEditor->PrefGenerateLogFile())
-				*pLog << "Error: Unable to get graphics importer for temporary BMP for RLE export!" << CErrorLog::endl;
+				*pLog << "Error: Unable to save exported RLE image using GDI+!" << CErrorLog::endl;
 
 			DeleteFile(szTempFilename);
-
-//			free(szTempFilename);
 
 			if(iShowErrorMessages)
 				MessageBox(m_wndImport.GetHWND(), "Export failed!", "Error", MB_OK | MB_ICONEXCLAMATION);
@@ -1656,31 +1755,7 @@ int CRLEResource::DoExport(const char *szFilename, int iIsImage, int iNumFramesT
 			return 0;
 		}
 
-		int iImageType;
-
-		if(m_iExportFilter == 2)
-			iImageType = qt::kQTFileTypePNG;
-		else if(m_iExportFilter == 3)
-			iImageType = qt::kQTFileTypeJPEG;
-		else
-			iImageType = qt::kQTFileTypeTIFF;
-
-		qtErr = qt::OpenADefaultComponent(qt::GraphicsExporterComponentType, iImageType, &geComponent);
-
-		qtErr = qt::GraphicsExportSetInputGraphicsImporter(geComponent, giComponent);
-
-		qt::CopyCStringToPascal(szFilename, fileSpec.name);
-
-		qtErr = qt::GraphicsExportSetOutputFile(geComponent, &fileSpec);
-
-		qtErr = qt::GraphicsExportDoExport(geComponent, nil);
-
-		qt::CloseComponent(geComponent);
-		qt::CloseComponent(giComponent);
-
 		DeleteFile(szTempFilename);
-
-//		free(szTempFilename);
 	}
 
 	if(m_wndExport.IsCreated())
