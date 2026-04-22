@@ -89,7 +89,7 @@ private:
 
 	int InitializePicture(HWND hwnd);
 
-	/** Rasterize the active PictHandle to a BMP (QuickTime) and cache for GDI painting. */
+	/** Rasterize the active PICT into a cached BMP for GDI painting. */
 	int EnsurePictPreview(void);
 	void InvalidatePictPreview(void);
 
@@ -101,7 +101,7 @@ private:
 	short m_iWidth;
 	short m_iHeight;
 
-	/** Full-size preview DIB; scaled in OnPaint with GDI. QuickTime is not used for scaling. */
+	/** Full-size preview DIB; scaled in OnPaint with GDI. */
 	HBITMAP m_hPreviewBitmap;
 
 	/** Raw PICT data; empty means none. */

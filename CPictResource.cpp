@@ -11,8 +11,15 @@
 #include <windows.h>
 #include <windowsx.h>
 #include <gdiplus.h>
+#include <memory>
+#include <vector>
 
 #pragma comment(lib, "gdiplus.lib")
+
+#include <libGraphite/data/data.hpp>
+#include <libGraphite/quickdraw/pict.hpp>
+#include <libGraphite/quickdraw/internal/surface.hpp>
+#include <libGraphite/quickdraw/internal/color.hpp>
 
 #include "CWindow.h"
 
@@ -21,234 +28,6 @@
 #include "CPictResource.h"
 
 #include "resource.h"
-
-namespace qt
-{
-#include <QTML.h>
-#include <QuickDraw.h>
-#include <ImageCompression.h>
-#include <QuickTimeComponents.h>
-#include <TextUtils.h>
-}
-
-namespace
-{
-int GetEncoderClsid(const WCHAR *pMimeType, CLSID *pClsid)
-{
-	UINT iNumEncoders = 0;
-	UINT iEncoderInfoSize = 0;
-
-	if(Gdiplus::GetImageEncodersSize(&iNumEncoders, &iEncoderInfoSize) != Gdiplus::Ok || iEncoderInfoSize == 0)
-		return 0;
-
-	std::vector<UCHAR> vEncoderInfo(iEncoderInfoSize);
-	Gdiplus::ImageCodecInfo *pEncoderInfo = (Gdiplus::ImageCodecInfo *)&vEncoderInfo[0];
-
-	if(Gdiplus::GetImageEncoders(iNumEncoders, iEncoderInfoSize, pEncoderInfo) != Gdiplus::Ok)
-		return 0;
-
-	for(UINT i = 0; i < iNumEncoders; i++)
-	{
-		if(wcscmp(pEncoderInfo[i].MimeType, pMimeType) == 0)
-		{
-			*pClsid = pEncoderInfo[i].Clsid;
-			return 1;
-		}
-	}
-
-	return 0;
-}
-
-int SaveImageWithGDIPlus(const char *szInputFilename, const char *szOutputFilename, const WCHAR *pMimeType)
-{
-	WCHAR szInputFilenameW[MAX_PATH];
-	WCHAR szOutputFilenameW[MAX_PATH];
-
-	if(MultiByteToWideChar(CP_ACP, 0, szInputFilename, -1, szInputFilenameW, MAX_PATH) == 0)
-		return 0;
-
-	if(MultiByteToWideChar(CP_ACP, 0, szOutputFilename, -1, szOutputFilenameW, MAX_PATH) == 0)
-		return 0;
-
-	Gdiplus::GdiplusStartupInput startupInput;
-	ULONG_PTR iToken = 0;
-
-	if(Gdiplus::GdiplusStartup(&iToken, &startupInput, NULL) != Gdiplus::Ok)
-		return 0;
-
-	Gdiplus::Bitmap image(szInputFilenameW);
-
-	if(image.GetLastStatus() != Gdiplus::Ok)
-	{
-		Gdiplus::GdiplusShutdown(iToken);
-		return 0;
-	}
-
-	CLSID encoderClsid;
-
-	if(GetEncoderClsid(pMimeType, &encoderClsid) == 0)
-	{
-		Gdiplus::GdiplusShutdown(iToken);
-		return 0;
-	}
-
-	Gdiplus::Status saveStatus = image.Save(szOutputFilenameW, &encoderClsid, NULL);
-
-	Gdiplus::GdiplusShutdown(iToken);
-
-	return (saveStatus == Gdiplus::Ok);
-}
-
-// Same contract as QuickDraw PackBits(Ptr *srcPtr, Ptr *dstPtr, short srcBytes).
-static void EvPackBits(unsigned char **srcPtr, unsigned char **dstPtr, short srcBytes)
-{
-	unsigned char *src = *srcPtr;
-	unsigned char *dst = *dstPtr;
-	int remaining = (int)(unsigned short)srcBytes;
-
-	while(remaining > 0)
-	{
-		if(remaining >= 3 && src[0] == src[1] && src[1] == src[2])
-		{
-			unsigned char val = src[0];
-			int run = 0;
-
-			while(run < remaining && run < 128 && src[run] == val)
-				run++;
-
-			if(run >= 3)
-			{
-				*dst++ = (unsigned char)(257 - run);
-				*dst++ = val;
-				src     += run;
-				remaining -= run;
-				continue;
-			}
-		}
-
-		int lit = 0;
-
-		while(lit < remaining && lit < 128)
-		{
-			if(remaining - lit >= 3 && src[lit] == src[lit + 1] && src[lit] == src[lit + 2])
-				break;
-
-			lit++;
-		}
-
-		if(lit == 0)
-			lit = 1;
-
-		*dst++ = (unsigned char)(lit - 1);
-		memcpy(dst, src, lit);
-		dst     += lit;
-		src     += lit;
-		remaining -= lit;
-	}
-
-	*srcPtr = src;
-	*dstPtr = dst;
-}
-
-/** Copies PICT bytes into a temporary Mac handle for QuickTime, then exports to BMP. */
-static int ExportPictToBmpFile(const std::vector<UCHAR> &pictData, const char *szBmpPath)
-{
-	if(pictData.empty())
-		return 0;
-
-	qt::Handle hPic = qt::NewHandle((long)pictData.size());
-
-	if(hPic == NULL)
-		return 0;
-
-	memcpy(*hPic, &pictData[0], pictData.size());
-
-	qt::FSSpec fileSpec;
-
-	qt::CopyCStringToPascal(szBmpPath, fileSpec.name);
-
-	fileSpec.vRefNum = 0;
-	fileSpec.parID   = 0;
-
-	qt::GraphicsExportComponent geComponent;
-
-	qt::OSErr qtErr = qt::OpenADefaultComponent(qt::GraphicsExporterComponentType, qt::kQTFileTypeBMP, &geComponent);
-
-	if(qtErr != qt::noErr)
-	{
-		qt::DisposeHandle(hPic);
-		return 0;
-	}
-
-	qtErr = qt::GraphicsExportSetInputPicture(geComponent, (qt::PicHandle)hPic);
-	qtErr = qt::GraphicsExportSetOutputFile(geComponent, &fileSpec);
-	qtErr = qt::GraphicsExportDoExport(geComponent, nil);
-
-	qt::CloseComponent(geComponent);
-
-	qt::DisposeHandle(hPic);
-
-	return (qtErr == qt::noErr);
-}
-
-int ConvertImageTo24BppBmp(const char *szInputFilename, const char *szOutputFilename)
-{
-	WCHAR szInputFilenameW[MAX_PATH];
-	WCHAR szOutputFilenameW[MAX_PATH];
-
-	if(MultiByteToWideChar(CP_ACP, 0, szInputFilename, -1, szInputFilenameW, MAX_PATH) == 0)
-		return 0;
-
-	if(MultiByteToWideChar(CP_ACP, 0, szOutputFilename, -1, szOutputFilenameW, MAX_PATH) == 0)
-		return 0;
-
-	Gdiplus::GdiplusStartupInput startupInput;
-	ULONG_PTR iToken = 0;
-
-	if(Gdiplus::GdiplusStartup(&iToken, &startupInput, NULL) != Gdiplus::Ok)
-		return 0;
-
-	Gdiplus::Bitmap sourceImage(szInputFilenameW);
-
-	if(sourceImage.GetLastStatus() != Gdiplus::Ok)
-	{
-		Gdiplus::GdiplusShutdown(iToken);
-		return 0;
-	}
-
-	UINT iWidth = sourceImage.GetWidth();
-	UINT iHeight = sourceImage.GetHeight();
-
-	if((iWidth == 0) || (iHeight == 0))
-	{
-		Gdiplus::GdiplusShutdown(iToken);
-		return 0;
-	}
-
-	Gdiplus::Bitmap bmp24(iWidth, iHeight, PixelFormat24bppRGB);
-	Gdiplus::Graphics graphics(&bmp24);
-
-	if(graphics.DrawImage(&sourceImage, 0, 0, iWidth, iHeight) != Gdiplus::Ok)
-	{
-		Gdiplus::GdiplusShutdown(iToken);
-		return 0;
-	}
-
-	CLSID bmpClsid;
-
-	if(GetEncoderClsid(L"image/bmp", &bmpClsid) == 0)
-	{
-		Gdiplus::GdiplusShutdown(iToken);
-		return 0;
-	}
-
-	Gdiplus::Status saveStatus = bmp24.Save(szOutputFilenameW, &bmpClsid, NULL);
-
-	Gdiplus::GdiplusShutdown(iToken);
-
-	return (saveStatus == Gdiplus::Ok);
-}
-}
 
 ////////////////////////////////////////////////////////////////
 ///////////////////  CLASS MEMBER FUNCTIONS  ///////////////////
@@ -669,41 +448,50 @@ int CPictResource::EnsurePictPreview(void)
 
 	CErrorLog *pLog  = CErrorLog::GetCurrentErrorLog();
 
-	char szTempFilename[MAX_PATH];
+	try
+	{
+		std::shared_ptr<std::vector<char> > bytes(new std::vector<char>(pPict->size()));
+		for(size_t i = 0; i < pPict->size(); i++)
+			(*bytes)[i] = (char)(*pPict)[i];
 
-	strcpy(szTempFilename, "PICTPV");
+		std::shared_ptr<graphite::data::data> data(new graphite::data::data(bytes, pPict->size(), 0));
+		std::shared_ptr<graphite::qd::pict> pict(new graphite::qd::pict(data));
+		std::shared_ptr<graphite::qd::surface> surface = pict->image_surface().lock();
 
-	if(pEditor->GenerateTempFilename(szTempFilename) == 0)
+		if(surface == NULL)
+			return 0;
+
+		graphite::qd::size sz = surface->size();
+		std::vector<uint32_t> raw = surface->raw();
+
+		BITMAPINFO bmi;
+		ZeroMemory(&bmi, sizeof(BITMAPINFO));
+		bmi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+		bmi.bmiHeader.biWidth = sz.width();
+		bmi.bmiHeader.biHeight = -sz.height();
+		bmi.bmiHeader.biPlanes = 1;
+		bmi.bmiHeader.biBitCount = 32;
+		bmi.bmiHeader.biCompression = BI_RGB;
+
+		HDC hdc = GetDC(m_pWindow->GetHWND());
+		void *pBits = NULL;
+		m_hPreviewBitmap = CreateDIBSection(hdc, &bmi, DIB_RGB_COLORS, &pBits, NULL, 0);
+		ReleaseDC(m_pWindow->GetHWND(), hdc);
+
+		if(m_hPreviewBitmap == NULL || pBits == NULL)
+			return 0;
+
+		memcpy(pBits, &raw[0], raw.size() * sizeof(uint32_t));
+	}
+	catch(...)
 	{
 		if(pEditor->PrefGenerateLogFile())
-			*pLog << "Error: Unable to make temporary file for PICT preview!" << CErrorLog::endl;
+			*pLog << "Error: Unable to rasterize PICT with Graphite for preview." << CErrorLog::endl;
 
 		return 0;
 	}
 
-	if(ExportPictToBmpFile(*pPict, szTempFilename) == 0)
-	{
-		if(pEditor->PrefGenerateLogFile())
-			*pLog << "Error: Unable to rasterize PICT for preview." << CErrorLog::endl;
-
-		DeleteFile(szTempFilename);
-
-		return 0;
-	}
-
-	m_hPreviewBitmap = (HBITMAP)LoadImageA(NULL, szTempFilename, IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
-
-	DeleteFile(szTempFilename);
-
-	if(m_hPreviewBitmap == NULL)
-	{
-		if(pEditor->PrefGenerateLogFile())
-			*pLog << "Error: Unable to load PICT preview bitmap." << CErrorLog::endl;
-
-		return 0;
-	}
-
-	return 1;
+	return m_hPreviewBitmap != NULL;
 }
 
 int CPictResource::OnPaint(void)
@@ -855,31 +643,63 @@ int CPictResource::FileImport(char *szFilename, int iShowErrorMessages)
 		return 1;
 	}
 
-	char szTempFilename[MAX_PATH];
+	WCHAR szFilenameW[MAX_PATH];
 
-	strcpy(szTempFilename, "PICT");
-
-//	szTempFilename = _tempnam(pEditor->GetTempFileDirectory(), "PICT");
-
-//	if(szTempFilename == NULL)
-	if(pEditor->GenerateTempFilename(szTempFilename) == 0)
-	{
-		if(pEditor->PrefGenerateLogFile())
-			*pLog << "Error: Unable to make temporary file for importing PICT resource!" << CErrorLog::endl;
-
-		if(iShowErrorMessages)
-			MessageBox(m_pWindow->GetHWND(), "Import failed!", "Error", MB_OK | MB_ICONEXCLAMATION);
-
+	if(MultiByteToWideChar(CP_ACP, 0, szFilename2, -1, szFilenameW, MAX_PATH) == 0)
 		return 0;
-	}
 
-	if(ConvertImageTo24BppBmp(szFilename2, szTempFilename) == 0)
+	try
+	{
+		Gdiplus::GdiplusStartupInput startupInput;
+		ULONG_PTR iToken = 0;
+
+		if(Gdiplus::GdiplusStartup(&iToken, &startupInput, NULL) != Gdiplus::Ok)
+			return 0;
+
+		Gdiplus::Bitmap sourceImage(szFilenameW);
+		if(sourceImage.GetLastStatus() != Gdiplus::Ok)
+		{
+			Gdiplus::GdiplusShutdown(iToken);
+			return 0;
+		}
+
+		UINT iWidth = sourceImage.GetWidth();
+		UINT iHeight = sourceImage.GetHeight();
+
+		std::shared_ptr<graphite::qd::surface> surface(new graphite::qd::surface((int)iWidth, (int)iHeight));
+
+		for(UINT y = 0; y < iHeight; y++)
+		{
+			for(UINT x = 0; x < iWidth; x++)
+			{
+				Gdiplus::Color c;
+				sourceImage.GetPixel(x, y, &c);
+				surface->set((int)x, (int)y, graphite::qd::color(c.GetR(), c.GetG(), c.GetB(), c.GetA()));
+			}
+		}
+
+		std::shared_ptr<graphite::qd::pict> pict = graphite::qd::pict::from_surface(surface);
+		std::shared_ptr<graphite::data::data> pictData = pict->data(false);
+		std::shared_ptr<std::vector<char> > bytes = pictData->get();
+
+		m_vTempPicture.resize(pictData->size());
+		for(size_t i = 0; i < pictData->size(); i++)
+			m_vTempPicture[i] = (UCHAR)(*bytes)[i];
+
+		Gdiplus::GdiplusShutdown(iToken);
+
+		m_iTempWidth = (short)iWidth;
+		m_iTempHeight = (short)iHeight;
+		m_tempRectDest.left   = 48;
+		m_tempRectDest.top    = 120;
+		m_tempRectDest.right  = m_tempRectDest.left + m_iTempWidth;
+		m_tempRectDest.bottom = m_tempRectDest.top  + m_iTempHeight;
+	}
+	catch(...)
 	{
 		if(pEditor->PrefGenerateLogFile())
-			*pLog << "Error: Unable to load image \"" << szFilename2 << "\" for PICT resource!" << CErrorLog::endl;
+			*pLog << "Error: Unable to load image \"" << szFilename2 << "\" for PICT resource using Graphite!" << CErrorLog::endl;
 
-		DeleteFile(szTempFilename);
-		
 		if(iShowErrorMessages)
 		{
 			std::string szError = "\"";
@@ -887,223 +707,25 @@ int CPictResource::FileImport(char *szFilename, int iShowErrorMessages)
 			szError += "\" is not a supported image file!";
 			MessageBox(m_pWindow->GetHWND(), szError.c_str(), "Error", MB_OK | MB_ICONEXCLAMATION);
 		}
-
 		return 0;
 	}
-
-	BITMAPFILEHEADER bmfh;
-	BITMAPINFOHEADER bmih;
-
-	std::ifstream infile;
-
-	infile.open(szTempFilename, std::ios::in | std::ios::binary);
-
-	if(infile.is_open() == 0)
-	{
-		if(pEditor->PrefGenerateLogFile())
-			*pLog << "Error: Unable to open temporary file for PICT resource!" << CErrorLog::endl;
-
-		DeleteFile(szTempFilename);
-
-//		free(szTempFilename);
-
-		if(iShowErrorMessages)
-			MessageBox(m_pWindow->GetHWND(), "Import failed!", "Error", MB_OK | MB_ICONEXCLAMATION);
-
-		return 0;
-	}
-
-//	*pLog << "Temporary file successfully opened.\n";
-
-	infile.read((char *)&bmfh, sizeof(BITMAPFILEHEADER));
-	infile.read((char *)&bmih, sizeof(BITMAPINFOHEADER));
-
-	m_iTempWidth  = bmih.biWidth;
-	m_iTempHeight = bmih.biHeight;
-
-	m_tempRectDest.left   = 48;
-	m_tempRectDest.top    = 120;
-	m_tempRectDest.right  = m_tempRectDest.left + m_iTempWidth;
-	m_tempRectDest.bottom = m_tempRectDest.top  + m_iTempHeight;
-
-	int iMaxSize = (((129 * m_iTempWidth + 127) / 128) * 3 + 2) * m_iTempHeight * 3 + 126;
-
-	iMaxSize += (4 - (iMaxSize & 3)) & 3;
-
-	m_vTempPicture.resize(iMaxSize);
-
-	UCHAR *pOutput = &m_vTempPicture[0];
-
-	UCHAR *pPictSize = pOutput; pOutput += sizeof(USHORT);	// Picture size
-
-	MacPictRect rectImage;
-
-	rectImage.top    = SwapEndianShort(0x0000);
-	rectImage.left   = SwapEndianShort(0x0000);
-	rectImage.bottom = SwapEndianShort(m_iTempHeight);
-	rectImage.right  = SwapEndianShort(m_iTempWidth);
-
-	*(MacPictRect *)pOutput = rectImage; pOutput += sizeof(MacPictRect);	// Bounding rectangle
-
-	*(short *)pOutput = SwapEndianShort(0x0011); pOutput += sizeof(short);	// Version opcode
-	*(short *)pOutput = SwapEndianShort(0x02FF); pOutput += sizeof(short);	// Extended version 2 picture
-
-	*(short *)pOutput = SwapEndianShort(0x0C00); pOutput += sizeof(short);	// Header opcode
-	*(short *)pOutput = SwapEndianShort(0xFFFE); pOutput += sizeof(short);	// Extended version 2 picture
-	*(short *)pOutput = SwapEndianShort(0x0000); pOutput += sizeof(short);	// Reserved
-	*(int   *)pOutput = SwapEndianInt(0x00480000); pOutput += sizeof(int);	// Horizontal resolution (72 dpi)
-	*(int   *)pOutput = SwapEndianInt(0x00480000); pOutput += sizeof(int);	// Vertical resolution (72 dpi)
-	*(MacPictRect *)pOutput = rectImage;            pOutput += sizeof(MacPictRect);	// Bounding rectangle
-	*(int   *)pOutput = SwapEndianInt(0x00000000); pOutput += sizeof(int);	// Reserved
-
-	*(short *)pOutput = SwapEndianShort(0x001E); pOutput += sizeof(short);	// Default highlight opcode
-
-	*(short *)pOutput = SwapEndianShort(0x0001); pOutput += sizeof(short);	// Clipping region opcode
-	*(short *)pOutput = SwapEndianShort(0x000A); pOutput += sizeof(short);	// Clipping region size (10 bytes)
-	*(MacPictRect *)pOutput = rectImage;            pOutput += sizeof(MacPictRect);	// Clipping rectangle
-
-	*(short *)pOutput = SwapEndianShort(0x009A); pOutput += sizeof(short);	// Direct bits opcode
-
-	*(int *)pOutput = SwapEndianInt(0x000000FF); pOutput += sizeof(int);	// PixMap.baseAddr
-
-	USHORT iRowBytes = m_iTempWidth * 4;
-
-	*(USHORT *)pOutput = SwapEndianShort(0x8000 | iRowBytes); pOutput += sizeof(USHORT); // PixMap.rowBytes
-
-	*(MacPictRect *)pOutput = rectImage;            pOutput += sizeof(MacPictRect);	// PixMap.bounds
-	*(short *)pOutput = SwapEndianShort(0x0000); pOutput += sizeof(short);	// PixMap.pmVersion
-	*(short *)pOutput = SwapEndianShort(0x0004); pOutput += sizeof(short);	// PixMap.packType (PackBits)
-	*(int   *)pOutput = SwapEndianInt(0x00000000); pOutput += sizeof(int);	// PixMap.packSize
-	*(int   *)pOutput = SwapEndianInt(0x00480000); pOutput += sizeof(int);	// PixMap.hRes (72 dpi)
-	*(int   *)pOutput = SwapEndianInt(0x00480000); pOutput += sizeof(int);	// PixMap.vRes (72 dpi)
-	*(short *)pOutput = SwapEndianShort(0x0010); pOutput += sizeof(short);	// PixMap.pixelType (direct RGB channels)
-	*(short *)pOutput = SwapEndianShort(0x0020); pOutput += sizeof(short);	// PixMap.pixelSize (32 BPP)
-	*(short *)pOutput = SwapEndianShort(0x0003); pOutput += sizeof(short);	// PixMap.cmpCount (3 components, R, G, and B)
-	*(short *)pOutput = SwapEndianShort(0x0008); pOutput += sizeof(short);	// PixMap.cmpSize (8 bits per component)
-	*(int   *)pOutput = SwapEndianInt(0x00000000); pOutput += sizeof(int);	// PixMap.planeBytes
-	*(int   *)pOutput = SwapEndianInt(0x00000000); pOutput += sizeof(int);	// PixMap.pmTable
-	*(int   *)pOutput = SwapEndianInt(0x00000000); pOutput += sizeof(int);	// PixMap.pmReserved
-
-	*(MacPictRect *)pOutput = rectImage; pOutput += sizeof(MacPictRect);	// Source rectangle
-	*(MacPictRect *)pOutput = rectImage; pOutput += sizeof(MacPictRect);	// Destination rectangle
-
-	*(short *)pOutput = SwapEndianShort(0x0000); pOutput += sizeof(short);	// Transfer mode (source copy)
-
-	int i, j;
-
-	std::vector<UCHAR> vBMPRow;
-	std::vector<UCHAR> vBMPData;
-
-	vBMPRow.resize(m_iTempWidth * 3);
-	vBMPData.resize(m_iTempWidth * m_iTempHeight * 3);
-
-	int iAlignment = (4 - ((m_iTempWidth * 3) & 3)) & 3;
-
-	char szJunk[4];
-
-	int iIndex;
-
-	for(i = 0; i < m_iTempHeight; i++)
-	{
-		infile.read((char *)&vBMPRow[0], m_iTempWidth * 3);
-
-		if(iAlignment > 0)
-			infile.read(szJunk, iAlignment);
-
-		for(j = 0; j < m_iTempWidth; j++)
-		{
-			iIndex = (m_iTempHeight - 1 - i) * m_iTempWidth * 3 + j;
-
-			vBMPData[iIndex]                    = vBMPRow[3 * j + 2];
-			vBMPData[iIndex + m_iTempWidth]     = vBMPRow[3 * j + 1];
-			vBMPData[iIndex + m_iTempWidth * 2] = vBMPRow[3 * j];
-		}
-	}
-
-	infile.close();
-
-	UCHAR *pStartData = pOutput;
-
-	UCHAR *pRowSize;
-
-	UCHAR *pPixel;
-
-	for(i = 0; i < m_iTempHeight; i++)
-	{
-		if(iRowBytes < 8)
-		{
-			for(j = 0; j < m_iTempWidth; j++)
-			{
-				*pOutput = 0x00;                                     pOutput++;
-				*pOutput = vBMPData[(i * 3)     * m_iTempWidth + j]; pOutput++;
-				*pOutput = vBMPData[(i * 3 + 1) * m_iTempWidth + j]; pOutput++;
-				*pOutput = vBMPData[(i * 3 + 2) * m_iTempWidth + j]; pOutput++;
-			}
-		}
-		else
-		{
-			pRowSize = pOutput;
-
-			if(iRowBytes <= 250)
-				pOutput += sizeof(UCHAR);
-			else
-				pOutput += sizeof(USHORT);
-
-			for(j = 0; j < 3; j++)
-			{
-				pPixel = &vBMPData[(i * 3 + j) * m_iTempWidth];
-
-				EvPackBits(&pPixel, &pOutput, m_iTempWidth);
-			}
-
-			if(iRowBytes <= 250)
-				*pRowSize = (UCHAR)(pOutput - pRowSize - 1);
-			else
-				*(USHORT *)pRowSize = SwapEndianShort((USHORT)(pOutput - pRowSize - 2));
-		}
-	}
-
-	iAlignment = (4 - ((pOutput - pStartData) & 3)) & 3;
-
-	for(i = 0; i < iAlignment; i++)
-	{
-		*pOutput = 0x00; pOutput++;
-	}
-
-	*(short *)pOutput = SwapEndianShort(0x00FF); pOutput += sizeof(short);	// End-of-picture opcode
-
-	int iPictSize = pOutput - &m_vTempPicture[0];
-
-	*(USHORT *)pPictSize = SwapEndianShort((USHORT)iPictSize);
-
-	m_vTempPicture.resize((size_t)iPictSize);
-
-	DeleteFile(szTempFilename);
-
-//	free(szTempFilename);
 
 	InvalidatePictPreview();
 
 	if(m_pWindow != NULL)
-	{
 		InitializePicture(m_pWindow->GetHWND());
-	}
 	else
 	{
 		m_vPicture.swap(m_vTempPicture);
 		m_vTempPicture.clear();
-
 		m_iWidth  = m_iTempWidth;
 		m_iHeight = m_iTempHeight;
-
 		m_rectDest = m_tempRectDest;
-
 		m_iTempWidth  = 0;
 		m_iTempHeight = 0;
 	}
 
 	m_iIsDirty = 1;
-
 	return 1;
 }
 
@@ -1151,71 +773,90 @@ int CPictResource::FileExport(const char *szFilename, int iImageType, int iShowE
 		strcpy(szFilename2, szFilename);
 	}
 
-	char szTempFilename[MAX_PATH];
-	const char *szBmpFilename = szFilename2;
+	const std::vector<UCHAR> &pictRef = !m_vTempPicture.empty() ? m_vTempPicture : m_vPicture;
 
-	if(iImageType != 0)
+	try
 	{
-		strcpy(szTempFilename, "PICT");
+		std::shared_ptr<std::vector<char> > bytes(new std::vector<char>(pictRef.size()));
+		for(size_t i = 0; i < pictRef.size(); i++)
+			(*bytes)[i] = (char)pictRef[i];
 
-		if(pEditor->GenerateTempFilename(szTempFilename) == 0)
+		std::shared_ptr<graphite::data::data> data(new graphite::data::data(bytes, pictRef.size(), 0));
+		std::shared_ptr<graphite::qd::pict> pict(new graphite::qd::pict(data));
+		std::shared_ptr<graphite::qd::surface> surface = pict->image_surface().lock();
+
+		if(surface == NULL)
+			return 0;
+
+		graphite::qd::size sz = surface->size();
+		std::vector<uint32_t> raw = surface->raw();
+
+		WCHAR szFilenameW[MAX_PATH];
+		if(MultiByteToWideChar(CP_ACP, 0, szFilename2, -1, szFilenameW, MAX_PATH) == 0)
+			return 0;
+
+		Gdiplus::GdiplusStartupInput startupInput;
+		ULONG_PTR iToken = 0;
+		if(Gdiplus::GdiplusStartup(&iToken, &startupInput, NULL) != Gdiplus::Ok)
+			return 0;
+
+		Gdiplus::Bitmap image((INT)sz.width(), (INT)sz.height(), (INT)(sz.width() * sizeof(uint32_t)), PixelFormat32bppARGB, (BYTE *)&raw[0]);
+
+		CLSID encoderClsid;
+		UINT iNumEncoders = 0;
+		UINT iEncoderInfoSize = 0;
+		if(Gdiplus::GetImageEncodersSize(&iNumEncoders, &iEncoderInfoSize) != Gdiplus::Ok || iEncoderInfoSize == 0)
 		{
-			if(pEditor->PrefGenerateLogFile())
-				*pLog << "Error: Unable to make temporary file for exporting PICT resource!" << CErrorLog::endl;
-
-			if(iShowErrorMessages)
-				MessageBox(m_pWindow->GetHWND(), "Export failed!", "Error", MB_OK | MB_ICONEXCLAMATION);
-
+			Gdiplus::GdiplusShutdown(iToken);
 			return 0;
 		}
 
-		szBmpFilename = szTempFilename;
+		std::vector<UCHAR> vEncoderInfo(iEncoderInfoSize);
+		Gdiplus::ImageCodecInfo *pEncoderInfo = (Gdiplus::ImageCodecInfo *)&vEncoderInfo[0];
+		if(Gdiplus::GetImageEncoders(iNumEncoders, iEncoderInfoSize, pEncoderInfo) != Gdiplus::Ok)
+		{
+			Gdiplus::GdiplusShutdown(iToken);
+			return 0;
+		}
+
+		const WCHAR *pMimeType = L"image/bmp";
+		if(iImageType == 1)
+			pMimeType = L"image/png";
+		else if(iImageType == 2)
+			pMimeType = L"image/jpeg";
+		else if(iImageType == 3)
+			pMimeType = L"image/tiff";
+
+		bool bFound = false;
+		for(UINT i = 0; i < iNumEncoders; i++)
+		{
+			if(wcscmp(pEncoderInfo[i].MimeType, pMimeType) == 0)
+			{
+				encoderClsid = pEncoderInfo[i].Clsid;
+				bFound = true;
+				break;
+			}
+		}
+
+		if(!bFound || image.Save(szFilenameW, &encoderClsid, NULL) != Gdiplus::Ok)
+		{
+			Gdiplus::GdiplusShutdown(iToken);
+			return 0;
+		}
+
+		Gdiplus::GdiplusShutdown(iToken);
+		return 1;
 	}
-
-	const std::vector<UCHAR> &pictRef = !m_vTempPicture.empty() ? m_vTempPicture : m_vPicture;
-
-	if(ExportPictToBmpFile(pictRef, szBmpFilename) == 0)
+	catch(...)
 	{
 		if(pEditor->PrefGenerateLogFile())
-			*pLog << "Error: Unable to export PICT to bitmap for FileExport!" << CErrorLog::endl;
-
-		if(iImageType != 0)
-			DeleteFile(szTempFilename);
+			*pLog << "Error: Unable to export PICT using Graphite!" << CErrorLog::endl;
 
 		if(iShowErrorMessages)
 			MessageBox(m_pWindow->GetHWND(), "Export failed!", "Error", MB_OK | MB_ICONEXCLAMATION);
 
 		return 0;
 	}
-
-	if(iImageType != 0)
-	{
-		const WCHAR *pMimeType;
-
-		if(iImageType == 1)
-			pMimeType = L"image/png";
-		else if(iImageType == 2)
-			pMimeType = L"image/jpeg";
-		else
-			pMimeType = L"image/tiff";
-
-		if(SaveImageWithGDIPlus(szBmpFilename, szFilename2, pMimeType) == 0)
-		{
-			if(pEditor->PrefGenerateLogFile())
-				*pLog << "Error: Unable to save exported PICT image using GDI+!" << CErrorLog::endl;
-
-			DeleteFile(szTempFilename);
-
-			if(iShowErrorMessages)
-				MessageBox(m_pWindow->GetHWND(), "Export failed!", "Error", MB_OK | MB_ICONEXCLAMATION);
-
-			return 0;
-		}
-
-		DeleteFile(szTempFilename);
-	}
-
-	return 1;
 }
 
 BOOL CPictResource::PictDlgProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
