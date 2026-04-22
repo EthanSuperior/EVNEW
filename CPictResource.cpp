@@ -90,6 +90,31 @@ int SaveImageWithGDIPlus(const char *szInputFilename, const char *szOutputFilena
 	return (saveStatus == Gdiplus::Ok);
 }
 
+int ExportPictToBmpFile(qt::Handle hPic, const char *szBmpPath)
+{
+	qt::FSSpec fileSpec;
+
+	qt::CopyCStringToPascal(szBmpPath, fileSpec.name);
+
+	fileSpec.vRefNum = 0;
+	fileSpec.parID   = 0;
+
+	qt::GraphicsExportComponent geComponent;
+
+	qt::OSErr qtErr = qt::OpenADefaultComponent(qt::GraphicsExporterComponentType, qt::kQTFileTypeBMP, &geComponent);
+
+	if(qtErr != qt::noErr)
+		return 0;
+
+	qtErr = qt::GraphicsExportSetInputPicture(geComponent, (qt::PicHandle)hPic);
+	qtErr = qt::GraphicsExportSetOutputFile(geComponent, &fileSpec);
+	qtErr = qt::GraphicsExportDoExport(geComponent, nil);
+
+	qt::CloseComponent(geComponent);
+
+	return (qtErr == qt::noErr);
+}
+
 int ConvertImageTo24BppBmp(const char *szInputFilename, const char *szOutputFilename)
 {
 	WCHAR szInputFilenameW[MAX_PATH];
@@ -158,11 +183,11 @@ CPictResource::CPictResource(void)
 	m_iWidth  = 0;
 	m_iHeight = 0;
 
-	m_iPortExists = 0;
-
 	m_hPicture = NULL;
 
 	m_hTempPicture = NULL;
+
+	m_hPreviewBitmap = NULL;
 
 	m_rectDest.left   = 0;
 	m_rectDest.top    = 0;
@@ -179,6 +204,9 @@ CPictResource::~CPictResource(void)
 
 	if(m_hTempPicture != NULL)
 		qt::DisposeHandle(m_hTempPicture);
+
+	if(m_hPreviewBitmap != NULL)
+		DeleteObject(m_hPreviewBitmap);
 }
 
 int CPictResource::GetType(void)
@@ -349,15 +377,6 @@ int CPictResource::Initialize(HWND hwnd)
 
 int CPictResource::InitializePicture(HWND hwnd)
 {
-	if(!m_iPortExists)
-	{
-		qt::MacSetPort(qt::CreatePortAssociation(hwnd, NULL, qt::kQTMLNoIdleEvents));
-
-		m_iPortExists = 1;
-	}
-	else
-		qt::MacSetPort(qt::GetHWNDPort(hwnd));
-
 	std::string szText = "Width: ";
 
 	if(m_iTempWidth == 0)
@@ -548,12 +567,7 @@ int CPictResource::CloseAndSave(void)
 
 	m_iIsNew = 0;
 
-	if(m_iPortExists)
-	{
-		qt::DestroyPortAssociation((qt::CGrafPort *)qt::GetHWNDPort(m_pWindow->GetHWND()));
-
-		m_iPortExists = 0;
-	}
+	InvalidatePictPreview();
 
 	CEditor::GetCurrentEditor()->RemoveEditDialog(m_pWindow, iIDOrNameChanged);
 
@@ -569,12 +583,7 @@ int CPictResource::CloseAndDontSave(void)
 	for(i = 0; i < NUM_PICT_CONTROLS; i++)
 		m_controls[i].Destroy();
 
-	if(m_iPortExists)
-	{
-		qt::DestroyPortAssociation((qt::CGrafPort *)qt::GetHWNDPort(m_pWindow->GetHWND()));
-
-		m_iPortExists = 0;
-	}
+	InvalidatePictPreview();
 
 	if(m_hTempPicture != NULL)
 	{
@@ -593,18 +602,118 @@ int CPictResource::CloseAndDontSave(void)
 	return 1;
 }
 
+void CPictResource::InvalidatePictPreview(void)
+{
+	if(m_hPreviewBitmap != NULL)
+	{
+		DeleteObject(m_hPreviewBitmap);
+		m_hPreviewBitmap = NULL;
+	}
+}
+
+int CPictResource::EnsurePictPreview(void)
+{
+	if(m_hPreviewBitmap != NULL)
+		return 1;
+
+	qt::Handle hPict = m_hTempPicture != NULL ? m_hTempPicture : m_hPicture;
+
+	if(hPict == NULL)
+		return 0;
+
+	CEditor *pEditor = CEditor::GetCurrentEditor();
+
+	if(pEditor == NULL)
+		return 0;
+
+	CErrorLog *pLog  = CErrorLog::GetCurrentErrorLog();
+
+	char szTempFilename[MAX_PATH];
+
+	strcpy(szTempFilename, "PICTPV");
+
+	if(pEditor->GenerateTempFilename(szTempFilename) == 0)
+	{
+		if(pEditor->PrefGenerateLogFile())
+			*pLog << "Error: Unable to make temporary file for PICT preview!" << CErrorLog::endl;
+
+		return 0;
+	}
+
+	if(ExportPictToBmpFile(hPict, szTempFilename) == 0)
+	{
+		if(pEditor->PrefGenerateLogFile())
+			*pLog << "Error: Unable to rasterize PICT for preview." << CErrorLog::endl;
+
+		DeleteFile(szTempFilename);
+
+		return 0;
+	}
+
+	m_hPreviewBitmap = (HBITMAP)LoadImageA(NULL, szTempFilename, IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
+
+	DeleteFile(szTempFilename);
+
+	if(m_hPreviewBitmap == NULL)
+	{
+		if(pEditor->PrefGenerateLogFile())
+			*pLog << "Error: Unable to load PICT preview bitmap." << CErrorLog::endl;
+
+		return 0;
+	}
+
+	return 1;
+}
+
 int CPictResource::OnPaint(void)
 {
-	PAINTSTRUCT paintStruct;
+	PAINTSTRUCT ps;
 
-	BeginPaint(m_pWindow->GetHWND(), &paintStruct);
+	BeginPaint(m_pWindow->GetHWND(), &ps);
 
-	if(m_hTempPicture != NULL)
-		qt::DrawPicture((qt::PicHandle)m_hTempPicture, &m_tempRectDest);
-	else if(m_hPicture != NULL)
-		qt::DrawPicture((qt::PicHandle)m_hPicture, &m_rectDest);
+	if((m_hTempPicture == NULL) && (m_hPicture == NULL))
+	{
+		EndPaint(m_pWindow->GetHWND(), &ps);
+		return 1;
+	}
 
-	EndPaint(m_pWindow->GetHWND(), &paintStruct);
+	qt::Rect const *pR = m_hTempPicture != NULL ? &m_tempRectDest : &m_rectDest;
+
+	RECT rcDest;
+	rcDest.left   = (LONG)pR->left;
+	rcDest.top    = (LONG)pR->top;
+	rcDest.right  = (LONG)pR->right;
+	rcDest.bottom = (LONG)pR->bottom;
+
+	if(EnsurePictPreview() == 0 || m_hPreviewBitmap == NULL)
+	{
+		EndPaint(m_pWindow->GetHWND(), &ps);
+		return 1;
+	}
+
+	BITMAP bm;
+
+	ZeroMemory(&bm, sizeof(bm));
+
+	GetObject(m_hPreviewBitmap, sizeof(bm), &bm);
+
+	int destW = (int)rcDest.right  - (int)rcDest.left;
+	int destH = (int)rcDest.bottom - (int)rcDest.top;
+
+	if(destW > 0 && destH > 0)
+	{
+		HDC hdc   = ps.hdc;
+		HDC hdcMem = CreateCompatibleDC(hdc);
+		HBITMAP hOld = (HBITMAP)SelectObject(hdcMem, m_hPreviewBitmap);
+		int oldMode = SetStretchBltMode(hdc, HALFTONE);
+		SetBrushOrgEx(hdc, 0, 0, NULL);
+		StretchBlt(hdc, rcDest.left, rcDest.top, destW, destH, hdcMem, 0, 0, bm.bmWidth, bm.bmHeight, SRCCOPY);
+		SetStretchBltMode(hdc, oldMode);
+		SelectObject(hdcMem, hOld);
+		DeleteDC(hdcMem);
+	}
+
+	EndPaint(m_pWindow->GetHWND(), &ps);
 
 	return 1;
 }
@@ -699,6 +808,8 @@ int CPictResource::FileImport(char *szFilename, int iShowErrorMessages)
 		m_tempRectDest.top    = 120;
 		m_tempRectDest.right  = m_tempRectDest.left + m_iTempWidth;
 		m_tempRectDest.bottom = m_tempRectDest.top  + m_iTempHeight;
+
+		InvalidatePictPreview();
 
 		if(m_pWindow != NULL)
 			InitializePicture(m_pWindow->GetHWND());
@@ -936,6 +1047,8 @@ int CPictResource::FileImport(char *szFilename, int iShowErrorMessages)
 
 //	free(szTempFilename);
 
+	InvalidatePictPreview();
+
 	if(m_pWindow != NULL)
 	{
 		InitializePicture(m_pWindow->GetHWND());
@@ -1028,26 +1141,21 @@ int CPictResource::FileExport(const char *szFilename, int iImageType, int iShowE
 		szBmpFilename = szTempFilename;
 	}
 
-	qt::FSSpec fileSpec;
-	qt::OSErr qtErr;
-	qt::GraphicsExportComponent geComponent;
+	qt::Handle hPict = m_hTempPicture != NULL ? m_hTempPicture : m_hPicture;
 
-	qt::CopyCStringToPascal(szBmpFilename, fileSpec.name);
+	if(ExportPictToBmpFile(hPict, szBmpFilename) == 0)
+	{
+		if(pEditor->PrefGenerateLogFile())
+			*pLog << "Error: Unable to export PICT to bitmap for FileExport!" << CErrorLog::endl;
 
-	fileSpec.vRefNum = 0;
-	fileSpec.parID   = 0;
+		if(iImageType != 0)
+			DeleteFile(szTempFilename);
 
-	qtErr = qt::OpenADefaultComponent(qt::GraphicsExporterComponentType, qt::kQTFileTypeBMP, &geComponent);
+		if(iShowErrorMessages)
+			MessageBox(m_pWindow->GetHWND(), "Export failed!", "Error", MB_OK | MB_ICONEXCLAMATION);
 
-	if(m_hTempPicture != NULL)
-		qtErr = qt::GraphicsExportSetInputPicture(geComponent, (qt::PicHandle)m_hTempPicture);
-	else
-		qtErr = qt::GraphicsExportSetInputPicture(geComponent, (qt::PicHandle)m_hPicture);
-
-	qtErr = qt::GraphicsExportSetOutputFile(geComponent, &fileSpec);
-	qtErr = qt::GraphicsExportDoExport(geComponent, nil);
-
-	qt::CloseComponent(geComponent);
+		return 0;
+	}
 
 	if(iImageType != 0)
 	{

@@ -89,6 +89,10 @@ private:
 
 	int InitializePicture(HWND hwnd);
 
+	/** Rasterize the active PictHandle to a BMP (QuickTime) and cache for GDI painting. */
+	int EnsurePictPreview(void);
+	void InvalidatePictPreview(void);
+
 	int OnPaint(void);
 
 	int FileImport(char *szFilename = NULL, int iShowErrorMessages = 1);
@@ -97,7 +101,8 @@ private:
 	short m_iWidth;
 	short m_iHeight;
 
-	int m_iPortExists;
+	/** Full-size preview DIB; scaled in OnPaint with GDI. QuickTime is not used for scaling. */
+	HBITMAP m_hPreviewBitmap;
 
 	qt::Handle m_hPicture;
 
