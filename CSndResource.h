@@ -22,9 +22,68 @@ class CSndResource;
 #include <vector>
 #include <string>
 
-namespace qt
+namespace sndfmt
 {
-#include <Sound.h>
+#pragma pack(push, 1)
+	struct ModRef
+	{
+		short modNumber;
+		int   modInit;
+	};
+
+	struct SndCommand
+	{
+		short cmd;
+		short param1;
+		int   param2;
+	};
+
+	struct SndListResource
+	{
+		short format;
+		short numModifiers;
+		ModRef modifierPart[1];
+		short numCommands;
+		SndCommand commandPart[1];
+		unsigned char dataPart[1];
+	};
+
+	struct Snd2ListResource
+	{
+		short format;
+		short refCount;
+		short numCommands;
+		SndCommand commandPart[1];
+		unsigned char dataPart[1];
+	};
+
+	struct CmpSoundHeader
+	{
+		char *samplePtr;
+		unsigned int numChannels;
+		unsigned int sampleRate;
+		unsigned int loopStart;
+		unsigned int loopEnd;
+		unsigned char encode;
+		unsigned char baseFrequency;
+		unsigned int numFrames;
+		unsigned char AIFFSampleRate[10];
+		char *markerChunk;
+		unsigned int format;
+		unsigned int futureUse2;
+		void *stateVars;
+		void *leftOverSamples;
+		short compressionID;
+		unsigned short packetSize;
+		short snthID;
+		unsigned short sampleSize;
+		unsigned char sampleArea[1];
+	};
+#pragma pack(pop)
+
+	const unsigned char stdSH = 0x00;
+	const unsigned int initStereoMask = 0x00C0;
+	const unsigned int initStereo = 0x00C0;
 }
 
 #include "CControl.h"
@@ -96,9 +155,9 @@ private:
 
 	int m_iIsDirty;
 
-	qt::SndListResource  *m_pSndHeader;
-	qt::Snd2ListResource *m_pSnd2Header;
-	qt::CmpSoundHeader   *m_pSndInfo;
+	sndfmt::SndListResource  *m_pSndHeader;
+	sndfmt::Snd2ListResource *m_pSnd2Header;
+	sndfmt::CmpSoundHeader   *m_pSndInfo;
 
 	UCHAR *m_pSndData;
 

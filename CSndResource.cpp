@@ -10,6 +10,11 @@
 
 #include <windows.h>
 #include <windowsx.h>
+#include <mmsystem.h>
+#include <memory>
+
+#include <libGraphite/data/data.hpp>
+#include <libGraphite/resources/sound.hpp>
 
 #include "CWindow.h"
 
@@ -18,6 +23,8 @@
 #include "CSndResource.h"
 
 #include "resource.h"
+
+#pragma comment(lib, "winmm.lib")
 
 ////////////////////////////////////////////////////////////////
 ///////////////////  CLASS MEMBER FUNCTIONS  ///////////////////
@@ -100,20 +107,20 @@ int CSndResource::LoadDirect(std::istream & input, int iSize)
 	{
 		m_iFormat = 1;
 
-		m_pSndHeader  = (qt::SndListResource *)&m_vData[0];
+		m_pSndHeader  = (sndfmt::SndListResource *)&m_vData[0];
 		m_pSnd2Header = NULL;
-		m_pSndInfo    = (qt::CmpSoundHeader *)&m_pSndHeader->dataPart[0];
+		m_pSndInfo    = (sndfmt::CmpSoundHeader *)&m_pSndHeader->dataPart[0];
 	}
 	else
 	{
 		m_iFormat = 2;
 
 		m_pSndHeader  = NULL;
-		m_pSnd2Header = (qt::Snd2ListResource *)&m_vData[0];
-		m_pSndInfo    = (qt::CmpSoundHeader *)&m_pSnd2Header->dataPart[0];
+		m_pSnd2Header = (sndfmt::Snd2ListResource *)&m_vData[0];
+		m_pSndInfo    = (sndfmt::CmpSoundHeader *)&m_pSnd2Header->dataPart[0];
 	}
 
-	if(m_pSndInfo->encode == qt::stdSH)
+	if(m_pSndInfo->encode == sndfmt::stdSH)
 		m_pSndData = (UCHAR *)&m_pSndInfo->numFrames;
 	else
 		m_pSndData = (UCHAR *)&m_pSndInfo->sampleArea[0];
@@ -147,20 +154,20 @@ int CSndResource::Load(char *pInput, int iSize)
 	{
 		m_iFormat = 1;
 
-		m_pSndHeader  = (qt::SndListResource *)&m_vData[0];
+		m_pSndHeader  = (sndfmt::SndListResource *)&m_vData[0];
 		m_pSnd2Header = NULL;
-		m_pSndInfo    = (qt::CmpSoundHeader *)&m_pSndHeader->dataPart[0];
+		m_pSndInfo    = (sndfmt::CmpSoundHeader *)&m_pSndHeader->dataPart[0];
 	}
 	else
 	{
 		m_iFormat = 2;
 
 		m_pSndHeader  = NULL;
-		m_pSnd2Header = (qt::Snd2ListResource *)&m_vData[0];
-		m_pSndInfo    = (qt::CmpSoundHeader *)&m_pSnd2Header->dataPart[0];
+		m_pSnd2Header = (sndfmt::Snd2ListResource *)&m_vData[0];
+		m_pSndInfo    = (sndfmt::CmpSoundHeader *)&m_pSnd2Header->dataPart[0];
 	}
 
-	if(m_pSndInfo->encode == qt::stdSH)
+	if(m_pSndInfo->encode == sndfmt::stdSH)
 		m_pSndData = (UCHAR *)&m_pSndInfo->numFrames;
 	else
 		m_pSndData = (UCHAR *)&m_pSndInfo->sampleArea[0];
@@ -208,8 +215,8 @@ int CSndResource::SwapEndians(void)
 	m_pSndInfo->markerChunk     = (char *)SwapEndianInt((int)m_pSndInfo->markerChunk);
 	m_pSndInfo->format          = SwapEndianInt(m_pSndInfo->format);
 	m_pSndInfo->futureUse2      = SwapEndianInt(m_pSndInfo->futureUse2);
-	m_pSndInfo->stateVars       = (qt::StateBlock *)SwapEndianInt((int)m_pSndInfo->stateVars);
-	m_pSndInfo->leftOverSamples = (qt::LeftOverBlock *)SwapEndianInt((int)m_pSndInfo->leftOverSamples);
+	m_pSndInfo->stateVars       = (void *)SwapEndianInt((int)m_pSndInfo->stateVars);
+	m_pSndInfo->leftOverSamples = (void *)SwapEndianInt((int)m_pSndInfo->leftOverSamples);
 	m_pSndInfo->compressionID   = SwapEndianShort(m_pSndInfo->compressionID);
 	m_pSndInfo->packetSize      = SwapEndianShort(m_pSndInfo->packetSize);
 	m_pSndInfo->snthID          = SwapEndianShort(m_pSndInfo->snthID);
@@ -327,18 +334,18 @@ int CSndResource::CloseAndSave(void)
 
 		if(m_iFormat == 1)
 		{
-			m_pSndHeader  = (qt::SndListResource *)&m_vData[0];
+			m_pSndHeader  = (sndfmt::SndListResource *)&m_vData[0];
 			m_pSnd2Header = NULL;
-			m_pSndInfo    = (qt::CmpSoundHeader *)&m_pSndHeader->dataPart[0];
+			m_pSndInfo    = (sndfmt::CmpSoundHeader *)&m_pSndHeader->dataPart[0];
 		}
 		else
 		{
 			m_pSndHeader  = NULL;
-			m_pSnd2Header = (qt::Snd2ListResource *)&m_vData[0];
-			m_pSndInfo    = (qt::CmpSoundHeader *)&m_pSnd2Header->dataPart[0];
+			m_pSnd2Header = (sndfmt::Snd2ListResource *)&m_vData[0];
+			m_pSndInfo    = (sndfmt::CmpSoundHeader *)&m_pSnd2Header->dataPart[0];
 		}
 
-		if(m_pSndInfo->encode == qt::stdSH)
+		if(m_pSndInfo->encode == sndfmt::stdSH)
 			m_pSndData = (UCHAR *)&m_pSndInfo->numFrames;
 		else
 			m_pSndData = (UCHAR *)&m_pSndInfo->sampleArea[0];
@@ -366,16 +373,16 @@ int CSndResource::CloseAndDontSave(void)
 	{
 		if(m_iFormat == 1)
 		{
-			m_pSndHeader  = (qt::SndListResource *)&m_vData[0];
+			m_pSndHeader  = (sndfmt::SndListResource *)&m_vData[0];
 			m_pSnd2Header = NULL;
-			m_pSndInfo    = (qt::CmpSoundHeader *)&m_pSndHeader->dataPart[0];
+			m_pSndInfo    = (sndfmt::CmpSoundHeader *)&m_pSndHeader->dataPart[0];
 			m_pSndData    = &m_pSndInfo->sampleArea[0];
 		}
 		else
 		{
 			m_pSndHeader  = NULL;
-			m_pSnd2Header = (qt::Snd2ListResource *)&m_vData[0];
-			m_pSndInfo    = (qt::CmpSoundHeader *)&m_pSnd2Header->dataPart[0];
+			m_pSnd2Header = (sndfmt::Snd2ListResource *)&m_vData[0];
+			m_pSndInfo    = (sndfmt::CmpSoundHeader *)&m_pSnd2Header->dataPart[0];
 			m_pSndData    = (UCHAR *)&m_pSndInfo->numFrames;
 		}
 
@@ -398,16 +405,23 @@ int CSndResource::PlaySound(void)
 
 	Button_SetText(hwndPlayButton, "Playing...");
 
-	UCHAR *pSoundResource;
+	CEditor *pEditor = CEditor::GetCurrentEditor();
 
-	if(!m_iIsDirty)
-		pSoundResource = &m_vData[0];
-	else
-		pSoundResource = &m_vData2[0];
+	if(pEditor != NULL)
+	{
+		char szTempFilename[MAX_PATH];
+		strcpy(szTempFilename, "SNDP");
 
-	qt::OSErr qtErr;
+		if(pEditor->GenerateTempFilename(szTempFilename))
+		{
+			std::string szWavFilename = szTempFilename;
+			szWavFilename += ".wav";
 
-	qtErr = qt::SndPlay(nil, (qt::SndListResource **)&pSoundResource, FALSE);
+			FileExport(szWavFilename.c_str(), 0);
+			::PlaySoundA(szWavFilename.c_str(), NULL, SND_FILENAME | SND_SYNC);
+			DeleteFile(szWavFilename.c_str());
+		}
+	}
 
 	Button_SetText(hwndPlayButton, "Play");
 
@@ -736,9 +750,9 @@ int CSndResource::FileImport(const char *szFilename, int iShowErrorMessages)
 
 	m_iIsDirty = 1;
 
-	m_pSndHeader  = (qt::SndListResource *)&m_vData2[0];
+	m_pSndHeader  = (sndfmt::SndListResource *)&m_vData2[0];
 	m_pSnd2Header = NULL;
-	m_pSndInfo    = (qt::CmpSoundHeader *)&m_pSndHeader->dataPart[0];
+	m_pSndInfo    = (sndfmt::CmpSoundHeader *)&m_pSndHeader->dataPart[0];
 	m_pSndData    = (UCHAR *)&m_pSndInfo->numFrames;
 
 	m_pSndHeader->format                    = 0x0001;
@@ -755,7 +769,7 @@ int CSndResource::FileImport(const char *szFilename, int iShowErrorMessages)
 	m_pSndInfo->sampleRate    = dwSamplesPerSec << 16;
 	m_pSndInfo->loopStart     = 0;
 	m_pSndInfo->loopEnd       = 0;
-	m_pSndInfo->encode        = qt::stdSH;
+	m_pSndInfo->encode        = sndfmt::stdSH;
 	m_pSndInfo->baseFrequency = 0x3C;
 
 	m_iFormatCopy = 1;
@@ -787,18 +801,18 @@ int CSndResource::FileImport(const char *szFilename, int iShowErrorMessages)
 
 		if(m_iFormat == 1)
 		{
-			m_pSndHeader  = (qt::SndListResource *)&m_vData[0];
+			m_pSndHeader  = (sndfmt::SndListResource *)&m_vData[0];
 			m_pSnd2Header = NULL;
-			m_pSndInfo    = (qt::CmpSoundHeader *)&m_pSndHeader->dataPart[0];
+			m_pSndInfo    = (sndfmt::CmpSoundHeader *)&m_pSndHeader->dataPart[0];
 		}
 		else
 		{
 			m_pSndHeader  = NULL;
-			m_pSnd2Header = (qt::Snd2ListResource *)&m_vData[0];
-			m_pSndInfo    = (qt::CmpSoundHeader *)&m_pSnd2Header->dataPart[0];
+			m_pSnd2Header = (sndfmt::Snd2ListResource *)&m_vData[0];
+			m_pSndInfo    = (sndfmt::CmpSoundHeader *)&m_pSnd2Header->dataPart[0];
 		}
 
-		if(m_pSndInfo->encode == qt::stdSH)
+		if(m_pSndInfo->encode == sndfmt::stdSH)
 			m_pSndData = (UCHAR *)&m_pSndInfo->numFrames;
 		else
 			m_pSndData = (UCHAR *)&m_pSndInfo->sampleArea[0];
@@ -847,7 +861,6 @@ int CSndResource::FileExport(const char *szFilename, int iShowErrorMessages)
 	}
 
 	std::ofstream outfile;
-
 	outfile.open(szFilename2, std::ios::out | std::ios::trunc | std::ios::binary);
 
 	if(outfile.is_open() == 0)
@@ -856,7 +869,6 @@ int CSndResource::FileExport(const char *szFilename, int iShowErrorMessages)
 			*pLog << "Error: Unable to open sound file \"" << szFilename2 << "\"!" << CErrorLog::endl;
 
 		std::string szError = "Unable to load file \"";
-
 		szError += szFilename2;
 		szError += "\"!";
 
@@ -869,188 +881,84 @@ int CSndResource::FileExport(const char *szFilename, int iShowErrorMessages)
 		return 0;
 	}
 
-	char szRiff[5]        = "RIFF";
-	char szRiffType[5]    = "WAVE";
-	char szFormatChunk[5] = "fmt ";
-	char szDataChunk[5]   = "data";
-
-	int iSize;
-
-	short  wFormatTag;
-	USHORT wChannels;
-	UINT   dwSamplesPerSec;
-	UINT   dwAvgBytesPerSec;
-	USHORT wBlockAlign;
-	USHORT wBitsPerSample;
-
-	std::vector<UCHAR> vOutputData;
-
-	if(m_pSndInfo->encode == 0x00)
+	try
 	{
-		outfile.write(szRiff, 4);
+		std::shared_ptr<std::vector<char> > bytes(new std::vector<char>(m_vData.size()));
+		for(size_t i = 0; i < m_vData.size(); i++)
+			(*bytes)[i] = (char)m_vData[i];
 
-		iSize = 36 + m_pSndInfo->numChannels;
+		std::shared_ptr<graphite::data::data> data(new graphite::data::data(bytes, m_vData.size(), 0));
+		std::shared_ptr<graphite::resources::sound> snd(new graphite::resources::sound(data));
+		std::vector<std::vector<uint32_t> > channels = snd->samples();
 
-		outfile.write((char *)&iSize, sizeof(int));
-		outfile.write(szRiffType, 4);
-		outfile.write(szFormatChunk, 4);
+		if(channels.empty())
+			return 0;
 
-		iSize = 16;
-
-		outfile.write((char *)&iSize, sizeof(int));
-
-		wFormatTag = 0x0001;
-
-		if((m_iFormat == 1) && ((m_pSndHeader->modifierPart[0].modInit) & (qt::initStereoMask) == qt::initStereo))
-			wChannels = 2;
+		USHORT wChannels = (USHORT)channels.size();
+		UINT dwSamplesPerSec = snd->sample_rate();
+		USHORT wBitsPerSample = snd->sample_bits();
+		if(wBitsPerSample <= 8)
+			wBitsPerSample = 8;
 		else
-			wChannels = 1;
+			wBitsPerSample = 16;
 
-		dwSamplesPerSec  = m_pSndInfo->sampleRate >> 16;
-		dwAvgBytesPerSec = dwSamplesPerSec * wChannels;
-		wBlockAlign      = wChannels;
-		wBitsPerSample   = 8;
+		UINT iFrames = (UINT)channels[0].size();
+		USHORT wBlockAlign = (USHORT)(wChannels * ((wBitsPerSample + 7) >> 3));
+		UINT dwAvgBytesPerSec = dwSamplesPerSec * wBlockAlign;
+		UINT iDataSize = iFrames * wBlockAlign;
+		UINT iRiffSize = 36 + iDataSize;
 
-		outfile.write((char *)&wFormatTag,       sizeof(short));
-		outfile.write((char *)&wChannels,        sizeof(USHORT));
-		outfile.write((char *)&dwSamplesPerSec,  sizeof(UINT));
+		outfile.write("RIFF", 4);
+		outfile.write((char *)&iRiffSize, sizeof(UINT));
+		outfile.write("WAVE", 4);
+		outfile.write("fmt ", 4);
+
+		UINT iFmtSize = 16;
+		USHORT wFormatTag = 0x0001;
+		outfile.write((char *)&iFmtSize, sizeof(UINT));
+		outfile.write((char *)&wFormatTag, sizeof(USHORT));
+		outfile.write((char *)&wChannels, sizeof(USHORT));
+		outfile.write((char *)&dwSamplesPerSec, sizeof(UINT));
 		outfile.write((char *)&dwAvgBytesPerSec, sizeof(UINT));
-		outfile.write((char *)&wBlockAlign,      sizeof(USHORT));
-		outfile.write((char *)&wBitsPerSample,   sizeof(USHORT));
+		outfile.write((char *)&wBlockAlign, sizeof(USHORT));
+		outfile.write((char *)&wBitsPerSample, sizeof(USHORT));
 
-		outfile.write(szDataChunk, 4);
+		outfile.write("data", 4);
+		outfile.write((char *)&iDataSize, sizeof(UINT));
 
-		iSize = m_pSndInfo->numChannels;
-
-		outfile.write((char *)&iSize, sizeof(int));
-
-		outfile.write((char *)m_pSndData, iSize);
+		for(UINT f = 0; f < iFrames; f++)
+		{
+			for(USHORT c = 0; c < wChannels; c++)
+			{
+				uint32_t sample = (f < channels[c].size()) ? channels[c][f] : 0;
+				if(wBitsPerSample == 8)
+				{
+					unsigned char b = (unsigned char)sample;
+					outfile.write((char *)&b, 1);
+				}
+				else
+				{
+					int v = (int)sample - 32768;
+					if(v < -32768) v = -32768;
+					if(v > 32767) v = 32767;
+					short s = (short)v;
+					outfile.write((char *)&s, sizeof(short));
+				}
+			}
+		}
 	}
-	else
+	catch(...)
 	{
-		qt::SoundComponentData sndInputFormat;
-		qt::SoundComponentData sndOutputFormat;
+		if(pEditor->PrefGenerateLogFile())
+			*pLog << "Error: Unable to decode snd resource using Graphite for export!" << CErrorLog::endl;
 
-		UINT iInputFrames;
-		UINT iInputBytes;
-		UINT iInputBytesCopy;
-		UINT iOutputBytes;
+		if(iShowErrorMessages)
+			MessageBox(m_pWindow->GetHWND(), "Export failed!", "Error", MB_OK | MB_ICONEXCLAMATION);
 
-		qt::OSErr qtErr;
-
-		memset(&sndInputFormat,  0, sizeof(qt::SoundComponentData));
-		memset(&sndOutputFormat, 0, sizeof(qt::SoundComponentData));
-
-		qtErr = qt::ParseSndHeader(&m_pSndHeader, &sndInputFormat, (ULONG *)&iInputFrames, NULL);
-
-//		sndInputFormat.format      = m_pSndInfo->format;
-//		sndInputFormat.numChannels = (short)m_pSndInfo->numChannels;
-//		sndInputFormat.sampleSize  = m_pSndInfo->sampleSize;
-//		sndInputFormat.sampleRate  = m_pSndInfo->sampleRate;
-//		sndInputFormat.sampleCount = m_pSndInfo->numFrames;
-//		sndInputFormat.buffer      = NULL;
-//		sndInputFormat.reserved    = 0;
-
-		sndOutputFormat.format      = qt::kSoundNotCompressed;
-		sndOutputFormat.numChannels = sndInputFormat.numChannels;
-		sndOutputFormat.sampleSize  = sndInputFormat.sampleSize;
-		sndOutputFormat.sampleRate  = sndInputFormat.sampleRate;
-		sndOutputFormat.sampleCount = 0;
-		sndOutputFormat.buffer      = NULL;
-		sndOutputFormat.reserved    = 0;
-
-		qt::SoundConverter soundConverter;
-
-		qtErr = qt::SoundConverterOpen(&sndInputFormat, &sndOutputFormat, &soundConverter);
-
-		if(qtErr != qt::noErr)
-		{
-			if(pEditor->PrefGenerateLogFile())
-				*pLog << "Error: Unable to open sound converter for compressed data!" << CErrorLog::endl;
-
-			std::string szError = "Export failed.";
-
-			if(pEditor->PrefGenerateLogFile())
-				szError += "  Consult log.txt for details.";
-
-			if(iShowErrorMessages)
-				MessageBox(m_pWindow->GetHWND(), szError.c_str(), "Error", MB_OK | MB_ICONEXCLAMATION);
-
-			return 0;
-		}
-
-		iInputBytes = m_vData.size() - 84;
-		iInputBytesCopy = iInputBytes;
-
-		qtErr = qt::SoundConverterBeginConversion(soundConverter);
-
-//		qtErr = qt::SoundConverterGetBufferSizes(soundConverter, iInputBytes, (ULONG *)&iInputFrames, (ULONG *)&iInputBytesCopy, (ULONG *)&iOutputBytes);
-
-		iOutputBytes = sndInputFormat.sampleCount * (sndOutputFormat.sampleSize >> 3);
-
-		vOutputData.resize(iOutputBytes);
-
-		UINT iOutputFrames;
-
-		qtErr = qt::SoundConverterConvertBuffer(soundConverter, &m_vData[84], m_pSndInfo->numFrames, &vOutputData[0], (ULONG *)&iOutputFrames, (ULONG *)&iOutputBytes);
-
-		qtErr = qt::SoundConverterEndConversion(soundConverter, &vOutputData[iOutputBytes], (ULONG *)&iOutputFrames, (ULONG *)&iOutputBytes);
-
-		if(qtErr != qt::noErr)
-		{
-			if(pEditor->PrefGenerateLogFile())
-				*pLog << "Error: Sound data decompression failed!" << CErrorLog::endl;
-
-			std::string szError = "Export failed.";
-
-			if(pEditor->PrefGenerateLogFile())
-				szError += "  Consult log.txt for details.";
-
-			if(iShowErrorMessages)
-				MessageBox(m_pWindow->GetHWND(), szError.c_str(), "Error", MB_OK | MB_ICONEXCLAMATION);
-
-			return 0;
-		}
-
-		qtErr = qt::SoundConverterClose(soundConverter);
-
-		outfile.write(szRiff, 4);
-
-		iSize = 36 + vOutputData.size();
-
-		outfile.write((char *)&iSize, sizeof(int));
-		outfile.write(szRiffType, 4);
-		outfile.write(szFormatChunk, 4);
-
-		iSize = 16;
-
-		outfile.write((char *)&iSize, sizeof(int));
-
-		wFormatTag       = 0x0001;
-		wChannels        = m_pSndInfo->numChannels;
-		dwSamplesPerSec  = m_pSndInfo->sampleRate >> 16;
-		wBitsPerSample   = m_pSndInfo->sampleSize;
-		wBlockAlign      = wChannels * ((wBitsPerSample + 7) >> 3);
-		dwAvgBytesPerSec = dwSamplesPerSec * wBlockAlign;
-
-		outfile.write((char *)&wFormatTag,       sizeof(short));
-		outfile.write((char *)&wChannels,        sizeof(USHORT));
-		outfile.write((char *)&dwSamplesPerSec,  sizeof(UINT));
-		outfile.write((char *)&dwAvgBytesPerSec, sizeof(UINT));
-		outfile.write((char *)&wBlockAlign,      sizeof(USHORT));
-		outfile.write((char *)&wBitsPerSample,   sizeof(USHORT));
-
-		outfile.write(szDataChunk, 4);
-
-		iSize = vOutputData.size();
-
-		outfile.write((char *)&iSize, sizeof(int));
-
-		outfile.write((char *)&vOutputData[0], iSize);
+		return 0;
 	}
 
 	outfile.close();
-
 	return 1;
 }
 
