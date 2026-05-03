@@ -1,16 +1,24 @@
 // EVNEW - Escape Velocity: Nova Editor for Windows
-// Image / PICT I/O and conversion helpers (no libGraphite in consumers).
+// Image / PICT / RLE / PPAT helpers: `CImageFormatHelper::surface` is `shared_ptr<graphite::qd::surface>`; Graphite stays in this .cpp.
 
 #ifndef CIMAGEFORMATHELPER_H_INCLUDED
 #define CIMAGEFORMATHELPER_H_INCLUDED
 
+#include <cstdint>
+#include <memory>
 #include <vector>
 
 #include <windows.h>
 
+namespace graphite::qd {
+	class surface;
+}
+
 class CImageFormatHelper
 {
 public:
+	using surface = std::shared_ptr<graphite::qd::surface>;
+
 	enum EImageFormat
 	{
 		IMAGE_FORMAT_BMP  = 0,
@@ -19,26 +27,28 @@ public:
 		IMAGE_FORMAT_TIFF = 3
 	};
 
-	/// General image file -> 24-bit BMP; used by RLE import and the Pict pipeline.
-	static int ImportToBmp(const char *szInputFilename, const char *szOutputBmpFilename, int *pWidth, int *pHeight, const char *szContext);
+	// --- Surface preview (PICT, RLE, PPAT, import pipeline) ---
+	static int PreviewSurface(const surface &surf, HBITMAP *pOutBitmap, int *pWidth, int *pHeight, const char *szContext);
 
-	/// 24-bit BMP file -> user-selected image format; used by RLE export and Pict file export.
-	static int ExportFromBmp(const char *szInputBmpFilename, const char *szOutputFilename, EImageFormat iFormat, const char *szContext);
+	// --- PICT <-> surface (`pictResourceId` / `pictResourceName` for Graphite ctor diagnostics) ---
+	static int PictToSurface(const std::vector<UCHAR> &pictBytes, std::int64_t pictResourceId, const char *pictResourceName, surface &outSurface, const char *szContext);
 
-	/// General image file -> in-memory PICT (via temp BMP and Graphite in the .cpp only).
-	static int ImportToPict(const char *szInputFilename, std::vector<UCHAR> &outPictBytes, short *pWidth, short *pHeight, const char *szContext);
+	static int SurfaceToPict(const surface &surf, std::vector<UCHAR> &outPictBytes, const char *szContext, bool rgb555 = false);
 
-	/// PICT -> user-selected file format (via temp BMP and GDI+ in the .cpp only).
-	static int ExportFromPict(const std::vector<UCHAR> &pictBytes, const char *szOutputFilename, EImageFormat iFormat, const char *szContext);
+	// --- RLE <-> surface (reserved for Graphite `qd::rle` / CRLEResource; not implemented yet) ---
+	static int RLEToSurface(const std::vector<UCHAR> &rleBytes, std::int64_t rleResourceId, const char *rleResourceName, surface &outSurface, const char *szContext);
 
-	/// 24-bit BMP on disk -> PICT bytes in memory.
-	static int ConvertBmpToPict(const char *szInputBmpFilename, std::vector<UCHAR> &outPictBytes, short *pWidth, short *pHeight, const char *szContext);
+	static int SurfaceToRLE(const surface &surf, std::vector<UCHAR> &outRleBytes, const char *szContext);
 
-	/// PICT bytes -> 24-bit BMP file.
-	static int ConvertPictToBmp(const std::vector<UCHAR> &pictBytes, const char *szOutputBmpFilename, const char *szContext);
+	// --- PPAT <-> surface (reserved; not implemented yet) ---
+	static int PpatToSurface(const std::vector<UCHAR> &ppatBytes, std::int64_t ppatResourceId, const char *ppatResourceName, surface &outSurface, const char *szContext);
 
-	/// PICT bytes -> 24bpp DIB for GDI preview.
-	static int ConvertPictToDib(const std::vector<UCHAR> &pictBytes, HBITMAP *pOutBitmap, int *pWidth, int *pHeight, const char *szContext);
+	static int SurfaceToPpat(const surface &surf, std::vector<UCHAR> &outPpatBytes, const char *szContext);
+
+	// --- Raster image file <-> surface (GDI+ decode / encode) ---
+	static int ImportSurface(const char *szInputFilename, surface &outSurface, short *pWidth, short *pHeight, const char *szContext);
+
+	static int ExportSurface(const surface &surf, const char *szOutputFilename, EImageFormat iFormat, const char *szContext);
 };
 
 #endif

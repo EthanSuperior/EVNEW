@@ -11,6 +11,10 @@
 #include <windows.h>
 #include <windowsx.h>
 
+#include <memory>
+
+#include <libGraphite/quickdraw/internal/surface.hpp>
+
 #include "CWindow.h"
 
 #include "EVNEW.h"
@@ -43,6 +47,8 @@ CPictResource::~CPictResource(void)
 {
 	if(m_hPreviewBitmap != NULL)
 		DeleteObject(m_hPreviewBitmap);
+
+	m_spDecodedSurface.reset();
 }
 
 int CPictResource::GetType(void)
@@ -109,6 +115,8 @@ int CPictResource::Save(char *pOutput)
 
 int CPictResource::Load(char *pInput, int iSize)
 {
+	m_spDecodedSurface.reset();
+
 	if(m_vPicture.empty() || pInput != (char *)&m_vPicture[0] || m_vPicture.size() != (size_t)iSize)
 	{
 		m_vPicture.resize(iSize);
@@ -420,6 +428,9 @@ void CPictResource::InvalidatePictPreview(void)
 		DeleteObject(m_hPreviewBitmap);
 		m_hPreviewBitmap = NULL;
 	}
+
+	m_spDecodedSurface.reset();
+
 	// Force a real repaint: without this, the old pixels can stay on the dialog until another
 	// event triggers WM_PAINT, so imports look “wrong at first” after swapping PICT data.
 	if(m_pWindow != NULL)
@@ -445,7 +456,21 @@ int CPictResource::EnsurePictPreview(void)
 
 	try
 	{
-		if(CImageFormatHelper::ConvertPictToDib(*pPict, &m_hPreviewBitmap, NULL, NULL, "CPictResource::EnsurePictPreview") == 0)
+		if(!m_spDecodedSurface)
+		{
+			if(CImageFormatHelper::PictToSurface(
+				   *pPict,
+				   static_cast<std::int64_t>(GetID()),
+				   GetName(),
+				   m_spDecodedSurface,
+				   "CPictResource::EnsurePictPreview(Decode)") == 0)
+				return 0;
+		}
+
+		if(!m_spDecodedSurface
+		   || CImageFormatHelper::PreviewSurface(
+			   m_spDecodedSurface, &m_hPreviewBitmap, NULL, NULL, "CPictResource::EnsurePictPreview(DIB)")
+				  == 0)
 			return 0;
 	}
 	catch(...)
@@ -624,7 +649,9 @@ int CPictResource::FileImport(char *szFilename, int iShowErrorMessages)
 	{
 		short iImportWidth = 0;
 		short iImportHeight = 0;
-		if(CImageFormatHelper::ImportToPict(szFilename2, m_vTempPicture, &iImportWidth, &iImportHeight, "CPictResource::FileImport") == 0)
+		CImageFormatHelper::surface importSurface;
+		if(CImageFormatHelper::ImportSurface(szFilename2, importSurface, &iImportWidth, &iImportHeight, "CPictResource::FileImport") == 0
+		   || CImageFormatHelper::SurfaceToPict(importSurface, m_vTempPicture, "CPictResource::FileImport", false) == 0)
 		{
 			if(pEditor->PrefGenerateLogFile() && pLog != NULL)
 				*pLog << "Error: Unable to load image \"" << szFilename2 << "\" for PICT resource!" << CErrorLog::endl;
@@ -736,7 +763,9 @@ int CPictResource::FileExport(const char *szFilename, int iImageType, int iShowE
 		else if(iImageType == 3)
 			iFormat = CImageFormatHelper::IMAGE_FORMAT_TIFF;
 
-		if(CImageFormatHelper::ExportFromPict(pictRef, szFilename2, iFormat, "CPictResource::FileExport") == 0)
+		CImageFormatHelper::surface exportSurface;
+		if(CImageFormatHelper::PictToSurface(pictRef, 0, NULL, exportSurface, "CPictResource::FileExport") == 0
+		   || CImageFormatHelper::ExportSurface(exportSurface, szFilename2, iFormat, "CPictResource::FileExport") == 0)
 		{
 			if(pEditor->PrefGenerateLogFile() && pLog != NULL)
 				*pLog << "Error: Unable to save exported PICT image to file (see image helper / PICT trace in log)!" << CErrorLog::endl;

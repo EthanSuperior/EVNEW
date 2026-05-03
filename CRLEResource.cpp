@@ -11,6 +11,10 @@
 #include <windows.h>
 #include <windowsx.h>
 
+#include <memory>
+
+#include <libGraphite/quickdraw/internal/surface.hpp>
+
 #include "CWindow.h"
 
 #include "EVNEW.h"
@@ -1164,10 +1168,11 @@ int CRLEResource::DoImport(const char *szFilename, int iIsImage, int iNumFramesT
 		return 0;
 	}
 
-	int iSourceWidth = 0;
-	int iSourceHeight = 0;
-
-	if(CImageFormatHelper::ImportToBmp(szFilename, szTempFilename, &iSourceWidth, &iSourceHeight, "CRLEResource::DoImport") == 0)
+	CImageFormatHelper::surface importSurf;
+	short                                  sw = 0;
+	short                                  sh = 0;
+	if(CImageFormatHelper::ImportSurface(szFilename, importSurf, &sw, &sh, "CRLEResource::DoImport") == 0
+	   || CImageFormatHelper::ExportSurface(importSurf, szTempFilename, CImageFormatHelper::IMAGE_FORMAT_BMP, "CRLEResource::DoImport") == 0)
 	{
 		if(pEditor->PrefGenerateLogFile())
 			*pLog << "Error: Unable to load image \"" << szFilename << "\" for RLE resource!" << CErrorLog::endl;
@@ -1191,6 +1196,9 @@ int CRLEResource::DoImport(const char *szFilename, int iIsImage, int iNumFramesT
 
 		return 0;
 	}
+
+	int iSourceWidth  = (int)sw;
+	int iSourceHeight = (int)sh;
 
 	BITMAPFILEHEADER bmfh;
 	BITMAPINFOHEADER bmih;
@@ -1598,7 +1606,11 @@ int CRLEResource::DoExport(const char *szFilename, int iIsImage, int iNumFramesT
 		else
 			iFormat = CImageFormatHelper::IMAGE_FORMAT_TIFF;
 
-		if(CImageFormatHelper::ExportFromBmp(szTempFilename, szFilename, iFormat, "CRLEResource::DoExport") == 0)
+		CImageFormatHelper::surface exportSurf;
+		short                                  ew = 0;
+		short                                  eh = 0;
+		if(CImageFormatHelper::ImportSurface(szTempFilename, exportSurf, &ew, &eh, "CRLEResource::DoExport") == 0
+		   || CImageFormatHelper::ExportSurface(exportSurf, szFilename, iFormat, "CRLEResource::DoExport") == 0)
 		{
 			if(pEditor->PrefGenerateLogFile())
 				*pLog << "Error: Unable to save exported RLE image using GDI+!" << CErrorLog::endl;

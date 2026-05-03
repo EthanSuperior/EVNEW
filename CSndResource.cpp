@@ -883,11 +883,13 @@ int CSndResource::FileExport(const char *szFilename, int iShowErrorMessages)
 
 	try
 	{
-		std::shared_ptr<std::vector<char> > bytes(new std::vector<char>(m_vData.size()));
-		for(size_t i = 0; i < m_vData.size(); i++)
+		// Trailing pad: libGraphite read_bytes can subscript one past the slice end; keep slice size = payload.
+		const size_t nSnd = m_vData.size();
+		std::shared_ptr<std::vector<char> > bytes(new std::vector<char>(nSnd + 1u, 0));
+		for(size_t i = 0; i < nSnd; i++)
 			(*bytes)[i] = (char)m_vData[i];
 
-		std::shared_ptr<graphite::data::data> data(new graphite::data::data(bytes, m_vData.size(), 0));
+		std::shared_ptr<graphite::data::data> data(new graphite::data::data(bytes, nSnd, 0));
 		std::shared_ptr<graphite::resources::sound> snd(new graphite::resources::sound(data));
 		std::vector<std::vector<uint32_t> > channels = snd->samples();
 

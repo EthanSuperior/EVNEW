@@ -19,12 +19,14 @@ class CPictResource;
 
 #include <windows.h>
 
+#include <memory>
 #include <vector>
 #include <string>
 
 #include "CControl.h"
 #include "CNovaResource.h"
 #include "Utils.h"
+#include "CImageFormatHelper.h"
 
 ////////////////////////////////////////////////////////////////
 //////////////////////////  CONSTANTS  /////////////////////////
@@ -104,7 +106,7 @@ private:
 	/** Full-size preview DIB; scaled in OnPaint with GDI. */
 	HBITMAP m_hPreviewBitmap;
 
-	/** Raw PICT data; empty means none. */
+	CImageFormatHelper::surface m_spDecodedSurface;
 	std::vector<UCHAR> m_vPicture;
 
 	MacPictRect m_rectDest;
