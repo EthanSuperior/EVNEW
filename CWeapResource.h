@@ -57,7 +57,7 @@ const std::string g_szWeapFields[NUM_WEAP_FIELDS] =
 	 "Submunitions Angle", "Submunitions Limit", "Proximity Delay", "Ionization",
 	 "Hit Particle Count", "Hit Particle Life", "Hit Particle Velocity",
 	 "Hit Particle Color", "Exit Type", "Burst Count", "Burst Reload",
-	 "Jamming Type 1 Vunlerability", "Jamming Type 2 Vulnerability",
+	 "Jamming Type 1 Vulnerability", "Jamming Type 2 Vulnerability",
 	 "Jamming Type 3 Vulnerability", "Jamming Type 4 Vulnerability", "Durability",
 	 "Guided Turn Rate", "Max Ammo", "Recoil", "Lightning Density",
 	 "Lightning Amplitude", "Ionization Color", "Flags 1", "Flags 2", "Flags 3",

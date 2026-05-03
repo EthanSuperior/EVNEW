@@ -39,7 +39,7 @@ const std::string g_szIntfFields[NUM_INTF_FIELDS] =
 	 "Shield X2", "Shield Y2", "Shield Color", "Armor X1", "Armor Y1",
 	 "Armor X2", "Armor Y2", "Armor Color", "Fuel X1", "Fuel Y1",
 	 "Fuel X2", "Fuel Y2", "Fuel Full", "Fuel Partial", "Navigation X1",
-	 "Navigation Y1", "Navigaiton X2", "Navigation Y2", "Weapon X1",
+	 "Navigation Y1", "Navigation X2", "Navigation Y2", "Weapon X1",
 	 "Weapon Y1", "Weapon X2", "Weapon Y2", "Target X1", "Target Y1",
 	 "Target X2", "Target Y2", "Cargo X1", "Cargo Y1", "Cargo X2",
 	 "Cargo Y2", "Status Font", "Status Font Size", "Subtitle font size",
