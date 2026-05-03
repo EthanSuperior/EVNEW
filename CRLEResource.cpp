@@ -10,150 +10,15 @@
 
 #include <windows.h>
 #include <windowsx.h>
-#include <gdiplus.h>
-
-#pragma comment(lib, "gdiplus.lib")
 
 #include "CWindow.h"
 
 #include "EVNEW.h"
 #include "CNovaResource.h"
 #include "CRLEResource.h"
+#include "CImageFormatHelper.h"
 
 #include "resource.h"
-
-namespace
-{
-int GetEncoderClsid(const WCHAR *pMimeType, CLSID *pClsid)
-{
-	UINT iNumEncoders = 0;
-	UINT iEncoderInfoSize = 0;
-
-	if(Gdiplus::GetImageEncodersSize(&iNumEncoders, &iEncoderInfoSize) != Gdiplus::Ok || iEncoderInfoSize == 0)
-		return 0;
-
-	std::vector<UCHAR> vEncoderInfo(iEncoderInfoSize);
-	Gdiplus::ImageCodecInfo *pEncoderInfo = (Gdiplus::ImageCodecInfo *)&vEncoderInfo[0];
-
-	if(Gdiplus::GetImageEncoders(iNumEncoders, iEncoderInfoSize, pEncoderInfo) != Gdiplus::Ok)
-		return 0;
-
-	for(UINT i = 0; i < iNumEncoders; i++)
-	{
-		if(wcscmp(pEncoderInfo[i].MimeType, pMimeType) == 0)
-		{
-			*pClsid = pEncoderInfo[i].Clsid;
-			return 1;
-		}
-	}
-
-	return 0;
-}
-
-int SaveImageWithGDIPlus(const char *szInputFilename, const char *szOutputFilename, const WCHAR *pMimeType)
-{
-	WCHAR szInputFilenameW[MAX_PATH];
-	WCHAR szOutputFilenameW[MAX_PATH];
-
-	if(MultiByteToWideChar(CP_ACP, 0, szInputFilename, -1, szInputFilenameW, MAX_PATH) == 0)
-		return 0;
-
-	if(MultiByteToWideChar(CP_ACP, 0, szOutputFilename, -1, szOutputFilenameW, MAX_PATH) == 0)
-		return 0;
-
-	Gdiplus::GdiplusStartupInput startupInput;
-	ULONG_PTR iToken = 0;
-
-	if(Gdiplus::GdiplusStartup(&iToken, &startupInput, NULL) != Gdiplus::Ok)
-		return 0;
-
-	Gdiplus::Bitmap image(szInputFilenameW);
-
-	if(image.GetLastStatus() != Gdiplus::Ok)
-	{
-		Gdiplus::GdiplusShutdown(iToken);
-		return 0;
-	}
-
-	CLSID encoderClsid;
-
-	if(GetEncoderClsid(pMimeType, &encoderClsid) == 0)
-	{
-		Gdiplus::GdiplusShutdown(iToken);
-		return 0;
-	}
-
-	Gdiplus::Status saveStatus = image.Save(szOutputFilenameW, &encoderClsid, NULL);
-
-	Gdiplus::GdiplusShutdown(iToken);
-
-	return (saveStatus == Gdiplus::Ok);
-}
-
-int ConvertImageTo24BppBmp(const char *szInputFilename, const char *szOutputFilename, int *pWidth, int *pHeight)
-{
-	WCHAR szInputFilenameW[MAX_PATH];
-	WCHAR szOutputFilenameW[MAX_PATH];
-
-	if(MultiByteToWideChar(CP_ACP, 0, szInputFilename, -1, szInputFilenameW, MAX_PATH) == 0)
-		return 0;
-
-	if(MultiByteToWideChar(CP_ACP, 0, szOutputFilename, -1, szOutputFilenameW, MAX_PATH) == 0)
-		return 0;
-
-	Gdiplus::GdiplusStartupInput startupInput;
-	ULONG_PTR iToken = 0;
-
-	if(Gdiplus::GdiplusStartup(&iToken, &startupInput, NULL) != Gdiplus::Ok)
-		return 0;
-
-	Gdiplus::Bitmap sourceImage(szInputFilenameW);
-
-	if(sourceImage.GetLastStatus() != Gdiplus::Ok)
-	{
-		Gdiplus::GdiplusShutdown(iToken);
-		return 0;
-	}
-
-	UINT iWidth = sourceImage.GetWidth();
-	UINT iHeight = sourceImage.GetHeight();
-
-	if((iWidth == 0) || (iHeight == 0))
-	{
-		Gdiplus::GdiplusShutdown(iToken);
-		return 0;
-	}
-
-	Gdiplus::Bitmap bmp24(iWidth, iHeight, PixelFormat24bppRGB);
-	Gdiplus::Graphics graphics(&bmp24);
-
-	if(graphics.DrawImage(&sourceImage, 0, 0, iWidth, iHeight) != Gdiplus::Ok)
-	{
-		Gdiplus::GdiplusShutdown(iToken);
-		return 0;
-	}
-
-	CLSID bmpClsid;
-
-	if(GetEncoderClsid(L"image/bmp", &bmpClsid) == 0)
-	{
-		Gdiplus::GdiplusShutdown(iToken);
-		return 0;
-	}
-
-	Gdiplus::Status saveStatus = bmp24.Save(szOutputFilenameW, &bmpClsid, NULL);
-
-	Gdiplus::GdiplusShutdown(iToken);
-
-	if(saveStatus != Gdiplus::Ok)
-		return 0;
-
-	*pWidth = (int)iWidth;
-	*pHeight = (int)iHeight;
-
-	return 1;
-}
-}
 
 ////////////////////////////////////////////////////////////////
 ///////////////////  CLASS MEMBER FUNCTIONS  ///////////////////
@@ -1302,7 +1167,7 @@ int CRLEResource::DoImport(const char *szFilename, int iIsImage, int iNumFramesT
 	int iSourceWidth = 0;
 	int iSourceHeight = 0;
 
-	if(ConvertImageTo24BppBmp(szFilename, szTempFilename, &iSourceWidth, &iSourceHeight) == 0)
+	if(CImageFormatHelper::ImportToBmp(szFilename, szTempFilename, &iSourceWidth, &iSourceHeight, "CRLEResource::DoImport") == 0)
 	{
 		if(pEditor->PrefGenerateLogFile())
 			*pLog << "Error: Unable to load image \"" << szFilename << "\" for RLE resource!" << CErrorLog::endl;
@@ -1725,16 +1590,15 @@ int CRLEResource::DoExport(const char *szFilename, int iIsImage, int iNumFramesT
 
 	if(m_iExportFilter != 1)
 	{
-		const WCHAR *pMimeType;
-
+		CImageFormatHelper::EImageFormat iFormat;
 		if(m_iExportFilter == 2)
-			pMimeType = L"image/png";
+			iFormat = CImageFormatHelper::IMAGE_FORMAT_PNG;
 		else if(m_iExportFilter == 3)
-			pMimeType = L"image/jpeg";
+			iFormat = CImageFormatHelper::IMAGE_FORMAT_JPEG;
 		else
-			pMimeType = L"image/tiff";
+			iFormat = CImageFormatHelper::IMAGE_FORMAT_TIFF;
 
-		if(SaveImageWithGDIPlus(szTempFilename, szFilename, pMimeType) == 0)
+		if(CImageFormatHelper::ExportFromBmp(szTempFilename, szFilename, iFormat, "CRLEResource::DoExport") == 0)
 		{
 			if(pEditor->PrefGenerateLogFile())
 				*pLog << "Error: Unable to save exported RLE image using GDI+!" << CErrorLog::endl;

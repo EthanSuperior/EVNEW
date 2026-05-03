@@ -17,6 +17,10 @@
 
 // Build and dependency notes are maintained in Readme.txt.
 
+// After cloning, pull git dependencies (the Graphite submodule):
+//   git submodule update --init --recursive
+// Open EVNEW.vcxproj in Visual Studio and build.  (VS 2022 with the C++
+// desktop workload and the v143 toolset, or a compatible version.)
 
 ////////////////////////////////////////////////////////////////
 //////////////////////////	INCLUDES  //////////////////////////
@@ -116,6 +120,12 @@ int CEditor::Init(HINSTANCE hInstance)
 
 	char szBuffer[MAX_PATH];
 
+	m_errorLog.SetAsCurrentErrorLog();
+
+	CEditor::ms_pCurrentEditor = this;
+
+	LoadPreferences();
+
 	if(m_iPrefGenerateLogFile)
 	{
 		strcpy(szBuffer, m_szDirectory);
@@ -124,12 +134,6 @@ int CEditor::Init(HINSTANCE hInstance)
 		m_errorLog.OpenLogFile(szBuffer, 0);
 		m_errorLog.EnableLogFileAutoFlush();
 	}
-	
-    m_errorLog.SetAsCurrentErrorLog();
-
-	CEditor::ms_pCurrentEditor = this;
-
-	LoadPreferences();
 
 	char szArg1[MAX_PATH], szArg2[MAX_PATH], szArg3[MAX_PATH];
 

@@ -123,7 +123,8 @@ int CErrorLog::FlushLogFile(void)
 	if(!m_iLogFileOpen)
 		return 0;
 
-	m_foutLogFile.flush();
+	if(m_foutLogFile.is_open())
+		m_foutLogFile.flush();
 
 	return 1;
 }

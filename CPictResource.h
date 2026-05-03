@@ -93,7 +93,7 @@ private:
 	int EnsurePictPreview(void);
 	void InvalidatePictPreview(void);
 
-	int OnPaint(void);
+	int OnPaint(HWND hwndPaint);
 
 	int FileImport(char *szFilename = NULL, int iShowErrorMessages = 1);
 	int FileExport(const char *szFilename = NULL, int iImageType = -1, int iShowErrorMessages = 1);

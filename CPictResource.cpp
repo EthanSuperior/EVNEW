@@ -10,22 +10,13 @@
 
 #include <windows.h>
 #include <windowsx.h>
-#include <gdiplus.h>
-#include <memory>
-#include <vector>
-
-#pragma comment(lib, "gdiplus.lib")
-
-#include <libGraphite/data/data.hpp>
-#include <libGraphite/quickdraw/pict.hpp>
-#include <libGraphite/quickdraw/internal/surface.hpp>
-#include <libGraphite/quickdraw/internal/color.hpp>
 
 #include "CWindow.h"
 
 #include "EVNEW.h"
 #include "CNovaResource.h"
 #include "CPictResource.h"
+#include "CImageFormatHelper.h"
 
 #include "resource.h"
 
@@ -429,6 +420,10 @@ void CPictResource::InvalidatePictPreview(void)
 		DeleteObject(m_hPreviewBitmap);
 		m_hPreviewBitmap = NULL;
 	}
+	// Force a real repaint: without this, the old pixels can stay on the dialog until another
+	// event triggers WM_PAINT, so imports look “wrong at first” after swapping PICT data.
+	if(m_pWindow != NULL)
+		InvalidateRect(m_pWindow->GetHWND(), NULL, TRUE);
 }
 
 int CPictResource::EnsurePictPreview(void)
@@ -450,43 +445,13 @@ int CPictResource::EnsurePictPreview(void)
 
 	try
 	{
-		std::shared_ptr<std::vector<char> > bytes(new std::vector<char>(pPict->size()));
-		for(size_t i = 0; i < pPict->size(); i++)
-			(*bytes)[i] = (char)(*pPict)[i];
-
-		std::shared_ptr<graphite::data::data> data(new graphite::data::data(bytes, pPict->size(), 0));
-		std::shared_ptr<graphite::qd::pict> pict(new graphite::qd::pict(data));
-		std::shared_ptr<graphite::qd::surface> surface = pict->image_surface().lock();
-
-		if(surface == NULL)
+		if(CImageFormatHelper::ConvertPictToDib(*pPict, &m_hPreviewBitmap, NULL, NULL, "CPictResource::EnsurePictPreview") == 0)
 			return 0;
-
-		graphite::qd::size sz = surface->size();
-		std::vector<uint32_t> raw = surface->raw();
-
-		BITMAPINFO bmi;
-		ZeroMemory(&bmi, sizeof(BITMAPINFO));
-		bmi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
-		bmi.bmiHeader.biWidth = sz.width();
-		bmi.bmiHeader.biHeight = -sz.height();
-		bmi.bmiHeader.biPlanes = 1;
-		bmi.bmiHeader.biBitCount = 32;
-		bmi.bmiHeader.biCompression = BI_RGB;
-
-		HDC hdc = GetDC(m_pWindow->GetHWND());
-		void *pBits = NULL;
-		m_hPreviewBitmap = CreateDIBSection(hdc, &bmi, DIB_RGB_COLORS, &pBits, NULL, 0);
-		ReleaseDC(m_pWindow->GetHWND(), hdc);
-
-		if(m_hPreviewBitmap == NULL || pBits == NULL)
-			return 0;
-
-		memcpy(pBits, &raw[0], raw.size() * sizeof(uint32_t));
 	}
 	catch(...)
 	{
-		if(pEditor->PrefGenerateLogFile())
-			*pLog << "Error: Unable to rasterize PICT with Graphite for preview." << CErrorLog::endl;
+		if(pEditor->PrefGenerateLogFile() && pLog != NULL)
+			*pLog << "Error: Unable to build PICT preview." << CErrorLog::endl;
 
 		return 0;
 	}
@@ -494,15 +459,26 @@ int CPictResource::EnsurePictPreview(void)
 	return m_hPreviewBitmap != NULL;
 }
 
-int CPictResource::OnPaint(void)
+int CPictResource::OnPaint(HWND hwndPaint)
 {
 	PAINTSTRUCT ps;
 
-	BeginPaint(m_pWindow->GetHWND(), &ps);
+	if(hwndPaint == NULL)
+		return 1;
+
+	BeginPaint(hwndPaint, &ps);
+
+	// After CloseAndSave / CloseAndDontSave, m_pWindow is cleared before the dialog HWND is destroyed;
+	// we must still BeginPaint/EndPaint on hwndPaint to clear the update region.
+	if(m_pWindow == NULL)
+	{
+		EndPaint(hwndPaint, &ps);
+		return 1;
+	}
 
 	if(m_vTempPicture.empty() && m_vPicture.empty())
 	{
-		EndPaint(m_pWindow->GetHWND(), &ps);
+		EndPaint(hwndPaint, &ps);
 		return 1;
 	}
 
@@ -516,7 +492,7 @@ int CPictResource::OnPaint(void)
 
 	if(EnsurePictPreview() == 0 || m_hPreviewBitmap == NULL)
 	{
-		EndPaint(m_pWindow->GetHWND(), &ps);
+		EndPaint(hwndPaint, &ps);
 		return 1;
 	}
 
@@ -542,7 +518,7 @@ int CPictResource::OnPaint(void)
 		DeleteDC(hdcMem);
 	}
 
-	EndPaint(m_pWindow->GetHWND(), &ps);
+	EndPaint(hwndPaint, &ps);
 
 	return 1;
 }
@@ -635,61 +611,36 @@ int CPictResource::FileImport(char *szFilename, int iShowErrorMessages)
 		m_tempRectDest.right  = m_tempRectDest.left + m_iTempWidth;
 		m_tempRectDest.bottom = m_tempRectDest.top  + m_iTempHeight;
 
-		InvalidatePictPreview();
-
+		// Finalize dialog layout and zoomed m_tempRectDest before discarding the cached DIB,
+		// so the next WM_PAINT does not blend stale geometry with the new PICT.
 		if(m_pWindow != NULL)
 			InitializePicture(m_pWindow->GetHWND());
+		InvalidatePictPreview();
 
 		return 1;
 	}
 
-	WCHAR szFilenameW[MAX_PATH];
-
-	if(MultiByteToWideChar(CP_ACP, 0, szFilename2, -1, szFilenameW, MAX_PATH) == 0)
-		return 0;
-
 	try
 	{
-		Gdiplus::GdiplusStartupInput startupInput;
-		ULONG_PTR iToken = 0;
-
-		if(Gdiplus::GdiplusStartup(&iToken, &startupInput, NULL) != Gdiplus::Ok)
-			return 0;
-
-		Gdiplus::Bitmap sourceImage(szFilenameW);
-		if(sourceImage.GetLastStatus() != Gdiplus::Ok)
+		short iImportWidth = 0;
+		short iImportHeight = 0;
+		if(CImageFormatHelper::ImportToPict(szFilename2, m_vTempPicture, &iImportWidth, &iImportHeight, "CPictResource::FileImport") == 0)
 		{
-			Gdiplus::GdiplusShutdown(iToken);
-			return 0;
-		}
+			if(pEditor->PrefGenerateLogFile() && pLog != NULL)
+				*pLog << "Error: Unable to load image \"" << szFilename2 << "\" for PICT resource!" << CErrorLog::endl;
 
-		UINT iWidth = sourceImage.GetWidth();
-		UINT iHeight = sourceImage.GetHeight();
-
-		std::shared_ptr<graphite::qd::surface> surface(new graphite::qd::surface((int)iWidth, (int)iHeight));
-
-		for(UINT y = 0; y < iHeight; y++)
-		{
-			for(UINT x = 0; x < iWidth; x++)
+			if(iShowErrorMessages)
 			{
-				Gdiplus::Color c;
-				sourceImage.GetPixel(x, y, &c);
-				surface->set((int)x, (int)y, graphite::qd::color(c.GetR(), c.GetG(), c.GetB(), c.GetA()));
+				std::string szError = "\"";
+				szError += szFilename2;
+				szError += "\" is not a supported image file!";
+				MessageBox(m_pWindow->GetHWND(), szError.c_str(), "Error", MB_OK | MB_ICONEXCLAMATION);
 			}
+			return 0;
 		}
 
-		std::shared_ptr<graphite::qd::pict> pict = graphite::qd::pict::from_surface(surface);
-		std::shared_ptr<graphite::data::data> pictData = pict->data(false);
-		std::shared_ptr<std::vector<char> > bytes = pictData->get();
-
-		m_vTempPicture.resize(pictData->size());
-		for(size_t i = 0; i < pictData->size(); i++)
-			m_vTempPicture[i] = (UCHAR)(*bytes)[i];
-
-		Gdiplus::GdiplusShutdown(iToken);
-
-		m_iTempWidth = (short)iWidth;
-		m_iTempHeight = (short)iHeight;
+		m_iTempWidth  = iImportWidth;
+		m_iTempHeight = iImportHeight;
 		m_tempRectDest.left   = 48;
 		m_tempRectDest.top    = 120;
 		m_tempRectDest.right  = m_tempRectDest.left + m_iTempWidth;
@@ -697,8 +648,8 @@ int CPictResource::FileImport(char *szFilename, int iShowErrorMessages)
 	}
 	catch(...)
 	{
-		if(pEditor->PrefGenerateLogFile())
-			*pLog << "Error: Unable to load image \"" << szFilename2 << "\" for PICT resource using Graphite!" << CErrorLog::endl;
+		if(pEditor->PrefGenerateLogFile() && pLog != NULL)
+			*pLog << "Error: Exception while loading image \"" << szFilename2 << "\" for PICT resource!" << CErrorLog::endl;
 
 		if(iShowErrorMessages)
 		{
@@ -710,8 +661,7 @@ int CPictResource::FileImport(char *szFilename, int iShowErrorMessages)
 		return 0;
 	}
 
-	InvalidatePictPreview();
-
+	// Update dialog size, zoom, and m_tempRectDest first; then drop the DIB and invalidate for repaint.
 	if(m_pWindow != NULL)
 		InitializePicture(m_pWindow->GetHWND());
 	else
@@ -724,6 +674,7 @@ int CPictResource::FileImport(char *szFilename, int iShowErrorMessages)
 		m_iTempWidth  = 0;
 		m_iTempHeight = 0;
 	}
+	InvalidatePictPreview();
 
 	m_iIsDirty = 1;
 	return 1;
@@ -777,92 +728,43 @@ int CPictResource::FileExport(const char *szFilename, int iImageType, int iShowE
 
 	try
 	{
-		std::shared_ptr<std::vector<char> > bytes(new std::vector<char>(pictRef.size()));
-		for(size_t i = 0; i < pictRef.size(); i++)
-			(*bytes)[i] = (char)pictRef[i];
-
-		std::shared_ptr<graphite::data::data> data(new graphite::data::data(bytes, pictRef.size(), 0));
-		std::shared_ptr<graphite::qd::pict> pict(new graphite::qd::pict(data));
-		std::shared_ptr<graphite::qd::surface> surface = pict->image_surface().lock();
-
-		if(surface == NULL)
-			return 0;
-
-		graphite::qd::size sz = surface->size();
-		std::vector<uint32_t> raw = surface->raw();
-
-		WCHAR szFilenameW[MAX_PATH];
-		if(MultiByteToWideChar(CP_ACP, 0, szFilename2, -1, szFilenameW, MAX_PATH) == 0)
-			return 0;
-
-		Gdiplus::GdiplusStartupInput startupInput;
-		ULONG_PTR iToken = 0;
-		if(Gdiplus::GdiplusStartup(&iToken, &startupInput, NULL) != Gdiplus::Ok)
-			return 0;
-
-		Gdiplus::Bitmap image((INT)sz.width(), (INT)sz.height(), (INT)(sz.width() * sizeof(uint32_t)), PixelFormat32bppARGB, (BYTE *)&raw[0]);
-
-		CLSID encoderClsid;
-		UINT iNumEncoders = 0;
-		UINT iEncoderInfoSize = 0;
-		if(Gdiplus::GetImageEncodersSize(&iNumEncoders, &iEncoderInfoSize) != Gdiplus::Ok || iEncoderInfoSize == 0)
-		{
-			Gdiplus::GdiplusShutdown(iToken);
-			return 0;
-		}
-
-		std::vector<UCHAR> vEncoderInfo(iEncoderInfoSize);
-		Gdiplus::ImageCodecInfo *pEncoderInfo = (Gdiplus::ImageCodecInfo *)&vEncoderInfo[0];
-		if(Gdiplus::GetImageEncoders(iNumEncoders, iEncoderInfoSize, pEncoderInfo) != Gdiplus::Ok)
-		{
-			Gdiplus::GdiplusShutdown(iToken);
-			return 0;
-		}
-
-		const WCHAR *pMimeType = L"image/bmp";
+		CImageFormatHelper::EImageFormat iFormat = CImageFormatHelper::IMAGE_FORMAT_BMP;
 		if(iImageType == 1)
-			pMimeType = L"image/png";
+			iFormat = CImageFormatHelper::IMAGE_FORMAT_PNG;
 		else if(iImageType == 2)
-			pMimeType = L"image/jpeg";
+			iFormat = CImageFormatHelper::IMAGE_FORMAT_JPEG;
 		else if(iImageType == 3)
-			pMimeType = L"image/tiff";
+			iFormat = CImageFormatHelper::IMAGE_FORMAT_TIFF;
 
-		bool bFound = false;
-		for(UINT i = 0; i < iNumEncoders; i++)
+		if(CImageFormatHelper::ExportFromPict(pictRef, szFilename2, iFormat, "CPictResource::FileExport") == 0)
 		{
-			if(wcscmp(pEncoderInfo[i].MimeType, pMimeType) == 0)
-			{
-				encoderClsid = pEncoderInfo[i].Clsid;
-				bFound = true;
-				break;
-			}
-		}
+			if(pEditor->PrefGenerateLogFile() && pLog != NULL)
+				*pLog << "Error: Unable to save exported PICT image to file (see image helper / PICT trace in log)!" << CErrorLog::endl;
 
-		if(!bFound || image.Save(szFilenameW, &encoderClsid, NULL) != Gdiplus::Ok)
-		{
-			Gdiplus::GdiplusShutdown(iToken);
+			if(iShowErrorMessages)
+				MessageBox(m_pWindow->GetHWND(), "Export failed! Enable log file in preferences for details.", "Error", MB_OK | MB_ICONEXCLAMATION);
+
 			return 0;
 		}
-
-		Gdiplus::GdiplusShutdown(iToken);
-		return 1;
 	}
 	catch(...)
 	{
-		if(pEditor->PrefGenerateLogFile())
-			*pLog << "Error: Unable to export PICT using Graphite!" << CErrorLog::endl;
+		if(pEditor->PrefGenerateLogFile() && pLog != NULL)
+			*pLog << "Error: Exception while exporting PICT to file!" << CErrorLog::endl;
 
 		if(iShowErrorMessages)
-			MessageBox(m_pWindow->GetHWND(), "Export failed!", "Error", MB_OK | MB_ICONEXCLAMATION);
+			MessageBox(m_pWindow->GetHWND(), "Export failed! Enable log file in preferences for details.", "Error", MB_OK | MB_ICONEXCLAMATION);
 
 		return 0;
 	}
+
+	return 1;
 }
 
 BOOL CPictResource::PictDlgProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 {
 	CWindow *pWindow;
-	CPictResource *pResource;
+	CPictResource *pResource = NULL;
 
 	pWindow = CWindow::GetWindow(hwnd, 1);
 
@@ -875,6 +777,8 @@ BOOL CPictResource::PictDlgProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lpara
 	{
 		case WM_INITDIALOG:
 		{
+			if(pWindow == NULL || pResource == NULL)
+				return TRUE;
 			if(pResource->Initialize(hwnd) == 0)
 			{
 				std::string szBuffer = "PICT initialization failed.";
@@ -892,7 +796,14 @@ BOOL CPictResource::PictDlgProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lpara
 
 		case WM_PAINT:
 		{
-			pResource->OnPaint();
+			if(pResource != NULL)
+				pResource->OnPaint(hwnd);
+			else
+			{
+				PAINTSTRUCT ps;
+				BeginPaint(hwnd, &ps);
+				EndPaint(hwnd, &ps);
+			}
 
 			return TRUE;
 
@@ -903,7 +814,8 @@ BOOL CPictResource::PictDlgProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lpara
 		{
 			if(wparam == SC_CLOSE)
 			{
-				pResource->CloseAndDontSave();
+				if(pResource != NULL)
+					pResource->CloseAndDontSave();
 
 				return TRUE;
 			}
@@ -913,6 +825,8 @@ BOOL CPictResource::PictDlgProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lpara
 
 		case WM_COMMAND:
 		{
+			if(pResource == NULL)
+				return TRUE;
 			int iNotifyCode = HIWORD(wparam);
 			int iControlID  = LOWORD(wparam);
 
