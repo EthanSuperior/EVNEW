@@ -483,10 +483,7 @@ any characters that are converted incorrectly, or anything else that might be us
 
 4/18/26: Release 1.1.0
 
- -- Features --
- * Remove QuickTime in favor of libGraphite
-
- -- Bug Fixes --
+-- Bug Fixes --
  
 * Update build to work on more modern systems
 * Fixed an issue where UnkResources would not write back data
@@ -494,6 +491,10 @@ any characters that are converted incorrectly, or anything else that might be us
 * Fixed some missing windows encodings (#3)
 * Fixed some typos (#5)
 * Fixed issue where the presence of ddraw.dll would prevent PICT resources from rendering
+
+-- Feature Changes --
+ 
+* Remove QuickTime in favor of libGraphite
 
 
 +-------------+
