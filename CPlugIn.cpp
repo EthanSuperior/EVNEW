@@ -90,7 +90,7 @@ CPlugIn::CPlugIn(void)
 	strcpy(m_szRle8Subdirectory, "Rle8s");
 	strcpy(m_szRle8FilenamePrefix, "rle8_");
 	strcpy(m_szRle8MaskSubdirectory, "Rle8s");
-	strcpy(m_szRle8MaskFilenamePrefix, "rle8mask");
+	strcpy(m_szRle8MaskFilenamePrefix, "rle8mask_");
 	m_iRle8ImageFileType = 0;		// .bmp
 	m_iRle8MaskFileType  = 0;		// .bmp
 	m_iRle8FramesPerRow  = 6;
@@ -99,7 +99,7 @@ CPlugIn::CPlugIn(void)
 	strcpy(m_szRleDSubdirectory, "RleDs");
 	strcpy(m_szRleDFilenamePrefix, "rleD_");
 	strcpy(m_szRleDMaskSubdirectory, "RleDs");
-	strcpy(m_szRleDMaskFilenamePrefix, "rleDmask");
+	strcpy(m_szRleDMaskFilenamePrefix, "rleDmask_");
 	m_iRleDImageFileType = 0;		// .bmp
 	m_iRleDMaskFileType  = 0;		// .bmp
 	m_iRleDFramesPerRow  = 6;
@@ -265,6 +265,13 @@ int CPlugIn::SetSndSaveOptions(int iSave, char *szSubdirectory, char *szFilename
 
 	strcpy(m_szSndSubdirectory,   szSubdirectory);
 	strcpy(m_szSndFilenamePrefix, szFilenamePrefix);
+
+	return 1;
+}
+
+int CPlugIn::SetSaveMedia(int iSave)
+{
+	m_iCicnSave = m_iPictSave = m_iRle8Save = m_iRleDSave = m_iSndSave = iSave;
 
 	return 1;
 }
@@ -988,7 +995,7 @@ int CPlugIn::Save(CWindow *pWndParent)
 				PrintTextField(fileout, g_szResourceTypes[i].c_str(), '\t');
 
 				fileout << m_vResources[i][j]->GetID() << '\t';
-					
+
 				PrintTextField(fileout, m_vResources[i][j]->GetName(), '\t');
 
 				m_iFileOffset = fileout.tellp();

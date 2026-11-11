@@ -16,7 +16,7 @@
 // How to compile EVNEW:
 
 // EVNEW uses the QuickTime Software Development Kit (SDK) for several things.
-// You can download the SDK from 
+// You can download the SDK from
 // <http://developer.apple.com/quicktime>
 // Once the SDK is installed, add to your compiler's search paths for headers
 // and libraries the locations of the QT SDK headers and libraries, or just
@@ -161,7 +161,7 @@ int CEditor::Init(HINSTANCE hInstance)
 		return 0;
 	}
 
-	char szArg1[MAX_PATH], szArg2[MAX_PATH], szArg3[MAX_PATH];
+	char szArg1[MAX_PATH], szArg2[MAX_PATH], szArg3[MAX_PATH], szArg4[MATH_PATH];
 
 	iCount = ParseCommandLine(szCommandLine, szArg1); szCommandLine += iCount;
 
@@ -215,7 +215,7 @@ int CEditor::Init(HINSTANCE hInstance)
 
 			if(iCount == 0)
 			{
-				MessageBox(NULL, "Usage: EVNEW.exe -totxt \"source.rez\" \"destination.txt\"", "Error", MB_OK | MB_ICONEXCLAMATION);
+				MessageBox(NULL, "Usage: EVNEW.exe -totxt \"source.rez\" \"destination.txt\" [-nomedia]", "Error", MB_OK | MB_ICONEXCLAMATION);
 
 				return 0;
 			}
@@ -224,7 +224,7 @@ int CEditor::Init(HINSTANCE hInstance)
 
 			if(iCount == 0)
 			{
-				MessageBox(NULL, "Usage: EVNEW.exe -totxt \"source.rez\" \"destination.txt\"", "Error", MB_OK | MB_ICONEXCLAMATION);
+				MessageBox(NULL, "Usage: EVNEW.exe -totxt \"source.rez\" \"destination.txt\" [-nomedia]", "Error", MB_OK | MB_ICONEXCLAMATION);
 
 				return 0;
 			}
@@ -241,6 +241,17 @@ int CEditor::Init(HINSTANCE hInstance)
 
 			if(strcmp(pExtension, "txt") != 0)
 				strcat(szArg3, ".txt");
+
+			// Optional 4th argument: -nomedia skips cicn/pict/rle8/rleD/snd export (default is to export them)
+			iCount = ParseCommandLine(szCommandLine, szArg4);
+			szCommandLine += iCount;
+			m_plugIn.SetSaveMedia((iCount > 0 && strcmp(szArg4, "-nomedia") == 0) ? 0 : 1);
+
+			// Images are written relative to the output folder, so it must be a full path
+			char szFull[MAX_PATH];
+
+			if(GetFullPathName(szArg3, MAX_PATH, szFull, NULL) != 0)
+				strcpy(szArg3, szFull);
 
 			m_plugIn.SetFilename(szArg3);
 			m_plugIn.Save(NULL);
@@ -1485,7 +1496,7 @@ int CEditor::RemoveEditDialog(CWindow *pWindow, int iIDOrNameChanged)
 	menuItemInfo.fMask  = MIIM_DATA;
 
 	for(i = IDM_WINDOW_1; i <= IDM_WINDOW_MAX; i++)
-	{	
+	{
 		GetMenuItemInfo(m_hWindowMenu, i, FALSE, &menuItemInfo);
 
 		if((CWindow *)menuItemInfo.dwItemData == pWindow)
