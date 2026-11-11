@@ -52,6 +52,7 @@ public:
 	int SetRle8SaveOptions(int iSave, char *szSubdirectory, char *szFilenamePrefix, char *szMaskSubdirectory, char *szMaskFilenamePrefix, int iImageFileType, int iMaskFileType, int iFramesPerRow);
 	int SetRleDSaveOptions(int iSave, char *szSubdirectory, char *szFilenamePrefix, char *szMaskSubdirectory, char *szMaskFilenamePrefix, int iImageFileType, int iMaskFileType, int iFramesPerRow);
 	int SetSndSaveOptions(int iSave, char *szSubdirectory, char *szFilenamePrefix);
+	int SetSaveMedia(int iSave);
 
 	int GetCurFileOffset(void);
 
