@@ -893,9 +893,31 @@ int CEditor::FileSaveAs(void)
 	return 1;
 }
 
-int CEditor::FileImportCSV(void) 
+int CEditor::FileImportCSV(int iOpenDialog, char* szFilename) 
 {
-	MessageBox(NULL, "WIP", "Error", MB_OK | MB_ICONEXCLAMATION);
+	char szFilename2[MAX_PATH];
+
+	if (iOpenDialog)
+	{
+		strcpy(szFilename2, "");
+
+		m_ofnLoadSave.hwndOwner = m_dialogMain.GetHWND();
+		m_ofnLoadSave.lpstrFile = szFilename2;
+		m_ofnLoadSave.lpstrTitle = "Open CSV";
+		m_ofnLoadSave.lpstrFilter = "Comma Separated Values File (*.csv)\0*.csv";
+		m_ofnLoadSave.nFilterIndex = 1;
+		m_ofnLoadSave.lpstrDefExt = "csv";
+		m_ofnLoadSave.Flags = OFN_HIDEREADONLY | OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST;
+
+		if (GetOpenFileName(&m_ofnLoadSave) == 0)
+			return 0;
+	}
+	else
+	{
+		strcpy(szFilename2, szFilename);
+	}
+
+	m_plugIn.AdditiveLoadCSV(szFilename2, &m_dialogMain);
 	return 0;
 }
 
@@ -1926,7 +1948,7 @@ BOOL CEditor::MainDialogProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 			}
 			else if (iControlID == ID_FILE_IMPORTFROMCSV)
 			{
-				pEditor->FileImportCSV();
+				pEditor->FileImportCSV(1, NULL);
 			}
 			else if (iControlID == ID_FILE_EXPORTTOCSV)
 			{
