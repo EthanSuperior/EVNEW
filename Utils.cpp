@@ -416,7 +416,7 @@ int ReadTextField(std::istream & input, char *pData, int iCount)
 int ReadIntField(std::istream& input, char delim) 
 {
 	char buffer[20];
-	input.getline(buffer, 255, delim);
+	input.getline(buffer, 20, delim);
 	return atoi(buffer);
 }
 
