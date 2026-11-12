@@ -305,9 +305,6 @@ int ReadTextField(std::istream & input, char *pData, int iCount)
 	int iIsQuoted = 0;
 
 	int i;
-	char debBuf[16];
-	sprintf(debBuf, "%c", c);
-	MessageBox(NULL, debBuf, "Debug", MB_OK | MB_ICONEXCLAMATION);
 
 	if(c == '\"')
 	{
