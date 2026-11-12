@@ -58,6 +58,7 @@ public:
 	int Load(char *szFilename, CWindow *pWndParent);
 	int Save(CWindow *pWndParent);
 
+	int AdditiveLoadCSV(char* szFilename, CWindow* pWndParent);
 	int ExportToCSV(char* szDirectory, CWindow* pWndParent);
 
 	CNovaResource * AllocateResource(int iType);

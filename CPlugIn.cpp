@@ -1304,6 +1304,161 @@ int CPlugIn::Save(CWindow *pWndParent)
 
 	return 1;
 }
+int CPlugIn::AdditiveLoadCSV(char* szFilename, CWindow* pWndParent)
+{
+	//SetFilename(szFilename);
+
+	int iError = 0;
+
+	CErrorLog* pLog = CErrorLog::GetCurrentErrorLog();
+
+	std::ifstream filein;
+
+	filein.open(szFilename, std::ios::in);
+
+	std::string szBuffer;
+
+	if (!filein.is_open())
+	{
+		szBuffer = "Error: Unable to open file \"";
+		szBuffer += szFilename;
+		szBuffer += "\"!";
+
+		if (m_iShowErrorMessages)
+			MessageBox(pWndParent->GetHWND(), szBuffer.c_str(), "Error", MB_OK | MB_ICONEXCLAMATION);
+
+		*pLog << szBuffer << CErrorLog::endl;
+
+		return -1;
+	}
+
+	int i, j, k;
+
+	char c;
+
+	char szResourceType[256];
+
+	short iID;
+
+	char szResourceName[256];
+
+	char szJunk[16];
+
+	m_iFileOffset = 0;
+
+
+	HWND hwndLoadingText;
+	HWND hwndProgressBar;
+
+	if ((pWndParent != NULL) && (m_iShowProgressBar))
+	{
+		m_wndLoading.SetExtraData(0, (int)this);
+		m_wndLoading.SetExtraData(1, (int)pLog);
+		m_wndLoading.CreateAsDialog(pWndParent->GetInstance(), IDD_LOADING, 0, pWndParent);
+
+		SetWindowText(m_wndLoading.GetHWND(), "Loading Resources");
+
+		hwndLoadingText = GetDlgItem(m_wndLoading.GetHWND(), IDC_LOADING_TEXT1);
+		hwndProgressBar = GetDlgItem(m_wndLoading.GetHWND(), IDC_LOADING_PROGRESS1);
+
+		SendMessage(hwndProgressBar, PBM_SETRANGE, 0, MAKELPARAM(0, 32767));
+	}
+
+	int iNumResources = 0;
+	int iCurIndex = 0;
+
+	std::string szLoading;
+
+	// Our header line is for humans, so we can skip it
+	while (filein.peek() != '\n')
+		filein.ignore(1);
+
+	while (1)
+	{
+		while (((filein.peek() == '\n') || (filein.peek() == ',')) && (!filein.eof()))
+			filein.ignore(1);
+
+		ReadTextField(filein, szResourceType, 256);
+
+		if ((filein.eof()) || (filein.fail()) || (filein.bad()) || (!filein.good()))
+			break;
+
+
+		for (i = 0; i < NUM_RESOURCE_TYPES; i++)
+		{
+			if ((strcmp(szResourceType, g_szResourceTypes[i].c_str()) == 0) || (strcmp(szResourceType, g_szMacResourceTypes[i].c_str()) == 0))
+			{
+				if ((pWndParent != NULL) && (m_iShowProgressBar))
+				{
+					SendMessage(hwndProgressBar, PBM_DELTAPOS, 1, 0);
+
+					szLoading = "Loading resource ";
+
+					szLoading += ToString(iCurIndex + 1);
+					szLoading += " of ";
+
+					if (iNumResources > 0)
+						szLoading += ToString(iNumResources);
+					else
+						szLoading += "?";
+
+					Static_SetText(hwndLoadingText, szLoading.c_str());
+				}
+
+				m_vResources[i].push_back(AllocateResource(i));
+
+				filein >> iID;
+
+				filein.ignore(1);
+
+				ReadTextField(filein, szResourceName, 256);
+
+				m_iFileOffset = filein.tellg();
+
+				m_vResources[i][m_vResources[i].size() - 1]->SetID(iID);
+				m_vResources[i][m_vResources[i].size() - 1]->SetName(szResourceName);
+				m_vResources[i][m_vResources[i].size() - 1]->SetIsNew(0);
+
+				if (g_iResourceCanLoadSaveText[i])
+				{
+					if (m_vResources[i][m_vResources[i].size() - 1]->LoadFromText(filein, ',') == 0)
+						iError = 1;
+				}
+				else
+				{
+					if (m_vResources[i][m_vResources[i].size() - 1]->LoadFromTextEx(filein, std::string(m_szFilePath)) == 0)
+						iError = 1;
+				}
+
+				ReadTextField(filein, szJunk, 4);
+
+				iCurIndex++;
+
+				break;
+			}
+		}
+
+		if (i == NUM_RESOURCE_TYPES)
+		{
+			c = filein.get();
+
+			while ((c != '\n') && (!filein.eof()))
+				c = filein.get();
+		}
+	}
+
+	filein.close();
+
+	if ((pWndParent != NULL) && (m_iShowProgressBar))
+	{
+		m_wndLoading.Destroy();
+	}
+
+	if (iError)
+		return 0;
+
+	return 1;
+}
 
 int CPlugIn::ExportToCSV(char* szDirectory, CWindow* pWndParent)
 {
