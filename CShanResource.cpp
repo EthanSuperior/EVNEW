@@ -519,9 +519,9 @@ int CShanResource::SaveToText(std::ostream & output, char delim)
 
 int CShanResource::LoadFromText(std::istream & input, char delim)
 {
-	input >> m_iRotationFrames = ReadIntField(input, delim);
+	m_iRotationFrames = ReadIntField(input, delim);
 	m_iBaseImage = ReadIntField(input, delim);
-	m_iBaseMask
+	m_iBaseMask = ReadIntField(input, delim);
 	m_iBaseSetCount = ReadIntField(input, delim);
 	m_iBaseXSize = ReadIntField(input, delim);
 	m_iBaseYSize = ReadIntField(input, delim);
