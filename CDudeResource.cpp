@@ -252,40 +252,12 @@ int CDudeResource::SaveToText(std::ostream & output, char delim)
 
 int CDudeResource::LoadFromText(std::istream & input, char delim)
 {
-	input >> m_iAIType
-		  >> m_iGovernment
-		  >> m_iShipTypes[0]
-		  >> m_iShipTypes[1]
-		  >> m_iShipTypes[2]
-		  >> m_iShipTypes[3]
-		  >> m_iShipTypes[4]
-		  >> m_iShipTypes[5]
-		  >> m_iShipTypes[6]
-		  >> m_iShipTypes[7]
-		  >> m_iShipTypes[8]
-		  >> m_iShipTypes[9]
-		  >> m_iShipTypes[10]
-		  >> m_iShipTypes[11]
-		  >> m_iShipTypes[12]
-		  >> m_iShipTypes[13]
-		  >> m_iShipTypes[14]
-		  >> m_iShipTypes[15]
-		  >> m_iShipProbabilities[0]
-		  >> m_iShipProbabilities[1]
-		  >> m_iShipProbabilities[2]
-		  >> m_iShipProbabilities[3]
-		  >> m_iShipProbabilities[4]
-		  >> m_iShipProbabilities[5]
-		  >> m_iShipProbabilities[6]
-		  >> m_iShipProbabilities[7]
-		  >> m_iShipProbabilities[8]
-		  >> m_iShipProbabilities[9]
-		  >> m_iShipProbabilities[10]
-		  >> m_iShipProbabilities[11]
-		  >> m_iShipProbabilities[12]
-		  >> m_iShipProbabilities[13]
-		  >> m_iShipProbabilities[14]
-		  >> m_iShipProbabilities[15];
+	m_iAIType = ReadIntField(input, delim);
+	m_iGovernment = ReadIntField(input, delim);
+	for (int i = 0; i < 16; i++)
+		m_iShipTypes[i] = ReadIntField(input, delim);
+	for (int i = 0; i < 16; i++)
+		m_iShipProbabilities[i] = ReadIntField(input, delim);
 
 	ReadHex16Field(input, (char *)&m_iFlags);
 	ReadHex16Field(input, (char *)&m_iInfoTypes);

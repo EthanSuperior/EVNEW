@@ -396,61 +396,59 @@ int CWeapResource::SaveToText(std::ostream & output, char delim)
 
 int CWeapResource::LoadFromText(std::istream & input, char delim)
 {
-	input >> m_iReload
-		  >> m_iLifetime
-		  >> m_iMassDamage
-		  >> m_iEnergyDamage
-		  >> m_iGuidance
-		  >> m_iSpeed
-		  >> m_iAmmoType
-		  >> m_iGraphics
-		  >> m_iInaccuracy
-		  >> m_iSound
-		  >> m_iImpact
-		  >> m_iExplosionType
-		  >> m_iProximityRadius
-		  >> m_iBlastRadius
-		  >> m_iSmokeSet
-		  >> m_iDecay
-		  >> m_iParticleCount
-		  >> m_iParticleVelocity
-		  >> m_iParticleMinLife
-		  >> m_iParticleMaxLife;
+	m_iReload = ReadIntField(input, delim);
+	m_iLifetime = ReadIntField(input, delim);
+	m_iMassDamage = ReadIntField(input, delim);
+	m_iEnergyDamage = ReadIntField(input, delim);
+	m_iGuidance = ReadIntField(input, delim);
+	m_iSpeed = ReadIntField(input, delim);
+	m_iAmmoType = ReadIntField(input, delim);
+	m_iGraphics = ReadIntField(input, delim);
+	m_iInaccuracy = ReadIntField(input, delim);
+	m_iSound = ReadIntField(input, delim);
+	m_iImpact = ReadIntField(input, delim);
+	m_iExplosionType = ReadIntField(input, delim);
+	m_iProximityRadius = ReadIntField(input, delim);
+	m_iBlastRadius = ReadIntField(input, delim);
+	m_iSmokeSet = ReadIntField(input, delim);
+	m_iDecay = ReadIntField(input, delim);
+	m_iParticleCount = ReadIntField(input, delim);
+	m_iParticleVelocity = ReadIntField(input, delim);
+	m_iParticleMinLife = ReadIntField(input, delim);
+	m_iParticleMaxLife = ReadIntField(input, delim);
 
 	ReadHex32Field(input, (char *)&m_iParticleColor);
 
-	input >> m_iBeamLength
-		  >> m_iBeamWidth
-		  >> m_iBeamFalloff;
+	m_iBeamLength = ReadIntField(input, delim);
+	m_iBeamWidth = ReadIntField(input, delim);
+	m_iBeamFalloff = ReadIntField(input, delim);
 
 	ReadHex32Field(input, (char *)&m_iBeamColor);
 	ReadHex32Field(input, (char *)&m_iCoronaColor);
 
-	input >> m_iSubmunitionsCount
-		  >> m_iSubmunitionsType
-		  >> m_iSubmunitionsAngle
-		  >> m_iSubmunitionsLimit
-		  >> m_iProximityDelay
-		  >> m_iIonization
-		  >> m_iHitParticleCount
-		  >> m_iHitParticleLife
-		  >> m_iHitParticleVelocity;
+	m_iSubmunitionsCount = ReadIntField(input, delim);
+	m_iSubmunitionsType = ReadIntField(input, delim);
+	m_iSubmunitionsAngle = ReadIntField(input, delim);
+	m_iSubmunitionsLimit = ReadIntField(input, delim);
+	m_iProximityDelay = ReadIntField(input, delim);
+	m_iIonization = ReadIntField(input, delim);
+	m_iHitParticleCount = ReadIntField(input, delim);
+	m_iHitParticleLife = ReadIntField(input, delim);
+	m_iHitParticleVelocity = ReadIntField(input, delim);
 
 	ReadHex32Field(input, (char *)&m_iHitParticleColor);
 
-	input >> m_iExitType
-		  >> m_iBurstCount
-		  >> m_iBurstReload
-		  >> m_iJammingVulnerability[0]
-		  >> m_iJammingVulnerability[1]
-		  >> m_iJammingVulnerability[2]
-		  >> m_iJammingVulnerability[3]
-		  >> m_iDurability
-		  >> m_iGuidedTurnRate
-		  >> m_iMaxAmmo
-		  >> m_iRecoil
-		  >> m_iLightningDensity
-		  >> m_iLightningAmplitude;
+	m_iExitType = ReadIntField(input, delim);
+	m_iBurstCount = ReadIntField(input, delim);
+	m_iBurstReload = ReadIntField(input, delim);
+	for (int i = 0; i < 4; i++)
+		m_iJammingVulnerability[i] = ReadIntField(input, delim);
+	m_iDurability = ReadIntField(input, delim);
+	m_iGuidedTurnRate = ReadIntField(input, delim);
+	m_iMaxAmmo = ReadIntField(input, delim);
+	m_iRecoil = ReadIntField(input, delim);
+	m_iLightningDensity = ReadIntField(input, delim);
+	m_iLightningAmplitude = ReadIntField(input, delim);
 
 	ReadHex32Field(input, (char *)&m_iIonizationColor);
 

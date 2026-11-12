@@ -318,48 +318,36 @@ int CSpobResource::SaveToText(std::ostream & output, char delim)
 
 int CSpobResource::LoadFromText(std::istream & input, char delim)
 {
-	input >> m_iXPosition
-		  >> m_iYPosition
-		  >> m_iGraphics
-		  >> m_iTribute
-		  >> m_iTechLevel
-		  >> m_iSpecialTechs[0]
-		  >> m_iSpecialTechs[1]
-		  >> m_iSpecialTechs[2]
-		  >> m_iSpecialTechs[3]
-		  >> m_iSpecialTechs[4]
-		  >> m_iSpecialTechs[5]
-		  >> m_iSpecialTechs[6]
-		  >> m_iSpecialTechs[7]
-		  >> m_iGovernment
-		  >> m_iMinStatus
-		  >> m_iCustomPicture
-		  >> m_iCustomSound
-		  >> m_iDefenseDude
-		  >> m_iDefenseCount
-		  >> m_iAnimationDelay
-		  >> m_iFrame0Bias
-		  >> m_iHyperlinks[0]
-		  >> m_iHyperlinks[1]
-		  >> m_iHyperlinks[2]
-		  >> m_iHyperlinks[3]
-		  >> m_iHyperlinks[4]
-		  >> m_iHyperlinks[5]
-		  >> m_iHyperlinks[6]
-		  >> m_iHyperlinks[7];
+	m_iXPosition = ReadIntField(input, delim);
+	m_iYPosition = ReadIntField(input, delim);
+	m_iGraphics = ReadIntField(input, delim);
+	m_iTribute = ReadIntField(input, delim);
+	m_iTechLevel = ReadIntField(input, delim);
+	for (int i = 0; i < 8; i++)
+		m_iSpecialTechs[i] = ReadIntField(input, delim);
+	m_iGovernment = ReadIntField(input, delim);
+	m_iMinStatus = ReadIntField(input, delim);
+	m_iCustomPicture = ReadIntField(input, delim);
+	m_iCustomSound = ReadIntField(input, delim);
+	m_iDefenseDude = ReadIntField(input, delim);
+	m_iDefenseCount = ReadIntField(input, delim);
+	m_iAnimationDelay = ReadIntField(input, delim);
+	m_iFrame0Bias = ReadIntField(input, delim);
+	for (int i = 0; i < 8; i++)
+		m_iHyperlinks[i] = ReadIntField(input, delim);
 
 	input.ignore(1);
 
 	ReadTextField(input, m_szOnDominate, 255);
 	ReadTextField(input, m_szOnRelease,  255);
 
-	input >> m_iLandingFee
-		  >> m_iGravity
-		  >> m_iWeapon
-		  >> m_iStrength
-		  >> m_iDeadType
-		  >> m_iDeadTime
-		  >> m_iExplosionType;
+	m_iLandingFee = ReadIntField(input, delim);
+	m_iGravity = ReadIntField(input, delim);
+	m_iWeapon = ReadIntField(input, delim);
+	m_iStrength = ReadIntField(input, delim);
+	m_iDeadType = ReadIntField(input, delim);
+	m_iDeadTime = ReadIntField(input, delim);
+	m_iExplosionType = ReadIntField(input, delim);
 
 	input.ignore(1);
 

@@ -235,16 +235,16 @@ int CCronResource::SaveToText(std::ostream & output, char delim)
 
 int CCronResource::LoadFromText(std::istream & input, char delim)
 {
-	input >> m_iFirstDay
-		  >> m_iFirstMonth
-		  >> m_iFirstYear
-		  >> m_iLastDay
-		  >> m_iLastMonth
-		  >> m_iLastYear
-		  >> m_iRandom
-		  >> m_iDuration
-		  >> m_iPreHoldoff
-		  >> m_iPostHoldoff;
+	m_iFirstDay = ReadIntField(input, delim);
+	m_iFirstMonth = ReadIntField(input, delim);
+	m_iFirstYear = ReadIntField(input, delim);
+	m_iLastDay = ReadIntField(input, delim);
+	m_iLastMonth = ReadIntField(input, delim);
+	m_iLastYear = ReadIntField(input, delim);
+	m_iRandom = ReadIntField(input, delim);
+	m_iDuration = ReadIntField(input, delim);
+	m_iPreHoldoff = ReadIntField(input, delim);
+	m_iPostHoldoff = ReadIntField(input, delim);
 
 	input.ignore(1);
 
@@ -255,15 +255,15 @@ int CCronResource::LoadFromText(std::istream & input, char delim)
 	ReadHex64Field(input, m_cContribute);
 	ReadHex64Field(input, m_cRequire);
 
-	input >> m_iGovernment1
-		  >> m_iGovernmentNews1
-		  >> m_iGovernment2
-		  >> m_iGovernmentNews2
-		  >> m_iGovernment3
-		  >> m_iGovernmentNews3
-		  >> m_iGovernment4
-		  >> m_iGovernmentNews4
-		  >> m_iIndependentNews;
+	m_iGovernment1 = ReadIntField(input, delim);
+	m_iGovernmentNews1 = ReadIntField(input, delim);
+	m_iGovernment2 = ReadIntField(input, delim);
+	m_iGovernmentNews2 = ReadIntField(input, delim);
+	m_iGovernment3 = ReadIntField(input, delim);
+	m_iGovernmentNews3 = ReadIntField(input, delim);
+	m_iGovernment4 = ReadIntField(input, delim);
+	m_iGovernmentNews4 = ReadIntField(input, delim);
+	m_iIndependentNews = ReadIntField(input, delim);
 
 	ReadHex16Field(input, (char *)&m_iFlags);
 

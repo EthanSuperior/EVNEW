@@ -162,11 +162,11 @@ int CRankResource::SaveToText(std::ostream & output, char delim)
 
 int CRankResource::LoadFromText(std::istream & input, char delim)
 {
-	input >> m_iWeight
-		  >> m_iGovernment
-		  >> m_iSalary
-		  >> m_iSalaryCap
-		  >> m_iPriceMod;
+	m_iWeight = ReadIntField(input, delim);
+	m_iGovernment = ReadIntField(input, delim);
+	m_iSalary = ReadIntField(input, delim);
+	m_iSalaryCap = ReadIntField(input, delim);
+	m_iPriceMod = ReadIntField(input, delim);
 
 	input.ignore(1);
 

@@ -580,32 +580,32 @@ int CShipResource::SaveToText(std::ostream & output, char delim)
 
 int CShipResource::LoadFromText(std::istream & input, char delim)
 {
-	input >> m_iCargo
-		  >> m_iShields
-		  >> m_iShieldRecharge
-		  >> m_iArmor
-		  >> m_iArmorRecharge
-		  >> m_iAcceleration
-		  >> m_iMaxSpeed
-		  >> m_iTurning
-		  >> m_iFuel
-		  >> m_iFreeMass
-		  >> m_iMaxGuns
-		  >> m_iMaxTurrets
-		  >> m_iTechLevel
-		  >> m_iCost
-		  >> m_iDeathDelay
-		  >> m_iExplosion1
-		  >> m_iExplosion2
-		  >> m_iDisplayWeight
-		  >> m_iMass
-		  >> m_iLength
-		  >> m_iCrew
-		  >> m_iStrength
-		  >> m_iGovernment
-		  >> m_iEscapePodCount
-		  >> m_iFuelRegeneration
-		  >> m_iSkillVariation;
+	m_iCargo = ReadIntField(input, delim);
+	m_iShields = ReadIntField(input, delim);
+	m_iShieldRecharge = ReadIntField(input, delim);
+	m_iArmor = ReadIntField(input, delim);
+	m_iArmorRecharge = ReadIntField(input, delim);
+	m_iAcceleration = ReadIntField(input, delim);
+	m_iMaxSpeed = ReadIntField(input, delim);
+	m_iTurning = ReadIntField(input, delim);
+	m_iFuel = ReadIntField(input, delim);
+	m_iFreeMass = ReadIntField(input, delim);
+	m_iMaxGuns = ReadIntField(input, delim);
+	m_iMaxTurrets = ReadIntField(input, delim);
+	m_iTechLevel = ReadIntField(input, delim);
+	m_iCost = ReadIntField(input, delim);
+	m_iDeathDelay = ReadIntField(input, delim);
+	m_iExplosion1 = ReadIntField(input, delim);
+	m_iExplosion2 = ReadIntField(input, delim);
+	m_iDisplayWeight = ReadIntField(input, delim);
+	m_iMass = ReadIntField(input, delim);
+	m_iLength = ReadIntField(input, delim);
+	m_iCrew = ReadIntField(input, delim);
+	m_iStrength = ReadIntField(input, delim);
+	m_iGovernment = ReadIntField(input, delim);
+	m_iEscapePodCount = ReadIntField(input, delim);
+	m_iFuelRegeneration = ReadIntField(input, delim);
+	m_iSkillVariation = ReadIntField(input, delim);
 
 	input.ignore(1);
 
@@ -613,15 +613,15 @@ int CShipResource::LoadFromText(std::istream & input, char delim)
 	ReadTextField(input, m_szAppearOn,     255);
 	ReadTextField(input, m_szOnPurchase,   256);
 
-	input >> m_iDeionize
-		  >> m_iMaxIonization
-		  >> m_iKeyCarried;
+	m_iDeionize = ReadIntField(input, delim);
+	m_iMaxIonization = ReadIntField(input, delim);
+	m_iKeyCarried = ReadIntField(input, delim);
 
 	ReadHex64Field(input, m_cContribute);
 	ReadHex64Field(input, m_cRequire);
 
-	input >> m_iBuyRandom
-		  >> m_iHireRandom;
+	m_iBuyRandom = ReadIntField(input, delim);
+	m_iHireRandom = ReadIntField(input, delim);
 
 	input.ignore(1);
 
@@ -633,51 +633,21 @@ int CShipResource::LoadFromText(std::istream & input, char delim)
 	ReadTextField(input, m_szLongName,  128);
 	ReadTextField(input, m_szMovieFile,  32);
 
-	input >> m_iEscortAI
-		  >> m_iEscortUpgradeTo
-		  >> m_iEscortUpgradeCost
-		  >> m_iEscortSellValue
-		  >> m_iEscortType
-		  >> m_iWeapons[0]
-		  >> m_iWeapons[1]
-		  >> m_iWeapons[2]
-		  >> m_iWeapons[3]
-		  >> m_iWeapons[4]
-		  >> m_iWeapons[5]
-		  >> m_iWeapons[6]
-		  >> m_iWeapons[7]
-		  >> m_iWeaponCounts[0]
-		  >> m_iWeaponCounts[1]
-		  >> m_iWeaponCounts[2]
-		  >> m_iWeaponCounts[3]
-		  >> m_iWeaponCounts[4]
-		  >> m_iWeaponCounts[5]
-		  >> m_iWeaponCounts[6]
-		  >> m_iWeaponCounts[7]
-		  >> m_iWeaponAmmos[0]
-		  >> m_iWeaponAmmos[1]
-		  >> m_iWeaponAmmos[2]
-		  >> m_iWeaponAmmos[3]
-		  >> m_iWeaponAmmos[4]
-		  >> m_iWeaponAmmos[5]
-		  >> m_iWeaponAmmos[6]
-		  >> m_iWeaponAmmos[7]
-		  >> m_iOutfits[0]
-		  >> m_iOutfits[1]
-		  >> m_iOutfits[2]
-		  >> m_iOutfits[3]
-		  >> m_iOutfits[4]
-		  >> m_iOutfits[5]
-		  >> m_iOutfits[6]
-		  >> m_iOutfits[7]
-		  >> m_iOutfitCounts[0]
-		  >> m_iOutfitCounts[1]
-		  >> m_iOutfitCounts[2]
-		  >> m_iOutfitCounts[3]
-		  >> m_iOutfitCounts[4]
-		  >> m_iOutfitCounts[5]
-		  >> m_iOutfitCounts[6]
-		  >> m_iOutfitCounts[7];
+	m_iEscortAI = ReadIntField(input, delim);
+	m_iEscortUpgradeTo = ReadIntField(input, delim);
+	m_iEscortUpgradeCost = ReadIntField(input, delim);
+	m_iEscortSellValue = ReadIntField(input, delim);
+	m_iEscortType = ReadIntField(input, delim);
+	for (int i = 0; i < 8; i++)
+		m_iWeapons[i] = ReadIntField(input, delim);
+	for (int i = 0; i < 8; i++)
+		m_iWeaponCounts[i] = ReadIntField(input, delim);
+	for (int i = 0; i < 8; i++)
+		m_iWeaponAmmos[i] = ReadIntField(input, delim);
+	for (int i = 0; i < 8; i++)
+		m_iOutfits[i] = ReadIntField(input, delim);
+	for (int i = 0; i < 8; i++)
+		m_iOutfitCounts[i] = ReadIntField(input, delim);
 
 	ReadHex16Field(input, (char *)&m_iFlags1);
 	ReadHex16Field(input, (char *)&m_iFlags2);

@@ -162,7 +162,7 @@ int CDescResource::LoadFromText(std::istream & input, char delim)
 
 	FixNewlines('\n', 1);
 
-	input >> m_iGraphics;
+	m_iGraphics = ReadIntField(input, delim);
 
 	input.ignore(1);
 

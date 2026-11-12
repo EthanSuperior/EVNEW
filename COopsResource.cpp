@@ -127,11 +127,11 @@ int COopsResource::SaveToText(std::ostream & output, char delim)
 
 int COopsResource::LoadFromText(std::istream & input, char delim)
 {
-	input >> m_iStellar
-		  >> m_iCommodity
-		  >> m_iPriceDelta
-		  >> m_iDuration
-		  >> m_iRandom;
+	m_iStellar = ReadIntField(input, delim);
+	m_iCommodity = ReadIntField(input, delim);
+	m_iPriceDelta = ReadIntField(input, delim);
+	m_iDuration = ReadIntField(input, delim);
+	m_iRandom = ReadIntField(input, delim);
 
 	input.ignore(1);
 

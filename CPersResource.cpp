@@ -282,26 +282,26 @@ int CPersResource::SaveToText(std::ostream & output, char delim)
 
 int CPersResource::LoadFromText(std::istream & input, char delim)
 {
-	input >> m_iSystem
-		  >> m_iGovernment
-		  >> m_iAIType
-		  >> m_iAggressiveness
-		  >> m_iCowardice
-		  >> m_iShipType
-		  >> m_iCredits
-		  >> m_iShieldMod
-		  >> m_iHailPicture
-		  >> m_iCommQuote
-		  >> m_iHailQuote
-		  >> m_iLinkedMission;
+	m_iSystem = ReadIntField(input, delim);
+	m_iGovernment = ReadIntField(input, delim);
+	m_iAIType = ReadIntField(input, delim);
+	m_iAggressiveness = ReadIntField(input, delim);
+	m_iCowardice = ReadIntField(input, delim);
+	m_iShipType = ReadIntField(input, delim);
+	m_iCredits = ReadIntField(input, delim);
+	m_iShieldMod = ReadIntField(input, delim);
+	m_iHailPicture = ReadIntField(input, delim);
+	m_iCommQuote = ReadIntField(input, delim);
+	m_iHailQuote = ReadIntField(input, delim);
+	m_iLinkedMission = ReadIntField(input, delim);
 
 	input.ignore(1);
 
 	ReadTextField(input, m_szActiveOn, 256);
 
-	input >> m_iGrantClass
-		  >> m_iGrantCount
-		  >> m_iGrantRandom;
+	m_iGrantClass = ReadIntField(input, delim);
+	m_iGrantCount = ReadIntField(input, delim);
+	m_iGrantRandom = ReadIntField(input, delim);
 
 	input.ignore(1);
 
@@ -309,18 +309,12 @@ int CPersResource::LoadFromText(std::istream & input, char delim)
 
 	ReadHex32Field(input, (char *)&m_iColor);
 
-	input >> m_iWeaponTypes[0]
-		  >> m_iWeaponTypes[1]
-		  >> m_iWeaponTypes[2]
-		  >> m_iWeaponTypes[3]
-		  >> m_iWeaponCounts[0]
-		  >> m_iWeaponCounts[1]
-		  >> m_iWeaponCounts[2]
-		  >> m_iWeaponCounts[3]
-		  >> m_iWeaponAmmos[0]
-		  >> m_iWeaponAmmos[1]
-		  >> m_iWeaponAmmos[2]
-		  >> m_iWeaponAmmos[3];
+	for (int i = 0; i < 4; i++)
+		m_iWeaponTypes[i] = ReadIntField(input, delim);
+	for (int i = 0; i < 4; i++)
+		m_iWeaponCounts[i] = ReadIntField(input, delim);
+	for (int i = 0; i < 4; i++)
+		m_iWeaponAmmos[i] = ReadIntField(input, delim);
 
 	ReadHex16Field(input, (char *)&m_iFlags1);
 	ReadHex16Field(input, (char *)&m_iFlags2);

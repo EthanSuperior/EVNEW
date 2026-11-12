@@ -124,12 +124,12 @@ int CSpinResource::SaveToText(std::ostream & output, char delim)
 
 int CSpinResource::LoadFromText(std::istream & input, char delim)
 {
-	input >> m_iSpritesID
-		  >> m_iMaskID
-		  >> m_iXSize
-		  >> m_iYSize
-		  >> m_iXTiles
-		  >> m_iYTiles;
+	m_iSpritesID = ReadIntField(input, delim);
+	m_iMaskID = ReadIntField(input, delim);
+	m_iXSize = ReadIntField(input, delim);
+	m_iYSize = ReadIntField(input, delim);
+	m_iXTiles = ReadIntField(input, delim);
+	m_iYTiles = ReadIntField(input, delim);
 
 	input.ignore(1);
 

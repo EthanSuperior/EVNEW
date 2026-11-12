@@ -127,10 +127,10 @@ int CNebuResource::SaveToText(std::ostream & output, char delim)
 
 int CNebuResource::LoadFromText(std::istream & input, char delim)
 {
-	input >> m_iXPosition
-		  >> m_iYPosition
-		  >> m_iXSize
-		  >> m_iYSize;
+	m_iXPosition = ReadIntField(input, delim);
+	m_iYPosition = ReadIntField(input, delim);
+	m_iXSize = ReadIntField(input, delim);
+	m_iYSize = ReadIntField(input, delim);
 
 	input.ignore(1);
 

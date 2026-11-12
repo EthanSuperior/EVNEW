@@ -322,31 +322,25 @@ int CGovtResource::SaveToText(std::ostream & output, char delim)
 
 int CGovtResource::LoadFromText(std::istream & input, char delim)
 {
-	input >> m_iVoiceType
-		  >> m_iScanFine
-		  >> m_iCrimeTolerance
-		  >> m_iSmugglingPenalty
-		  >> m_iDisablingPenalty
-		  >> m_iBoardingPenalty
-		  >> m_iKillingPenalty
-		  >> m_iShootingPenalty
-		  >> m_iInitialRecord
-		  >> m_iMaxOdds
-		  >> m_iClasses[0]
-		  >> m_iClasses[1]
-		  >> m_iClasses[2]
-		  >> m_iClasses[3]
-		  >> m_iAllies[0]
-		  >> m_iAllies[1]
-		  >> m_iAllies[2]
-		  >> m_iAllies[3]
-		  >> m_iEnemies[0]
-		  >> m_iEnemies[1]
-		  >> m_iEnemies[2]
-		  >> m_iEnemies[3]
-		  >> m_iInterface
-		  >> m_iNewsPicture
-		  >> m_iSkillMultiplier;
+	m_iVoiceType = ReadIntField(input, delim);
+	m_iScanFine = ReadIntField(input, delim);
+	m_iCrimeTolerance = ReadIntField(input, delim);
+	m_iSmugglingPenalty = ReadIntField(input, delim);
+	m_iDisablingPenalty = ReadIntField(input, delim);
+	m_iBoardingPenalty = ReadIntField(input, delim);
+	m_iKillingPenalty = ReadIntField(input, delim);
+	m_iShootingPenalty = ReadIntField(input, delim);
+	m_iInitialRecord = ReadIntField(input, delim);
+	m_iMaxOdds = ReadIntField(input, delim);
+	for (int i = 0; i < 4; i++)
+		m_iClasses[i] = ReadIntField(input, delim);
+	for (int i = 0; i < 4; i++)
+		m_iAllies[i] = ReadIntField(input, delim);
+	for (int i = 0; i < 4; i++)
+		m_iEnemies[i] = ReadIntField(input, delim);
+	m_iInterface = ReadIntField(input, delim);
+	m_iNewsPicture = ReadIntField(input, delim);
+	m_iSkillMultiplier = ReadIntField(input, delim);
 
 	input.ignore(1);
 
@@ -356,10 +350,8 @@ int CGovtResource::LoadFromText(std::istream & input, char delim)
 
 	ReadHex64Field(input, m_cRequire);
 
-	input >> m_iInherentJamming[0]
-		  >> m_iInherentJamming[1]
-		  >> m_iInherentJamming[2]
-		  >> m_iInherentJamming[3];
+	for (int i = 0; i < 4; i++)
+		m_iInherentJamming[i] = ReadIntField(input, delim);
 
 	input.ignore(1);
 

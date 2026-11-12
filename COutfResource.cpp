@@ -263,26 +263,23 @@ int COutfResource::SaveToText(std::ostream & output, char delim)
 
 int COutfResource::LoadFromText(std::istream & input, char delim)
 {
-	input >> m_iDisplayWeight
-		  >> m_iMass
-		  >> m_iTechLevel
-		  >> m_iModTypes[0]
-		  >> m_iModValues[0]
-		  >> m_iModTypes[1]
-		  >> m_iModValues[1]
-		  >> m_iModTypes[2]
-		  >> m_iModValues[2]
-		  >> m_iModTypes[3]
-		  >> m_iModValues[3]
-		  >> m_iMaxCount
-		  >> m_iCost
-		  >> m_iItemClass;
+	m_iDisplayWeight = ReadIntField(input, delim);
+	m_iMass = ReadIntField(input, delim);
+	m_iTechLevel = ReadIntField(input, delim);
+	for (int i = 0; i < 4; i++) 
+	{
+		m_iModTypes[i] = ReadIntField(input, delim);
+		m_iModValues[i] = ReadIntField(input, delim);
+	}
+	m_iMaxCount = ReadIntField(input, delim);
+	m_iCost = ReadIntField(input, delim);
+	m_iItemClass = ReadIntField(input, delim);
 
 	ReadHex16Field(input, m_cScanMask);
 
 	char c = m_cScanMask[0]; m_cScanMask[0] = m_cScanMask[1]; m_cScanMask[1] = c;
 
-	input >> m_iBuyRandom;
+	m_iBuyRandom = ReadIntField(input, delim);
 
 	input.ignore(1);
 
@@ -297,7 +294,7 @@ int COutfResource::LoadFromText(std::istream & input, char delim)
 	ReadTextField(input, m_szLowerCaseName,       64);
 	ReadTextField(input, m_szLowerCasePluralName, 65);
 
-	input >> m_iRequiredGovernment;
+	m_iRequiredGovernment = ReadIntField(input, delim);
 
 	ReadHex16Field(input, (char *)&m_iFlags);
 

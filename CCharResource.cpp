@@ -274,40 +274,39 @@ int CCharResource::SaveToText(std::ostream & output, char delim)
 
 int CCharResource::LoadFromText(std::istream & input, char delim)
 {
-	input >> m_iCash
-		  >> m_iShipType
-		  >> m_iSystem1
-		  >> m_iSystem2
-		  >> m_iSystem3
-		  >> m_iSystem4
-		  >> m_iGovernment1
-		  >> m_iStatus1
-		  >> m_iGovernment2
-		  >> m_iStatus2
-		  >> m_iGovernment3
-		  >> m_iStatus3
-		  >> m_iGovernment4
-		  >> m_iStatus4
-		  >> m_iCombatRating
-		  >> m_iIntroPict1
-		  >> m_iIntroPict2
-		  >> m_iIntroPict3
-		  >> m_iIntroPict4
-		  >> m_iPictDelay1
-		  >> m_iPictDelay2
-		  >> m_iPictDelay3
-		  >> m_iPictDelay4
-		  >> m_iIntroText;
+	
+	m_iCash = ReadIntField(input, delim);
+	m_iShipType = ReadIntField(input, delim);
+	m_iSystem1 = ReadIntField(input, delim);
+	m_iSystem2 = ReadIntField(input, delim);
+	m_iSystem3 = ReadIntField(input, delim);
+	m_iSystem4 = ReadIntField(input, delim);
+	m_iGovernment1 = ReadIntField(input, delim);
+	m_iStatus1 = ReadIntField(input, delim);
+	m_iGovernment2 = ReadIntField(input, delim);
+	m_iStatus2 = ReadIntField(input, delim);
+	m_iGovernment3 = ReadIntField(input, delim);
+	m_iStatus3 = ReadIntField(input, delim);
+	m_iGovernment4 = ReadIntField(input, delim);
+	m_iStatus4 = ReadIntField(input, delim);
+	m_iCombatRating = ReadIntField(input, delim);
+	m_iIntroPict1 = ReadIntField(input, delim);
+	m_iIntroPict2 = ReadIntField(input, delim);
+	m_iIntroPict3 = ReadIntField(input, delim);
+	m_iIntroPict4 = ReadIntField(input, delim);
+	m_iPictDelay1 = ReadIntField(input, delim);
+	m_iPictDelay2 = ReadIntField(input, delim);
+	m_iPictDelay3 = ReadIntField(input, delim);
+	m_iPictDelay4 = ReadIntField(input, delim);
+	m_iIntroText = ReadIntField(input, delim);
 
 	input.ignore(1);
 
 	ReadTextField(input, m_szOnStart, 256);
 
-	input >> m_iStartDay
-		  >> m_iStartMonth
-		  >> m_iStartYear;
-
-	input.ignore(1);
+	m_iStartDay = ReadIntField(input, delim);
+	m_iStartMonth = ReadIntField(input, delim);
+	m_iStartYear = ReadIntField(input, delim);
 
 	ReadTextField(input, m_szDatePrefix, 16);
 	ReadTextField(input, m_szDateSuffix, 16);

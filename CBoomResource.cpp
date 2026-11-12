@@ -109,9 +109,9 @@ int CBoomResource::SaveToText(std::ostream & output, char delim)
 
 int CBoomResource::LoadFromText(std::istream & input, char delim)
 {
-	input >> m_iFrameAdvance
-		  >> m_iSoundIndex
-		  >> m_iGraphicsIndex;
+	m_iFrameAdvance = ReadIntField(input, delim);
+	m_iSoundIndex = ReadIntField(input, delim);
+	m_iGraphicsIndex = ReadIntField(input, delim);
 
 	input.ignore(1);
 

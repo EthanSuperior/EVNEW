@@ -455,87 +455,35 @@ int CSystResource::SaveToText(std::ostream & output, char delim)
 
 int CSystResource::LoadFromText(std::istream & input, char delim)
 {
-	input >> m_iXPosition
-		  >> m_iYPosition
-		  >> m_iHyperlinks[0]
-		  >> m_iHyperlinks[1]
-		  >> m_iHyperlinks[2]
-		  >> m_iHyperlinks[3]
-		  >> m_iHyperlinks[4]
-		  >> m_iHyperlinks[5]
-		  >> m_iHyperlinks[6]
-		  >> m_iHyperlinks[7]
-		  >> m_iHyperlinks[8]
-		  >> m_iHyperlinks[9]
-		  >> m_iHyperlinks[10]
-		  >> m_iHyperlinks[11]
-		  >> m_iHyperlinks[12]
-		  >> m_iHyperlinks[13]
-		  >> m_iHyperlinks[14]
-		  >> m_iHyperlinks[15]
-		  >> m_iStellars[0]
-		  >> m_iStellars[1]
-		  >> m_iStellars[2]
-		  >> m_iStellars[3]
-		  >> m_iStellars[4]
-		  >> m_iStellars[5]
-		  >> m_iStellars[6]
-		  >> m_iStellars[7]
-		  >> m_iStellars[8]
-		  >> m_iStellars[9]
-		  >> m_iStellars[10]
-		  >> m_iStellars[11]
-		  >> m_iStellars[12]
-		  >> m_iStellars[13]
-		  >> m_iStellars[14]
-		  >> m_iStellars[15]
-		  >> m_iDudeTypes[0]
-		  >> m_iDudeTypes[1]
-		  >> m_iDudeTypes[2]
-		  >> m_iDudeTypes[3]
-		  >> m_iDudeTypes[4]
-		  >> m_iDudeTypes[5]
-		  >> m_iDudeTypes[6]
-		  >> m_iDudeTypes[7]
-		  >> m_iDudeProbabilities[0]
-		  >> m_iDudeProbabilities[1]
-		  >> m_iDudeProbabilities[2]
-		  >> m_iDudeProbabilities[3]
-		  >> m_iDudeProbabilities[4]
-		  >> m_iDudeProbabilities[5]
-		  >> m_iDudeProbabilities[6]
-		  >> m_iDudeProbabilities[7]
-		  >> m_iNumShips
-		  >> m_iGovernment
-		  >> m_iMessageBuoy
-		  >> m_iNumAsteroids
-		  >> m_iInterference
-		  >> m_iPersons[0]
-		  >> m_iPersons[1]
-		  >> m_iPersons[2]
-		  >> m_iPersons[3]
-		  >> m_iPersons[4]
-		  >> m_iPersons[5]
-		  >> m_iPersons[6]
-		  >> m_iPersons[7]
-		  >> m_iPersonProbabilities[0]
-		  >> m_iPersonProbabilities[1]
-		  >> m_iPersonProbabilities[2]
-		  >> m_iPersonProbabilities[3]
-		  >> m_iPersonProbabilities[4]
-		  >> m_iPersonProbabilities[5]
-		  >> m_iPersonProbabilities[6]
-		  >> m_iPersonProbabilities[7];
+	m_iXPosition = ReadIntField(input, delim);
+	m_iYPosition = ReadIntField(input, delim);
+	for (int i = 0; i < 16; i++)
+		m_iHyperlinks[i] = ReadIntField(input, delim);
+	for (int i = 0; i < 16; i++)
+		m_iStellars[i] = ReadIntField(input, delim);
+	for (int i = 0; i < 8; i++)
+		m_iDudeTypes[i] = ReadIntField(input, delim);
+	for (int i = 0; i < 8; i++)
+		m_iDudeProbabilities[i] = ReadIntField(input, delim);
+	m_iNumShips = ReadIntField(input, delim);
+	m_iGovernment = ReadIntField(input, delim);
+	m_iMessageBuoy = ReadIntField(input, delim);
+	m_iNumAsteroids = ReadIntField(input, delim);
+	m_iInterference = ReadIntField(input, delim);
+	for (int i = 0; i < 8; i++)
+		m_iPersons[i] = ReadIntField(input, delim);
+	for (int i = 0; i < 8; i++)
+		m_iPersonProbabilities[0] = ReadIntField(input, delim);
 
 	input.ignore(1);
 
 	ReadTextField(input, m_szVisibility, 256);
 
-	input >> m_iBackgroundColor
-		  >> m_iMurkiness
-		  >> m_iReinforcementFleet
-		  >> m_iReinforcementTime
-		  >> m_iReinforcementInterval;
+	m_iBackgroundColor = ReadIntField(input, delim);
+	m_iMurkiness = ReadIntField(input, delim);
+	m_iReinforcementFleet = ReadIntField(input, delim);
+	m_iReinforcementTime = ReadIntField(input, delim);
+	m_iReinforcementInterval = ReadIntField(input, delim);
 
 	input.ignore(1);
 

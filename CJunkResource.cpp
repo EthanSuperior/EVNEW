@@ -219,23 +219,11 @@ int CJunkResource::SaveToText(std::ostream & output, char delim)
 
 int CJunkResource::LoadFromText(std::istream & input, char delim)
 {
-	input >> m_iSoldAt[0]
-		  >> m_iSoldAt[1]
-		  >> m_iSoldAt[2]
-		  >> m_iSoldAt[3]
-		  >> m_iSoldAt[4]
-		  >> m_iSoldAt[5]
-		  >> m_iSoldAt[6]
-		  >> m_iSoldAt[7]
-		  >> m_iBoughtAt[0]
-		  >> m_iBoughtAt[1]
-		  >> m_iBoughtAt[2]
-		  >> m_iBoughtAt[3]
-		  >> m_iBoughtAt[4]
-		  >> m_iBoughtAt[5]
-		  >> m_iBoughtAt[6]
-		  >> m_iBoughtAt[7]
-		  >> m_iBasePrice;
+	for (int i = 0; i < 8; i++)
+		m_iSoldAt[i] = ReadIntField(input, delim);
+	for (int i = 0; i < 8; i++)
+		m_iBoughtAt[i] = ReadIntField(input, delim);
+	m_iBasePrice = ReadIntField(input, delim);
 
 	ReadHex16Field(input, m_cScanMask);
 

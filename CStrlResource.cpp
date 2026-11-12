@@ -161,9 +161,7 @@ int CStrlResource::SaveToText(std::ostream & output, char delim)
 
 int CStrlResource::LoadFromText(std::istream & input, char delim)
 {
-	int iCount;
-
-	input >> iCount;
+	int iCount = ReadIntField(input, delim);
 
 	input.ignore(1);
 
@@ -180,7 +178,7 @@ int CStrlResource::LoadFromText(std::istream & input, char delim)
 		m_vStrings[i] = szBuffer;
 	}
 
-	while((input.peek() == '\t') || (input.peek() == '\n'))
+	while((input.peek() == '\t') || (input.peek() == '\n') || (input.peek() == ','))
 		input.ignore(1);
 
 	return 1;

@@ -156,20 +156,20 @@ int CRoidResource::SaveToText(std::ostream & output, char delim)
 
 int CRoidResource::LoadFromText(std::istream & input, char delim)
 {
-	input >> m_iStrength
-		  >> m_iSpinRate
-		  >> m_iYieldType
-		  >> m_iYieldAmount
-		  >> m_iParticleCount
-		  >> m_iParticleColor;
+	m_iStrength = ReadIntField(input, delim);
+	m_iSpinRate = ReadIntField(input, delim);
+	m_iYieldType = ReadIntField(input, delim);
+	m_iYieldAmount = ReadIntField(input, delim);
+	m_iParticleCount = ReadIntField(input, delim);
+	m_iParticleColor = ReadIntField(input, delim);
 
 	ReadHex32Field(input, (char *)&m_iParticleColor);
 
-	input >> m_iFragmentType1
-		  >> m_iFragmentType2
-		  >> m_iFragmentCount
-		  >> m_iExplosionType
-		  >> m_iMass;
+	m_iFragmentType1 = ReadIntField(input, delim);
+	m_iFragmentType2 = ReadIntField(input, delim);
+	m_iFragmentCount = ReadIntField(input, delim);
+	m_iExplosionType = ReadIntField(input, delim);
+	m_iMass = ReadIntField(input, delim);
 
 	input.ignore(1);
 

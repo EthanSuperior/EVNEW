@@ -394,46 +394,46 @@ int CMisnResource::SaveToText(std::ostream & output, char delim)
 
 int CMisnResource::LoadFromText(std::istream & input, char delim)
 {
-	input >> m_iAvailableStellar
-		  >> m_iAvailableLocation
-		  >> m_iAvailableRecord
-		  >> m_iAvailableRating
-		  >> m_iAvailableRandom
-		  >> m_iTravelStellar
-		  >> m_iReturnStellar
-		  >> m_iCargoType
-		  >> m_iCargoAmount
-		  >> m_iCargoPickup
-		  >> m_iCargoDropoff;
+	m_iAvailableStellar = ReadIntField(input, delim);
+	m_iAvailableLocation = ReadIntField(input, delim);
+	m_iAvailableRecord = ReadIntField(input, delim);
+	m_iAvailableRating = ReadIntField(input, delim);
+	m_iAvailableRandom = ReadIntField(input, delim);
+	m_iTravelStellar = ReadIntField(input, delim);
+	m_iReturnStellar = ReadIntField(input, delim);
+	m_iCargoType = ReadIntField(input, delim);
+	m_iCargoAmount = ReadIntField(input, delim);
+	m_iCargoPickup = ReadIntField(input, delim);
+	m_iCargoDropoff = ReadIntField(input, delim);
 
 	ReadHex16Field(input, m_cScanMask);
 
 	char c = m_cScanMask[0]; m_cScanMask[0] = m_cScanMask[1]; m_cScanMask[1] = c;
 
-	input >> m_iPayValue
-		  >> m_iShipCount
-		  >> m_iShipSystem
-		  >> m_iShipDude
-		  >> m_iShipGoal
-		  >> m_iShipBehavior
-		  >> m_iShipName
-		  >> m_iShipStart
-		  >> m_iCompletionGovernment
-		  >> m_iCompletionReward
-		  >> m_iShipSubtitle
-		  >> m_iBriefingDesc
-		  >> m_iQuickBriefDesc
-		  >> m_iLoadCargoDesc
-		  >> m_iDropoffCargoDesc
-		  >> m_iCompletionDesc
-		  >> m_iFailDesc
-		  >> m_iShipDoneDesc
-		  >> m_iRefuseDesc
-		  >> m_iTimeLimit
-		  >> m_iAuxShipCount
-		  >> m_iAuxShipDude
-		  >> m_iAuxShipSyst
-		  >> m_iAvailableShipType;
+	m_iPayValue = ReadIntField(input, delim);
+	m_iShipCount = ReadIntField(input, delim);
+	m_iShipSystem = ReadIntField(input, delim);
+	m_iShipDude = ReadIntField(input, delim);
+	m_iShipGoal = ReadIntField(input, delim);
+	m_iShipBehavior = ReadIntField(input, delim);
+	m_iShipName = ReadIntField(input, delim);
+	m_iShipStart = ReadIntField(input, delim);
+	m_iCompletionGovernment = ReadIntField(input, delim);
+	m_iCompletionReward = ReadIntField(input, delim);
+	m_iShipSubtitle = ReadIntField(input, delim);
+	m_iBriefingDesc = ReadIntField(input, delim);
+	m_iQuickBriefDesc = ReadIntField(input, delim);
+	m_iLoadCargoDesc = ReadIntField(input, delim);
+	m_iDropoffCargoDesc = ReadIntField(input, delim);
+	m_iCompletionDesc = ReadIntField(input, delim);
+	m_iFailDesc = ReadIntField(input, delim);
+	m_iShipDoneDesc = ReadIntField(input, delim);
+	m_iRefuseDesc = ReadIntField(input, delim);
+	m_iTimeLimit = ReadIntField(input, delim);
+	m_iAuxShipCount = ReadIntField(input, delim);
+	m_iAuxShipDude = ReadIntField(input, delim);
+	m_iAuxShipSyst = ReadIntField(input, delim);
+	m_iAvailableShipType = ReadIntField(input, delim);
 
 	input.ignore(1);
 
@@ -447,15 +447,15 @@ int CMisnResource::LoadFromText(std::istream & input, char delim)
 
 	ReadHex64Field(input, m_cRequire);
 
-	input >> m_iDateIncrement;
+	m_iDateIncrement = ReadIntField(input, delim);
 
 	input.ignore(1);
 
 	ReadTextField(input, m_szAcceptButton, 32);
 	ReadTextField(input, m_szRefuseButton, 33);
 
-	input >> m_iDisplayWeight
-		  >> m_iCanAbort;
+	m_iDisplayWeight = ReadIntField(input, delim);
+	m_iCanAbort = ReadIntField(input, delim);
 
 	ReadHex16Field(input, (char *)&m_iFlags1);
 	ReadHex16Field(input, (char *)&m_iFlags2);

@@ -347,34 +347,34 @@ int CColrResource::LoadFromText(std::istream & input, char delim)
 
 	ReadTextField(input, m_szMenuFont, 64);
 
-	input >> m_iMenuFontSize;
+	m_iMenuFontSize = ReadIntField(input, delim);
 
 	ReadHex32Field(input, (char *)&m_iMenuColor1);
 	ReadHex32Field(input, (char *)&m_iMenuColor2);
 	ReadHex32Field(input, (char *)&m_iGridBright);
 	ReadHex32Field(input, (char *)&m_iGridDim);
 
-	input >> m_iProgressBarX1
-		  >> m_iProgressBarY1
-		  >> m_iProgressBarX2
-		  >> m_iProgressBarY2;
+	m_iProgressBarX1 = ReadIntField(input, delim);
+	m_iProgressBarY1 = ReadIntField(input, delim);
+	m_iProgressBarX2 = ReadIntField(input, delim);
+	m_iProgressBarY2 = ReadIntField(input, delim);
 
 	ReadHex32Field(input, (char *)&m_iProgressBright);
 	ReadHex32Field(input, (char *)&m_iProgressDim);
 	ReadHex32Field(input, (char *)&m_iProgressOutline);
 
-	input >> m_iButton1X
-		  >> m_iButton1Y
-		  >> m_iButton2X
-		  >> m_iButton2Y
-		  >> m_iButton3X
-		  >> m_iButton3Y
-		  >> m_iButton4X
-		  >> m_iButton4Y
-		  >> m_iButton5X
-		  >> m_iButton5Y
-		  >> m_iButton6X
-		  >> m_iButton6Y;
+	m_iButton1X = ReadIntField(input, delim);
+	m_iButton1Y = ReadIntField(input, delim);
+	m_iButton2X = ReadIntField(input, delim);
+	m_iButton2Y = ReadIntField(input, delim);
+	m_iButton3X = ReadIntField(input, delim);
+	m_iButton3Y = ReadIntField(input, delim);
+	m_iButton4X = ReadIntField(input, delim);
+	m_iButton4Y = ReadIntField(input, delim);
+	m_iButton5X = ReadIntField(input, delim);
+	m_iButton5Y = ReadIntField(input, delim);
+	m_iButton6X = ReadIntField(input, delim);
+	m_iButton6Y = ReadIntField(input, delim);
 
 	ReadHex32Field(input, (char *)&m_iFloatingMap);
 	ReadHex32Field(input, (char *)&m_iListText);
@@ -384,17 +384,17 @@ int CColrResource::LoadFromText(std::istream & input, char delim)
 
 	ReadTextField(input, m_szButtonFont, 64);
 
-	input >> m_iButtonFontSize
-		  >> m_iLogoX
-		  >> m_iLogoY
-		  >> m_iRolloverX
-		  >> m_iRolloverY
-		  >> m_iSlide1X
-		  >> m_iSlide1Y
-		  >> m_iSlide2X
-		  >> m_iSlide2Y
-		  >> m_iSlide3X
-		  >> m_iSlide3Y;
+	m_iButtonFontSize = ReadIntField(input, delim);
+	m_iLogoX = ReadIntField(input, delim);
+	m_iLogoY = ReadIntField(input, delim);
+	m_iRolloverX = ReadIntField(input, delim);
+	m_iRolloverY = ReadIntField(input, delim);
+	m_iSlide1X = ReadIntField(input, delim);
+	m_iSlide1Y = ReadIntField(input, delim);
+	m_iSlide2X = ReadIntField(input, delim);
+	m_iSlide2Y = ReadIntField(input, delim);
+	m_iSlide3X = ReadIntField(input, delim);
+	m_iSlide3Y = ReadIntField(input, delim);
 
 	input.ignore(1);
 
