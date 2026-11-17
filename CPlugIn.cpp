@@ -408,7 +408,7 @@ int CPlugIn::Load(char *szFilename, CWindow *pWndParent)
 						}
 						else
 						{
-							if(m_vResources[i][m_vResources[i].size() - 1]->LoadFromTextEx(filein, std::string(m_szFilePath)) == 0)
+							if(m_vResources[i][m_vResources[i].size() - 1]->LoadFromTextEx(filein, std::string(m_szFilePath), '\t') == 0)
 								iError = 1;
 						}
 
@@ -998,33 +998,33 @@ int CPlugIn::Save(CWindow *pWndParent)
 					szImageOrSoundFilename1 = GenerateFilename(m_szCicnSubdirectory,     m_szCicnFilenamePrefix,     ".bmp", m_vResources[i][j]->GetID());
 					szImageOrSoundFilename2 = GenerateFilename(m_szCicnMaskSubdirectory, m_szCicnMaskFilenamePrefix, ".bmp", m_vResources[i][j]->GetID());
 
-					m_vResources[i][j]->SaveToTextEx(fileout, std::string(m_szFilePath), szImageOrSoundFilename1, szImageOrSoundFilename2, 0);
+					m_vResources[i][j]->SaveToTextEx(fileout, std::string(m_szFilePath), szImageOrSoundFilename1, szImageOrSoundFilename2, 0, '\t');
 				}
 				else if(i == CNR_TYPE_PICT)
 				{
 					szImageOrSoundFilename1 = GenerateFilename(m_szPictSubdirectory, m_szPictFilenamePrefix, g_szImageTypeExtensions[m_iPictImageFileType].c_str(), m_vResources[i][j]->GetID());
 
-					m_vResources[i][j]->SaveToTextEx(fileout, std::string(m_szFilePath), szImageOrSoundFilename1, std::string(""), m_iPictImageFileType);
+					m_vResources[i][j]->SaveToTextEx(fileout, std::string(m_szFilePath), szImageOrSoundFilename1, std::string(""), m_iPictImageFileType, '\t');
 				}
 				else if(i == CNR_TYPE_RLE8)
 				{
 					szImageOrSoundFilename1 = GenerateFilename(m_szRle8Subdirectory,     m_szRle8FilenamePrefix,     g_szRleImageTypeExtensions[m_iRle8ImageFileType].c_str(), m_vResources[i][j]->GetID());
 					szImageOrSoundFilename2 = GenerateFilename(m_szRle8MaskSubdirectory, m_szRle8MaskFilenamePrefix, g_szRleImageTypeExtensions[m_iRle8MaskFileType].c_str(),  m_vResources[i][j]->GetID());
 
-					m_vResources[i][j]->SaveToTextEx(fileout, std::string(m_szFilePath), szImageOrSoundFilename1, szImageOrSoundFilename2, m_iRle8FramesPerRow);
+					m_vResources[i][j]->SaveToTextEx(fileout, std::string(m_szFilePath), szImageOrSoundFilename1, szImageOrSoundFilename2, m_iRle8FramesPerRow, '\t');
 				}
 				else if(i == CNR_TYPE_RLED)
 				{
 					szImageOrSoundFilename1 = GenerateFilename(m_szRleDSubdirectory,     m_szRleDFilenamePrefix,     g_szRleImageTypeExtensions[m_iRleDImageFileType].c_str(), m_vResources[i][j]->GetID());
 					szImageOrSoundFilename2 = GenerateFilename(m_szRleDMaskSubdirectory, m_szRleDMaskFilenamePrefix, g_szRleImageTypeExtensions[m_iRleDMaskFileType].c_str(),  m_vResources[i][j]->GetID());
 
-					m_vResources[i][j]->SaveToTextEx(fileout, std::string(m_szFilePath), szImageOrSoundFilename1, szImageOrSoundFilename2, m_iRleDFramesPerRow);
+					m_vResources[i][j]->SaveToTextEx(fileout, std::string(m_szFilePath), szImageOrSoundFilename1, szImageOrSoundFilename2, m_iRleDFramesPerRow, '\t');
 				}
 				else if(i == CNR_TYPE_SND)
 				{
 					
 					szImageOrSoundFilename1 = GenerateFilename(m_szSndSubdirectory, m_szSndFilenamePrefix, ".wav", m_vResources[i][j]->GetID());
-					m_vResources[i][j]->SaveToTextEx(fileout, std::string(m_szFilePath), szImageOrSoundFilename1, std::string(""), 0);
+					m_vResources[i][j]->SaveToTextEx(fileout, std::string(m_szFilePath), szImageOrSoundFilename1, std::string(""), 0, '\t');
 				}
 				else
 				{
@@ -1345,7 +1345,10 @@ int CPlugIn::AdditiveLoadCSV(char* szFilename, CWindow* pWndParent)
 	char szJunk[16];
 
 	m_iFileOffset = 0;
-
+	char oldpath[MAX_PATH];
+	// this is horrible, replace it in the future
+	strcpy(oldpath, m_szFilePath);
+	SetFilename(szFilename);
 
 	HWND hwndLoadingText;
 	HWND hwndProgressBar;
@@ -1426,7 +1429,7 @@ int CPlugIn::AdditiveLoadCSV(char* szFilename, CWindow* pWndParent)
 				}
 				else
 				{
-					if (m_vResources[i][m_vResources[i].size() - 1]->LoadFromTextEx(filein, std::string(m_szFilePath)) == 0)
+					if (m_vResources[i][m_vResources[i].size() - 1]->LoadFromTextEx(filein, std::string(m_szFilePath), ',') == 0)
 						iError = 1;
 				}
 
@@ -1446,6 +1449,9 @@ int CPlugIn::AdditiveLoadCSV(char* szFilename, CWindow* pWndParent)
 				c = filein.get();
 		}
 	}
+
+	// horrible
+	SetFilename(oldpath);
 
 	filein.close();
 
@@ -1585,33 +1591,33 @@ int CPlugIn::ExportToCSV(char* szDirectory, CWindow* pWndParent)
 				szImageOrSoundFilename1 = GenerateFilename(m_szCicnSubdirectory, m_szCicnFilenamePrefix, ".bmp", m_vResources[i][j]->GetID());
 				szImageOrSoundFilename2 = GenerateFilename(m_szCicnMaskSubdirectory, m_szCicnMaskFilenamePrefix, ".bmp", m_vResources[i][j]->GetID());
 
-				m_vResources[i][j]->SaveToTextEx(CSVOutStream, std::string(m_szFilePath), szImageOrSoundFilename1, szImageOrSoundFilename2, 0);
+				m_vResources[i][j]->SaveToTextEx(CSVOutStream, std::string(m_szFilePath), szImageOrSoundFilename1, szImageOrSoundFilename2, 0, ',');
 			}
 			else if (i == CNR_TYPE_PICT)
 			{
 				szImageOrSoundFilename1 = GenerateFilename(m_szPictSubdirectory, m_szPictFilenamePrefix, g_szImageTypeExtensions[m_iPictImageFileType].c_str(), m_vResources[i][j]->GetID());
 
-				m_vResources[i][j]->SaveToTextEx(CSVOutStream, std::string(m_szFilePath), szImageOrSoundFilename1, std::string(""), m_iPictImageFileType);
+				m_vResources[i][j]->SaveToTextEx(CSVOutStream, std::string(m_szFilePath), szImageOrSoundFilename1, std::string(""), m_iPictImageFileType, ',');
 			}
 			else if (i == CNR_TYPE_RLE8)
 			{
 				szImageOrSoundFilename1 = GenerateFilename(m_szRle8Subdirectory, m_szRle8FilenamePrefix, g_szRleImageTypeExtensions[m_iRle8ImageFileType].c_str(), m_vResources[i][j]->GetID());
 				szImageOrSoundFilename2 = GenerateFilename(m_szRle8MaskSubdirectory, m_szRle8MaskFilenamePrefix, g_szRleImageTypeExtensions[m_iRle8MaskFileType].c_str(), m_vResources[i][j]->GetID());
 
-				m_vResources[i][j]->SaveToTextEx(CSVOutStream, std::string(m_szFilePath), szImageOrSoundFilename1, szImageOrSoundFilename2, m_iRle8FramesPerRow);
+				m_vResources[i][j]->SaveToTextEx(CSVOutStream, std::string(m_szFilePath), szImageOrSoundFilename1, szImageOrSoundFilename2, m_iRle8FramesPerRow, ',');
 			}
 			else if (i == CNR_TYPE_RLED)
 			{
 				szImageOrSoundFilename1 = GenerateFilename(m_szRleDSubdirectory, m_szRleDFilenamePrefix, g_szRleImageTypeExtensions[m_iRleDImageFileType].c_str(), m_vResources[i][j]->GetID());
 				szImageOrSoundFilename2 = GenerateFilename(m_szRleDMaskSubdirectory, m_szRleDMaskFilenamePrefix, g_szRleImageTypeExtensions[m_iRleDMaskFileType].c_str(), m_vResources[i][j]->GetID());
 
-				m_vResources[i][j]->SaveToTextEx(CSVOutStream, std::string(m_szFilePath), szImageOrSoundFilename1, szImageOrSoundFilename2, m_iRleDFramesPerRow);
+				m_vResources[i][j]->SaveToTextEx(CSVOutStream, std::string(m_szFilePath), szImageOrSoundFilename1, szImageOrSoundFilename2, m_iRleDFramesPerRow, ',');
 			}
 			else if (i == CNR_TYPE_SND)
 			{
 				szImageOrSoundFilename1 = GenerateFilename(m_szSndSubdirectory, m_szSndFilenamePrefix, ".wav", m_vResources[i][j]->GetID());
 
-				m_vResources[i][j]->SaveToTextEx(CSVOutStream, std::string(m_szFilePath), szImageOrSoundFilename1, std::string(""), 0);
+				m_vResources[i][j]->SaveToTextEx(CSVOutStream, std::string(m_szFilePath), szImageOrSoundFilename1, std::string(""), 0, ',');
 			}
 			else
 			{

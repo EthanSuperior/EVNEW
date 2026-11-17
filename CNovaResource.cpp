@@ -110,7 +110,7 @@ int CNovaResource::SaveToText(std::ostream & output, char delim)
 	return 1;
 }
 
-int CNovaResource::SaveToTextEx(std::ostream & output, std::string & szFilePath, std::string & szFilename1, std::string & szFilename2, int iParam)
+int CNovaResource::SaveToTextEx(std::ostream & output, std::string & szFilePath, std::string & szFilename1, std::string & szFilename2, int iParam, char delim)
 {
 	return 1;
 }
@@ -120,7 +120,7 @@ int CNovaResource::LoadFromText(std::istream & input, char delim)
 	return 1;
 }
 
-int CNovaResource::LoadFromTextEx(std::istream & input, std::string & szFilePath)
+int CNovaResource::LoadFromTextEx(std::istream & input, std::string & szFilePath, char delim)
 {
 	return 1;
 }

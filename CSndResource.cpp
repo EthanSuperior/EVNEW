@@ -218,9 +218,9 @@ int CSndResource::SwapEndians(void)
 	return 1;
 }
 
-int CSndResource::SaveToTextEx(std::ostream & output, std::string & szFilePath, std::string & szFilename1, std::string & szFilename2, int iParam)
+int CSndResource::SaveToTextEx(std::ostream & output, std::string & szFilePath, std::string & szFilename1, std::string & szFilename2, int iParam, char delim)
 {
-	PrintTextField(output, szFilename1.c_str(), '\t');
+	PrintTextField(output, szFilename1.c_str(), delim);
 
 	std::string szFilename = szFilePath + szFilename1;
 	FileExport(szFilename.c_str(), 0);
@@ -228,7 +228,7 @@ int CSndResource::SaveToTextEx(std::ostream & output, std::string & szFilePath, 
 	return 1;
 }
 
-int CSndResource::LoadFromTextEx(std::istream & input, std::string & szFilePath)
+int CSndResource::LoadFromTextEx(std::istream & input, std::string & szFilePath, char delim)
 {
 	char szFilename[MAX_PATH];
 
