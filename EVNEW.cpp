@@ -918,6 +918,9 @@ int CEditor::FileImportCSV(int iOpenDialog, char* szFilename)
 	}
 
 	m_plugIn.AdditiveLoadCSV(szFilename2, &m_dialogMain);
+
+	UpdateResourceList();
+
 	return 0;
 }
 
@@ -934,6 +937,8 @@ int CEditor::FileExportCSV(void)
 	bi.lParam = 0;
 
 	// get our Item ID list
+	// this GUI is ugly, but because we have to import windows.h for QT, we can't use CFolderPickerDialog from afxdlgs.h
+	// Someone with more experience in the win32 API than me could probably do this the "correct" way
 	PIDLIST_ABSOLUTE id = SHBrowseForFolder(&bi);
 	if (id != NULL)
 		SHGetPathFromIDList(id, szFilename);	// Combine with our display name to get a path

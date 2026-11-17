@@ -193,20 +193,18 @@ int CFletResource::SaveToText(std::ostream & output, char delim)
 int CFletResource::LoadFromText(std::istream & input, char delim)
 {
 	m_iLeadShipType = ReadIntField(input, delim);
-	for (int i = 0; i < 3; i++)
+	for (int i = 0; i < 4; i++)
 		m_iEscortTypes[i] = ReadIntField(input, delim);
-	for (int i = 0; i < 3; i++)
+	for (int i = 0; i < 4; i++)
 		m_iMinEscorts[i] = ReadIntField(input, delim);
-	for (int i = 0; i < 3; i++)
+	for (int i = 0; i < 4; i++)
 		m_iMaxEscorts[i] = ReadIntField(input, delim);
 	m_iGovernment = ReadIntField(input, delim);
 	m_iSystem = ReadIntField(input, delim);
 
-	input.ignore(1);
-
 	ReadTextField(input, m_szAppearOn, 256);
 
-	input >> m_iQuote;
+	m_iQuote = ReadIntField(input, delim);
 
 	ReadHex16Field(input, (char *)&m_iFlags);
 

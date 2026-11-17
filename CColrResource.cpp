@@ -396,8 +396,6 @@ int CColrResource::LoadFromText(std::istream & input, char delim)
 	m_iSlide3X = ReadIntField(input, delim);
 	m_iSlide3Y = ReadIntField(input, delim);
 
-	input.ignore(1);
-
 	return 1;
 }
 

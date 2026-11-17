@@ -246,8 +246,6 @@ int CCronResource::LoadFromText(std::istream & input, char delim)
 	m_iPreHoldoff = ReadIntField(input, delim);
 	m_iPostHoldoff = ReadIntField(input, delim);
 
-	input.ignore(1);
-
 	ReadTextField(input, m_szEnableOn, 255);
 	ReadTextField(input, m_szOnStart,  255);
 	ReadTextField(input, m_szOnEnd,    256);

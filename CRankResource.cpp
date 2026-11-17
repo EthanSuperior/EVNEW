@@ -168,8 +168,6 @@ int CRankResource::LoadFromText(std::istream & input, char delim)
 	m_iSalaryCap = ReadIntField(input, delim);
 	m_iPriceMod = ReadIntField(input, delim);
 
-	input.ignore(1);
-
 	ReadTextField(input, m_szConvName,  64);
 	ReadTextField(input, m_szShortName, 64);
 

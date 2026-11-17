@@ -133,8 +133,6 @@ int COopsResource::LoadFromText(std::istream & input, char delim)
 	m_iDuration = ReadIntField(input, delim);
 	m_iRandom = ReadIntField(input, delim);
 
-	input.ignore(1);
-
 	ReadTextField(input, m_szActiveOn, 256);
 
 	return 1;

@@ -131,8 +131,6 @@ int CSpinResource::LoadFromText(std::istream & input, char delim)
 	m_iXTiles = ReadIntField(input, delim);
 	m_iYTiles = ReadIntField(input, delim);
 
-	input.ignore(1);
-
 	return 1;
 }
 

@@ -393,15 +393,11 @@ int CIntfResource::LoadFromText(std::istream & input, char delim)
 	m_iCargoX2 = ReadIntField(input, delim);
 	m_iCargoY2 = ReadIntField(input, delim);
 
-	input.ignore(1);
-
 	ReadTextField(input, m_szStatusFont, 64);
 
 	m_iStatusFontSize = ReadIntField(input, delim);
 	m_iSubtitleFontSize = ReadIntField(input, delim);
 	m_iBackground = ReadIntField(input, delim);
-
-	input.ignore(1);
 
 	return 1;
 }

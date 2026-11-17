@@ -435,8 +435,6 @@ int CMisnResource::LoadFromText(std::istream & input, char delim)
 	m_iAuxShipSyst = ReadIntField(input, delim);
 	m_iAvailableShipType = ReadIntField(input, delim);
 
-	input.ignore(1);
-
 	ReadTextField(input, m_szAvailableBits, 255);
 	ReadTextField(input, m_szOnAccept,      255);
 	ReadTextField(input, m_szOnRefuse,      255);
@@ -448,8 +446,6 @@ int CMisnResource::LoadFromText(std::istream & input, char delim)
 	ReadHex64Field(input, m_cRequire);
 
 	m_iDateIncrement = ReadIntField(input, delim);
-
-	input.ignore(1);
 
 	ReadTextField(input, m_szAcceptButton, 32);
 	ReadTextField(input, m_szRefuseButton, 33);

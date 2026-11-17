@@ -163,8 +163,6 @@ int CStrlResource::LoadFromText(std::istream & input, char delim)
 {
 	int iCount = ReadIntField(input, delim);
 
-	input.ignore(1);
-
 	m_vStrings.resize(iCount);
 
 	int i;
@@ -176,6 +174,9 @@ int CStrlResource::LoadFromText(std::istream & input, char delim)
 		ReadTextField(input, szBuffer, 256);
 
 		m_vStrings[i] = szBuffer;
+
+		while ((input.peek() == '\t') || (input.peek() == '\n') || (input.peek() == ','))
+			input.ignore(1);
 	}
 
 	while((input.peek() == '\t') || (input.peek() == '\n') || (input.peek() == ','))

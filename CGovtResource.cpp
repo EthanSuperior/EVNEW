@@ -342,8 +342,6 @@ int CGovtResource::LoadFromText(std::istream & input, char delim)
 	m_iNewsPicture = ReadIntField(input, delim);
 	m_iSkillMultiplier = ReadIntField(input, delim);
 
-	input.ignore(1);
-
 	ReadHex16Field(input, m_cScanMask);
 
 	char c = m_cScanMask[0]; m_cScanMask[0] = m_cScanMask[1]; m_cScanMask[1] = c;
@@ -352,8 +350,6 @@ int CGovtResource::LoadFromText(std::istream & input, char delim)
 
 	for (int i = 0; i < 4; i++)
 		m_iInherentJamming[i] = ReadIntField(input, delim);
-
-	input.ignore(1);
 
 	ReadTextField(input, m_szMediumName, 64);
 

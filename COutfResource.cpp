@@ -281,8 +281,6 @@ int COutfResource::LoadFromText(std::istream & input, char delim)
 
 	m_iBuyRandom = ReadIntField(input, delim);
 
-	input.ignore(1);
-
 	ReadTextField(input, m_szAvailability, 255);
 	ReadTextField(input, m_szOnPurchase,   255);
 	ReadTextField(input, m_szOnSell,       255);

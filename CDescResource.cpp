@@ -164,8 +164,6 @@ int CDescResource::LoadFromText(std::istream & input, char delim)
 
 	m_iGraphics = ReadIntField(input, delim);
 
-	input.ignore(1);
-
 	ReadTextField(input, m_szMovieFile, 32);
 
 	ReadHex16Field(input, (char *)&m_iFlags);

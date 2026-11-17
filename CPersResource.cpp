@@ -295,15 +295,11 @@ int CPersResource::LoadFromText(std::istream & input, char delim)
 	m_iHailQuote = ReadIntField(input, delim);
 	m_iLinkedMission = ReadIntField(input, delim);
 
-	input.ignore(1);
-
 	ReadTextField(input, m_szActiveOn, 256);
 
 	m_iGrantClass = ReadIntField(input, delim);
 	m_iGrantCount = ReadIntField(input, delim);
 	m_iGrantRandom = ReadIntField(input, delim);
-
-	input.ignore(1);
 
 	ReadTextField(input, m_szSubtitle, 64);
 

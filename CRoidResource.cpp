@@ -161,7 +161,6 @@ int CRoidResource::LoadFromText(std::istream & input, char delim)
 	m_iYieldType = ReadIntField(input, delim);
 	m_iYieldAmount = ReadIntField(input, delim);
 	m_iParticleCount = ReadIntField(input, delim);
-	m_iParticleColor = ReadIntField(input, delim);
 
 	ReadHex32Field(input, (char *)&m_iParticleColor);
 
@@ -170,8 +169,6 @@ int CRoidResource::LoadFromText(std::istream & input, char delim)
 	m_iFragmentCount = ReadIntField(input, delim);
 	m_iExplosionType = ReadIntField(input, delim);
 	m_iMass = ReadIntField(input, delim);
-
-	input.ignore(1);
 
 	return 1;
 }

@@ -336,8 +336,6 @@ int CSpobResource::LoadFromText(std::istream & input, char delim)
 	for (int i = 0; i < 8; i++)
 		m_iHyperlinks[i] = ReadIntField(input, delim);
 
-	input.ignore(1);
-
 	ReadTextField(input, m_szOnDominate, 255);
 	ReadTextField(input, m_szOnRelease,  255);
 
@@ -348,8 +346,6 @@ int CSpobResource::LoadFromText(std::istream & input, char delim)
 	m_iDeadType = ReadIntField(input, delim);
 	m_iDeadTime = ReadIntField(input, delim);
 	m_iExplosionType = ReadIntField(input, delim);
-
-	input.ignore(1);
 
 	ReadTextField(input, m_szOnDestroy,    255);
 	ReadTextField(input, m_szOnRegenerate, 255);

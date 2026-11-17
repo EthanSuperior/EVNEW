@@ -300,8 +300,6 @@ int CCharResource::LoadFromText(std::istream & input, char delim)
 	m_iPictDelay4 = ReadIntField(input, delim);
 	m_iIntroText = ReadIntField(input, delim);
 
-	input.ignore(1);
-
 	ReadTextField(input, m_szOnStart, 256);
 
 	m_iStartDay = ReadIntField(input, delim);

@@ -113,8 +113,6 @@ int CBoomResource::LoadFromText(std::istream & input, char delim)
 	m_iSoundIndex = ReadIntField(input, delim);
 	m_iGraphicsIndex = ReadIntField(input, delim);
 
-	input.ignore(1);
-
 	return 1;
 }
 

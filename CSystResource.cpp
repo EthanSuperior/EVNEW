@@ -473,9 +473,7 @@ int CSystResource::LoadFromText(std::istream & input, char delim)
 	for (int i = 0; i < 8; i++)
 		m_iPersons[i] = ReadIntField(input, delim);
 	for (int i = 0; i < 8; i++)
-		m_iPersonProbabilities[0] = ReadIntField(input, delim);
-
-	input.ignore(1);
+		m_iPersonProbabilities[i] = ReadIntField(input, delim);
 
 	ReadTextField(input, m_szVisibility, 256);
 
@@ -484,8 +482,6 @@ int CSystResource::LoadFromText(std::istream & input, char delim)
 	m_iReinforcementFleet = ReadIntField(input, delim);
 	m_iReinforcementTime = ReadIntField(input, delim);
 	m_iReinforcementInterval = ReadIntField(input, delim);
-
-	input.ignore(1);
 
 	ReadHex16Field(input, (char *)&m_iAsteroidTypes);
 

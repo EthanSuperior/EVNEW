@@ -607,8 +607,6 @@ int CShipResource::LoadFromText(std::istream & input, char delim)
 	m_iFuelRegeneration = ReadIntField(input, delim);
 	m_iSkillVariation = ReadIntField(input, delim);
 
-	input.ignore(1);
-
 	ReadTextField(input, m_szAvailability, 255);
 	ReadTextField(input, m_szAppearOn,     255);
 	ReadTextField(input, m_szOnPurchase,   256);
@@ -622,8 +620,6 @@ int CShipResource::LoadFromText(std::istream & input, char delim)
 
 	m_iBuyRandom = ReadIntField(input, delim);
 	m_iHireRandom = ReadIntField(input, delim);
-
-	input.ignore(1);
 
 	ReadTextField(input, m_szOnCapture, 255);
 	ReadTextField(input, m_szOnRetire,  255);

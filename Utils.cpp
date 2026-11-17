@@ -445,7 +445,7 @@ int ReadHex16Field(std::istream & input, char *pData)
 
 	c1 = input.peek();
 
-	while(((c1 == ' ') || (c1 == '\n') || (c1 == '\t')) && (!input.eof()))
+	while(((c1 == ' ') || (c1 == '\n') || (c1 == '\t') || (c1 == ',')) && (!input.eof()))
 	{
 		input.ignore(1);
 
@@ -526,7 +526,7 @@ int ReadHex32Field(std::istream & input, char *pData)
 
 	c1 = input.peek();
 
-	while(((c1 == ' ') || (c1 == '\n') || (c1 == '\t')) && (!input.eof()))
+	while(((c1 == ' ') || (c1 == '\n') || (c1 == '\t') || (c1 == ',')) && (!input.eof()))
 	{
 		input.ignore(1);
 

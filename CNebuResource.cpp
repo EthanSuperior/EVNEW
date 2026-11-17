@@ -132,8 +132,6 @@ int CNebuResource::LoadFromText(std::istream & input, char delim)
 	m_iXSize = ReadIntField(input, delim);
 	m_iYSize = ReadIntField(input, delim);
 
-	input.ignore(1);
-
 	ReadTextField(input, m_szActiveOn,  255);
 	ReadTextField(input, m_szOnExplore, 255);
 
