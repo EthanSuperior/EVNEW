@@ -947,6 +947,9 @@ int CEditor::FileExportCSV(void)
 
 	// load our path into the magical variable
 	m_ofnLoadSave.lpstrFile = szFilename;
+
+	// prevent a memory leak
+	CoTaskMemFree(id);
 	
 	if (m_plugIn.m_vResources[CNR_TYPE_CICN].size() > 0)
 	{
