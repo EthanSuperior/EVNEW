@@ -148,12 +148,12 @@ int CPictResource::Load(char *pInput, int iSize)
 	return 1;
 }
 
-int CPictResource::SaveToTextEx(std::ostream & output, std::string & szFilePath, std::string & szFilename1, std::string & szFilename2, int iParam)
+int CPictResource::SaveToTextEx(std::ostream & output, std::string & szFilePath, std::string & szFilename1, std::string & szFilename2, int iParam, char delim)
 {
-	output << m_iWidth  << '\t'
-		   << m_iHeight << '\t';
+	output << m_iWidth  << delim
+		   << m_iHeight << delim;
 
-	PrintTextField(output, szFilename1.c_str(), '\t');
+	PrintTextField(output, szFilename1.c_str(), delim);
 
 	std::string szFilename = szFilePath + szFilename1;
 
@@ -162,16 +162,11 @@ int CPictResource::SaveToTextEx(std::ostream & output, std::string & szFilePath,
 	return 1;
 }
 
-int CPictResource::LoadFromTextEx(std::istream & input, std::string & szFilePath)
+int CPictResource::LoadFromTextEx(std::istream & input, std::string & szFilePath, char delim)
 {
-	short iWidth, iHeight;
+	short iWidth = ReadIntField(input,delim), iHeight = ReadIntField(input, delim);
 
 	char szFilename[MAX_PATH];
-
-	input >> iWidth
-		  >> iHeight;
-
-	input.ignore(1);
 
 	strcpy(szFilename, szFilePath.c_str());
 

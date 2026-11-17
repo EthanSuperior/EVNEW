@@ -70,8 +70,8 @@ public:
 	int Save(char *pOutput);
 	int Load(char *pInput, int iSize);
 
-	int SaveToText(std::ostream & output);
-	int LoadFromText(std::istream & input);
+	int SaveToText(std::ostream& output, char delim);
+	int LoadFromText(std::istream& input, char delim);
 
 	static BOOL CharDlgProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
 

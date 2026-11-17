@@ -71,8 +71,8 @@ public:
 	int Save(char *pOutput);
 	int Load(char *pInput, int iSize);
 
-	int SaveToTextEx(std::ostream & output, std::string & szFilePath, std::string & szFilename1, std::string & szFilename2, int iParam);
-	int LoadFromTextEx(std::istream & input, std::string & szFilePath);
+	int SaveToTextEx(std::ostream & output, std::string & szFilePath, std::string & szFilename1, std::string & szFilename2, int iParam, char delim);
+	int LoadFromTextEx(std::istream & input, std::string & szFilePath, char delim);
 
 	static BOOL CicnDlgProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
 

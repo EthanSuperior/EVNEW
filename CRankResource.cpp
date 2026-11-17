@@ -142,33 +142,31 @@ int CRankResource::SwapEndians(void)
 	return 1;
 }
 
-int CRankResource::SaveToText(std::ostream & output)
+int CRankResource::SaveToText(std::ostream & output, char delim)
 {
-	output << m_iWeight     << '\t'
-		   << m_iGovernment << '\t'
-		   << m_iSalary     << '\t'
-		   << m_iSalaryCap  << '\t'
-		   << m_iPriceMod   << '\t';
+	output << m_iWeight     << delim
+		   << m_iGovernment << delim
+		   << m_iSalary     << delim
+		   << m_iSalaryCap  << delim
+		   << m_iPriceMod   << delim;
 
-	PrintTextField(output, m_szConvName,  '\t');
-	PrintTextField(output, m_szShortName, '\t');
+	PrintTextField(output, m_szConvName,  delim);
+	PrintTextField(output, m_szShortName, delim);
 
-	PrintHex64Field(output, m_cContribute, '\t');
+	PrintHex64Field(output, m_cContribute, delim);
 
-	PrintHex16Field(output, (char *)&m_iFlags, '\t');
+	PrintHex16Field(output, (char *)&m_iFlags, delim);
 
 	return 1;
 }
 
-int CRankResource::LoadFromText(std::istream & input)
+int CRankResource::LoadFromText(std::istream & input, char delim)
 {
-	input >> m_iWeight
-		  >> m_iGovernment
-		  >> m_iSalary
-		  >> m_iSalaryCap
-		  >> m_iPriceMod;
-
-	input.ignore(1);
+	m_iWeight = ReadIntField(input, delim);
+	m_iGovernment = ReadIntField(input, delim);
+	m_iSalary = ReadIntField(input, delim);
+	m_iSalaryCap = ReadIntField(input, delim);
+	m_iPriceMod = ReadIntField(input, delim);
 
 	ReadTextField(input, m_szConvName,  64);
 	ReadTextField(input, m_szShortName, 64);

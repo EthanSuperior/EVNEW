@@ -604,14 +604,14 @@ int CCicnResource::Load(char *pInput, int iSize)
 	return 1;
 }
 
-int CCicnResource::SaveToTextEx(std::ostream & output, std::string & szFilePath, std::string & szFilename1, std::string & szFilename2, int iParam)
+int CCicnResource::SaveToTextEx(std::ostream & output, std::string & szFilePath, std::string & szFilename1, std::string & szFilename2, int iParam, char delim)
 {
-	output << m_iWidth  << '\t'
-		   << m_iHeight << '\t'
-		   << m_iBPP    << '\t';
+	output << m_iWidth  << delim
+		   << m_iHeight << delim
+		   << m_iBPP    << delim;
 
-	PrintTextField(output, szFilename1.c_str(), '\t');
-	PrintTextField(output, szFilename2.c_str(), '\t');
+	PrintTextField(output, szFilename1.c_str(), delim);
+	PrintTextField(output, szFilename2.c_str(), delim);
 
 	std::string szIconFilename, szMaskFilename;
 
@@ -624,17 +624,15 @@ int CCicnResource::SaveToTextEx(std::ostream & output, std::string & szFilePath,
 	return 1;
 }
 
-int CCicnResource::LoadFromTextEx(std::istream & input, std::string & szFilePath)
+int CCicnResource::LoadFromTextEx(std::istream & input, std::string & szFilePath, char delim)
 {
 	int iWidth;
 	int iHeight;
 	int iBPP;
 
-	input >> iWidth
-		  >> iHeight
-		  >> iBPP;
-
-	input.ignore(1);
+	iWidth = ReadIntField(input, delim);
+	iHeight = ReadIntField(input, delim);
+	iBPP = ReadIntField(input, delim);
 
 	char szIconFilename[256];
 	char szMaskFilename[256];

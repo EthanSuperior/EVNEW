@@ -474,156 +474,152 @@ int CShipResource::SwapEndians(void)
 	return 1;
 }
 
-int CShipResource::SaveToText(std::ostream & output)
+int CShipResource::SaveToText(std::ostream & output, char delim)
 {
-	output << m_iCargo            << '\t'
-		   << m_iShields          << '\t'
-		   << m_iShieldRecharge   << '\t'
-		   << m_iArmor            << '\t'
-		   << m_iArmorRecharge    << '\t'
-		   << m_iAcceleration     << '\t'
-		   << m_iMaxSpeed         << '\t'
-		   << m_iTurning          << '\t'
-		   << m_iFuel             << '\t'
-		   << m_iFreeMass         << '\t'
-		   << m_iMaxGuns          << '\t'
-		   << m_iMaxTurrets       << '\t'
-		   << m_iTechLevel        << '\t'
-		   << m_iCost             << '\t'
-		   << m_iDeathDelay       << '\t'
-		   << m_iExplosion1       << '\t'
-		   << m_iExplosion2       << '\t'
-		   << m_iDisplayWeight    << '\t'
-		   << m_iMass             << '\t'
-		   << m_iLength           << '\t'
-		   << m_iCrew             << '\t'
-		   << m_iStrength         << '\t'
-		   << m_iGovernment       << '\t'
-		   << m_iEscapePodCount   << '\t'
-		   << m_iFuelRegeneration << '\t'
-		   << m_iSkillVariation   << '\t';
+	output << m_iCargo            << delim
+		   << m_iShields          << delim
+		   << m_iShieldRecharge   << delim
+		   << m_iArmor            << delim
+		   << m_iArmorRecharge    << delim
+		   << m_iAcceleration     << delim
+		   << m_iMaxSpeed         << delim
+		   << m_iTurning          << delim
+		   << m_iFuel             << delim
+		   << m_iFreeMass         << delim
+		   << m_iMaxGuns          << delim
+		   << m_iMaxTurrets       << delim
+		   << m_iTechLevel        << delim
+		   << m_iCost             << delim
+		   << m_iDeathDelay       << delim
+		   << m_iExplosion1       << delim
+		   << m_iExplosion2       << delim
+		   << m_iDisplayWeight    << delim
+		   << m_iMass             << delim
+		   << m_iLength           << delim
+		   << m_iCrew             << delim
+		   << m_iStrength         << delim
+		   << m_iGovernment       << delim
+		   << m_iEscapePodCount   << delim
+		   << m_iFuelRegeneration << delim
+		   << m_iSkillVariation   << delim;
 
-	PrintTextField(output, m_szAvailability, '\t');
-	PrintTextField(output, m_szAppearOn,     '\t');
-	PrintTextField(output, m_szOnPurchase,   '\t');
+	PrintTextField(output, m_szAvailability, delim);
+	PrintTextField(output, m_szAppearOn,     delim);
+	PrintTextField(output, m_szOnPurchase,   delim);
 
-	output << m_iDeionize      << '\t'
-		   << m_iMaxIonization << '\t'
-		   << m_iKeyCarried    << '\t';
+	output << m_iDeionize      << delim
+		   << m_iMaxIonization << delim
+		   << m_iKeyCarried    << delim;
 
-	PrintHex64Field(output, m_cContribute, '\t');
-	PrintHex64Field(output, m_cRequire,    '\t');
+	PrintHex64Field(output, m_cContribute, delim);
+	PrintHex64Field(output, m_cRequire,    delim);
 
-	output << m_iBuyRandom  << '\t'
-		   << m_iHireRandom << '\t';
+	output << m_iBuyRandom  << delim
+		   << m_iHireRandom << delim;
 
-	PrintTextField(output, m_szOnCapture, '\t');
-	PrintTextField(output, m_szOnRetire,  '\t');
-	PrintTextField(output, m_szSubtitle,  '\t');
-	PrintTextField(output, m_szShortName, '\t');
-	PrintTextField(output, m_szCommName,  '\t');
-	PrintTextField(output, m_szLongName,  '\t');
-	PrintTextField(output, m_szMovieFile, '\t');
+	PrintTextField(output, m_szOnCapture, delim);
+	PrintTextField(output, m_szOnRetire,  delim);
+	PrintTextField(output, m_szSubtitle,  delim);
+	PrintTextField(output, m_szShortName, delim);
+	PrintTextField(output, m_szCommName,  delim);
+	PrintTextField(output, m_szLongName,  delim);
+	PrintTextField(output, m_szMovieFile, delim);
 
-	output << m_iEscortAI          << '\t'
-		   << m_iEscortUpgradeTo   << '\t'
-		   << m_iEscortUpgradeCost << '\t'
-		   << m_iEscortSellValue   << '\t'
-		   << m_iEscortType        << '\t'
-		   << m_iWeapons[0]        << '\t'
-		   << m_iWeapons[1]        << '\t'
-		   << m_iWeapons[2]        << '\t'
-		   << m_iWeapons[3]        << '\t'
-		   << m_iWeapons[4]        << '\t'
-		   << m_iWeapons[5]        << '\t'
-		   << m_iWeapons[6]        << '\t'
-		   << m_iWeapons[7]        << '\t'
-		   << m_iWeaponCounts[0]   << '\t'
-		   << m_iWeaponCounts[1]   << '\t'
-		   << m_iWeaponCounts[2]   << '\t'
-		   << m_iWeaponCounts[3]   << '\t'
-		   << m_iWeaponCounts[4]   << '\t'
-		   << m_iWeaponCounts[5]   << '\t'
-		   << m_iWeaponCounts[6]   << '\t'
-		   << m_iWeaponCounts[7]   << '\t'
-		   << m_iWeaponAmmos[0]    << '\t'
-		   << m_iWeaponAmmos[1]    << '\t'
-		   << m_iWeaponAmmos[2]    << '\t'
-		   << m_iWeaponAmmos[3]    << '\t'
-		   << m_iWeaponAmmos[4]    << '\t'
-		   << m_iWeaponAmmos[5]    << '\t'
-		   << m_iWeaponAmmos[6]    << '\t'
-		   << m_iWeaponAmmos[7]    << '\t'
-		   << m_iOutfits[0]        << '\t'
-		   << m_iOutfits[1]        << '\t'
-		   << m_iOutfits[2]        << '\t'
-		   << m_iOutfits[3]        << '\t'
-		   << m_iOutfits[4]        << '\t'
-		   << m_iOutfits[5]        << '\t'
-		   << m_iOutfits[6]        << '\t'
-		   << m_iOutfits[7]        << '\t'
-		   << m_iOutfitCounts[0]   << '\t'
-		   << m_iOutfitCounts[1]   << '\t'
-		   << m_iOutfitCounts[2]   << '\t'
-		   << m_iOutfitCounts[3]   << '\t'
-		   << m_iOutfitCounts[4]   << '\t'
-		   << m_iOutfitCounts[5]   << '\t'
-		   << m_iOutfitCounts[6]   << '\t'
-		   << m_iOutfitCounts[7]   << '\t';
+	output << m_iEscortAI          << delim
+		   << m_iEscortUpgradeTo   << delim
+		   << m_iEscortUpgradeCost << delim
+		   << m_iEscortSellValue   << delim
+		   << m_iEscortType        << delim
+		   << m_iWeapons[0]        << delim
+		   << m_iWeapons[1]        << delim
+		   << m_iWeapons[2]        << delim
+		   << m_iWeapons[3]        << delim
+		   << m_iWeapons[4]        << delim
+		   << m_iWeapons[5]        << delim
+		   << m_iWeapons[6]        << delim
+		   << m_iWeapons[7]        << delim
+		   << m_iWeaponCounts[0]   << delim
+		   << m_iWeaponCounts[1]   << delim
+		   << m_iWeaponCounts[2]   << delim
+		   << m_iWeaponCounts[3]   << delim
+		   << m_iWeaponCounts[4]   << delim
+		   << m_iWeaponCounts[5]   << delim
+		   << m_iWeaponCounts[6]   << delim
+		   << m_iWeaponCounts[7]   << delim
+		   << m_iWeaponAmmos[0]    << delim
+		   << m_iWeaponAmmos[1]    << delim
+		   << m_iWeaponAmmos[2]    << delim
+		   << m_iWeaponAmmos[3]    << delim
+		   << m_iWeaponAmmos[4]    << delim
+		   << m_iWeaponAmmos[5]    << delim
+		   << m_iWeaponAmmos[6]    << delim
+		   << m_iWeaponAmmos[7]    << delim
+		   << m_iOutfits[0]        << delim
+		   << m_iOutfits[1]        << delim
+		   << m_iOutfits[2]        << delim
+		   << m_iOutfits[3]        << delim
+		   << m_iOutfits[4]        << delim
+		   << m_iOutfits[5]        << delim
+		   << m_iOutfits[6]        << delim
+		   << m_iOutfits[7]        << delim
+		   << m_iOutfitCounts[0]   << delim
+		   << m_iOutfitCounts[1]   << delim
+		   << m_iOutfitCounts[2]   << delim
+		   << m_iOutfitCounts[3]   << delim
+		   << m_iOutfitCounts[4]   << delim
+		   << m_iOutfitCounts[5]   << delim
+		   << m_iOutfitCounts[6]   << delim
+		   << m_iOutfitCounts[7]   << delim;
 
-	PrintHex16Field(output, (char *)&m_iFlags1, '\t');
-	PrintHex16Field(output, (char *)&m_iFlags2, '\t');
-	PrintHex16Field(output, (char *)&m_iFlags3, '\t');
+	PrintHex16Field(output, (char *)&m_iFlags1, delim);
+	PrintHex16Field(output, (char *)&m_iFlags2, delim);
+	PrintHex16Field(output, (char *)&m_iFlags3, delim);
 
 	return 1;
 }
 
-int CShipResource::LoadFromText(std::istream & input)
+int CShipResource::LoadFromText(std::istream & input, char delim)
 {
-	input >> m_iCargo
-		  >> m_iShields
-		  >> m_iShieldRecharge
-		  >> m_iArmor
-		  >> m_iArmorRecharge
-		  >> m_iAcceleration
-		  >> m_iMaxSpeed
-		  >> m_iTurning
-		  >> m_iFuel
-		  >> m_iFreeMass
-		  >> m_iMaxGuns
-		  >> m_iMaxTurrets
-		  >> m_iTechLevel
-		  >> m_iCost
-		  >> m_iDeathDelay
-		  >> m_iExplosion1
-		  >> m_iExplosion2
-		  >> m_iDisplayWeight
-		  >> m_iMass
-		  >> m_iLength
-		  >> m_iCrew
-		  >> m_iStrength
-		  >> m_iGovernment
-		  >> m_iEscapePodCount
-		  >> m_iFuelRegeneration
-		  >> m_iSkillVariation;
-
-	input.ignore(1);
+	m_iCargo = ReadIntField(input, delim);
+	m_iShields = ReadIntField(input, delim);
+	m_iShieldRecharge = ReadIntField(input, delim);
+	m_iArmor = ReadIntField(input, delim);
+	m_iArmorRecharge = ReadIntField(input, delim);
+	m_iAcceleration = ReadIntField(input, delim);
+	m_iMaxSpeed = ReadIntField(input, delim);
+	m_iTurning = ReadIntField(input, delim);
+	m_iFuel = ReadIntField(input, delim);
+	m_iFreeMass = ReadIntField(input, delim);
+	m_iMaxGuns = ReadIntField(input, delim);
+	m_iMaxTurrets = ReadIntField(input, delim);
+	m_iTechLevel = ReadIntField(input, delim);
+	m_iCost = ReadIntField(input, delim);
+	m_iDeathDelay = ReadIntField(input, delim);
+	m_iExplosion1 = ReadIntField(input, delim);
+	m_iExplosion2 = ReadIntField(input, delim);
+	m_iDisplayWeight = ReadIntField(input, delim);
+	m_iMass = ReadIntField(input, delim);
+	m_iLength = ReadIntField(input, delim);
+	m_iCrew = ReadIntField(input, delim);
+	m_iStrength = ReadIntField(input, delim);
+	m_iGovernment = ReadIntField(input, delim);
+	m_iEscapePodCount = ReadIntField(input, delim);
+	m_iFuelRegeneration = ReadIntField(input, delim);
+	m_iSkillVariation = ReadIntField(input, delim);
 
 	ReadTextField(input, m_szAvailability, 255);
 	ReadTextField(input, m_szAppearOn,     255);
 	ReadTextField(input, m_szOnPurchase,   256);
 
-	input >> m_iDeionize
-		  >> m_iMaxIonization
-		  >> m_iKeyCarried;
+	m_iDeionize = ReadIntField(input, delim);
+	m_iMaxIonization = ReadIntField(input, delim);
+	m_iKeyCarried = ReadIntField(input, delim);
 
 	ReadHex64Field(input, m_cContribute);
 	ReadHex64Field(input, m_cRequire);
 
-	input >> m_iBuyRandom
-		  >> m_iHireRandom;
-
-	input.ignore(1);
+	m_iBuyRandom = ReadIntField(input, delim);
+	m_iHireRandom = ReadIntField(input, delim);
 
 	ReadTextField(input, m_szOnCapture, 255);
 	ReadTextField(input, m_szOnRetire,  255);
@@ -633,51 +629,21 @@ int CShipResource::LoadFromText(std::istream & input)
 	ReadTextField(input, m_szLongName,  128);
 	ReadTextField(input, m_szMovieFile,  32);
 
-	input >> m_iEscortAI
-		  >> m_iEscortUpgradeTo
-		  >> m_iEscortUpgradeCost
-		  >> m_iEscortSellValue
-		  >> m_iEscortType
-		  >> m_iWeapons[0]
-		  >> m_iWeapons[1]
-		  >> m_iWeapons[2]
-		  >> m_iWeapons[3]
-		  >> m_iWeapons[4]
-		  >> m_iWeapons[5]
-		  >> m_iWeapons[6]
-		  >> m_iWeapons[7]
-		  >> m_iWeaponCounts[0]
-		  >> m_iWeaponCounts[1]
-		  >> m_iWeaponCounts[2]
-		  >> m_iWeaponCounts[3]
-		  >> m_iWeaponCounts[4]
-		  >> m_iWeaponCounts[5]
-		  >> m_iWeaponCounts[6]
-		  >> m_iWeaponCounts[7]
-		  >> m_iWeaponAmmos[0]
-		  >> m_iWeaponAmmos[1]
-		  >> m_iWeaponAmmos[2]
-		  >> m_iWeaponAmmos[3]
-		  >> m_iWeaponAmmos[4]
-		  >> m_iWeaponAmmos[5]
-		  >> m_iWeaponAmmos[6]
-		  >> m_iWeaponAmmos[7]
-		  >> m_iOutfits[0]
-		  >> m_iOutfits[1]
-		  >> m_iOutfits[2]
-		  >> m_iOutfits[3]
-		  >> m_iOutfits[4]
-		  >> m_iOutfits[5]
-		  >> m_iOutfits[6]
-		  >> m_iOutfits[7]
-		  >> m_iOutfitCounts[0]
-		  >> m_iOutfitCounts[1]
-		  >> m_iOutfitCounts[2]
-		  >> m_iOutfitCounts[3]
-		  >> m_iOutfitCounts[4]
-		  >> m_iOutfitCounts[5]
-		  >> m_iOutfitCounts[6]
-		  >> m_iOutfitCounts[7];
+	m_iEscortAI = ReadIntField(input, delim);
+	m_iEscortUpgradeTo = ReadIntField(input, delim);
+	m_iEscortUpgradeCost = ReadIntField(input, delim);
+	m_iEscortSellValue = ReadIntField(input, delim);
+	m_iEscortType = ReadIntField(input, delim);
+	for (int i = 0; i < 8; i++)
+		m_iWeapons[i] = ReadIntField(input, delim);
+	for (int i = 0; i < 8; i++)
+		m_iWeaponCounts[i] = ReadIntField(input, delim);
+	for (int i = 0; i < 8; i++)
+		m_iWeaponAmmos[i] = ReadIntField(input, delim);
+	for (int i = 0; i < 8; i++)
+		m_iOutfits[i] = ReadIntField(input, delim);
+	for (int i = 0; i < 8; i++)
+		m_iOutfitCounts[i] = ReadIntField(input, delim);
 
 	ReadHex16Field(input, (char *)&m_iFlags1);
 	ReadHex16Field(input, (char *)&m_iFlags2);

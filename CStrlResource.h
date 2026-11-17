@@ -65,8 +65,8 @@ public:
 	int Save(char *pOutput);
 	int Load(char *pInput, int iSize);
 
-	int SaveToText(std::ostream & output);
-	int LoadFromText(std::istream & input);
+	int SaveToText(std::ostream & output, char delim);
+	int LoadFromText(std::istream & input, char delim);
 
 	int EditCut(void);
 	int EditCopy(void);

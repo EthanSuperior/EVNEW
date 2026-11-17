@@ -231,83 +231,80 @@ int CCharResource::SwapEndians(void)
 	return 1;
 }
 
-int CCharResource::SaveToText(std::ostream & output)
+int CCharResource::SaveToText(std::ostream & output, char delim)
 {
-	output << m_iCash         << '\t'
-		   << m_iShipType     << '\t'
-		   << m_iSystem1      << '\t'
-		   << m_iSystem2      << '\t'
-		   << m_iSystem3      << '\t'
-		   << m_iSystem4      << '\t'
-		   << m_iGovernment1  << '\t'
-		   << m_iStatus1      << '\t'
-		   << m_iGovernment2  << '\t'
-		   << m_iStatus2      << '\t'
-		   << m_iGovernment3  << '\t'
-		   << m_iStatus3      << '\t'
-		   << m_iGovernment4  << '\t'
-		   << m_iStatus4      << '\t'
-		   << m_iCombatRating << '\t'
-		   << m_iIntroPict1   << '\t'
-		   << m_iIntroPict2   << '\t'
-		   << m_iIntroPict3   << '\t'
-		   << m_iIntroPict4   << '\t'
-		   << m_iPictDelay1   << '\t'
-		   << m_iPictDelay2   << '\t'
-		   << m_iPictDelay3   << '\t'
-		   << m_iPictDelay4   << '\t'
-		   << m_iIntroText    << '\t';
+	output << m_iCash         << delim
+		   << m_iShipType     << delim
+		   << m_iSystem1      << delim
+		   << m_iSystem2      << delim
+		   << m_iSystem3      << delim
+		   << m_iSystem4      << delim
+		   << m_iGovernment1  << delim
+		   << m_iStatus1      << delim
+		   << m_iGovernment2  << delim
+		   << m_iStatus2      << delim
+		   << m_iGovernment3  << delim
+		   << m_iStatus3      << delim
+		   << m_iGovernment4  << delim
+		   << m_iStatus4      << delim
+		   << m_iCombatRating << delim
+		   << m_iIntroPict1   << delim
+		   << m_iIntroPict2   << delim
+		   << m_iIntroPict3   << delim
+		   << m_iIntroPict4   << delim
+		   << m_iPictDelay1   << delim
+		   << m_iPictDelay2   << delim
+		   << m_iPictDelay3   << delim
+		   << m_iPictDelay4   << delim
+		   << m_iIntroText    << delim;
 
-	PrintTextField(output, m_szOnStart, '\t');
+	PrintTextField(output, m_szOnStart, delim);
 
-	output << m_iStartDay     << '\t'
-		   << m_iStartMonth   << '\t'
-		   << m_iStartYear    << '\t';
+	output << m_iStartDay     << delim
+		   << m_iStartMonth   << delim
+		   << m_iStartYear    << delim;
 
-	PrintTextField(output, m_szDatePrefix, '\t');
-	PrintTextField(output, m_szDateSuffix, '\t');
+	PrintTextField(output, m_szDatePrefix, delim);
+	PrintTextField(output, m_szDateSuffix, delim);
 
-	PrintHex16Field(output, (char *)&m_iFlags, '\t');
+	PrintHex16Field(output, (char *)&m_iFlags, delim);
 
 	return 1;
 }
 
-int CCharResource::LoadFromText(std::istream & input)
+int CCharResource::LoadFromText(std::istream & input, char delim)
 {
-	input >> m_iCash
-		  >> m_iShipType
-		  >> m_iSystem1
-		  >> m_iSystem2
-		  >> m_iSystem3
-		  >> m_iSystem4
-		  >> m_iGovernment1
-		  >> m_iStatus1
-		  >> m_iGovernment2
-		  >> m_iStatus2
-		  >> m_iGovernment3
-		  >> m_iStatus3
-		  >> m_iGovernment4
-		  >> m_iStatus4
-		  >> m_iCombatRating
-		  >> m_iIntroPict1
-		  >> m_iIntroPict2
-		  >> m_iIntroPict3
-		  >> m_iIntroPict4
-		  >> m_iPictDelay1
-		  >> m_iPictDelay2
-		  >> m_iPictDelay3
-		  >> m_iPictDelay4
-		  >> m_iIntroText;
-
-	input.ignore(1);
+	
+	m_iCash = ReadIntField(input, delim);
+	m_iShipType = ReadIntField(input, delim);
+	m_iSystem1 = ReadIntField(input, delim);
+	m_iSystem2 = ReadIntField(input, delim);
+	m_iSystem3 = ReadIntField(input, delim);
+	m_iSystem4 = ReadIntField(input, delim);
+	m_iGovernment1 = ReadIntField(input, delim);
+	m_iStatus1 = ReadIntField(input, delim);
+	m_iGovernment2 = ReadIntField(input, delim);
+	m_iStatus2 = ReadIntField(input, delim);
+	m_iGovernment3 = ReadIntField(input, delim);
+	m_iStatus3 = ReadIntField(input, delim);
+	m_iGovernment4 = ReadIntField(input, delim);
+	m_iStatus4 = ReadIntField(input, delim);
+	m_iCombatRating = ReadIntField(input, delim);
+	m_iIntroPict1 = ReadIntField(input, delim);
+	m_iIntroPict2 = ReadIntField(input, delim);
+	m_iIntroPict3 = ReadIntField(input, delim);
+	m_iIntroPict4 = ReadIntField(input, delim);
+	m_iPictDelay1 = ReadIntField(input, delim);
+	m_iPictDelay2 = ReadIntField(input, delim);
+	m_iPictDelay3 = ReadIntField(input, delim);
+	m_iPictDelay4 = ReadIntField(input, delim);
+	m_iIntroText = ReadIntField(input, delim);
 
 	ReadTextField(input, m_szOnStart, 256);
 
-	input >> m_iStartDay
-		  >> m_iStartMonth
-		  >> m_iStartYear;
-
-	input.ignore(1);
+	m_iStartDay = ReadIntField(input, delim);
+	m_iStartMonth = ReadIntField(input, delim);
+	m_iStartYear = ReadIntField(input, delim);
 
 	ReadTextField(input, m_szDatePrefix, 16);
 	ReadTextField(input, m_szDateSuffix, 16);

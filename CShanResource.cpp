@@ -422,190 +422,166 @@ int CShanResource::SwapEndians(void)
 	return 1;
 }
 
-int CShanResource::SaveToText(std::ostream & output)
+int CShanResource::SaveToText(std::ostream & output, char delim)
 {
-	output << m_iRotationFrames   << '\t'
-		   << m_iBaseImage        << '\t'
-		   << m_iBaseMask         << '\t'
-		   << m_iBaseSetCount     << '\t'
-		   << m_iBaseXSize        << '\t'
-		   << m_iBaseYSize        << '\t'
-		   << m_iBaseTransparency << '\t'
-		   << m_iAltImage         << '\t'
-		   << m_iAltMask          << '\t'
-		   << m_iAltSetCount      << '\t'
-		   << m_iAltXSize         << '\t'
-		   << m_iAltYSize         << '\t'
-		   << m_iGlowImage        << '\t'
-		   << m_iGlowMask         << '\t'
-		   << m_iGlowXSize        << '\t'
-		   << m_iGlowYSize        << '\t'
-		   << m_iLightsImage      << '\t'
-		   << m_iLightsMask       << '\t'
-		   << m_iLightsXSize      << '\t'
-		   << m_iLightsYSize      << '\t'
-		   << m_iWeaponImage      << '\t'
-		   << m_iWeaponMask       << '\t'
-		   << m_iWeaponXSize      << '\t'
-		   << m_iWeaponYSize      << '\t'
-		   << m_iShieldImage      << '\t'
-		   << m_iShieldMask       << '\t'
-		   << m_iShieldXSize      << '\t'
-		   << m_iShieldYSize      << '\t'
-		   << m_iAnimationDelay   << '\t'
-		   << m_iWeaponDecay      << '\t'
-		   << m_iBlinkMode        << '\t'
-		   << m_iBlinkValueA      << '\t'
-		   << m_iBlinkValueB      << '\t'
-		   << m_iBlinkValueC      << '\t'
-		   << m_iBlinkValueD      << '\t'
-		   << m_iGunPosX[0]       << '\t'
-		   << m_iGunPosY[0]       << '\t'
-		   << m_iGunPosZ[0]       << '\t'
-		   << m_iGunPosX[1]       << '\t'
-		   << m_iGunPosY[1]       << '\t'
-		   << m_iGunPosZ[1]       << '\t'
-		   << m_iGunPosX[2]       << '\t'
-		   << m_iGunPosY[2]       << '\t'
-		   << m_iGunPosZ[2]       << '\t'
-		   << m_iGunPosX[3]       << '\t'
-		   << m_iGunPosY[3]       << '\t'
-		   << m_iGunPosZ[3]       << '\t'
-		   << m_iTurretPosX[0]    << '\t'
-		   << m_iTurretPosY[0]    << '\t'
-		   << m_iTurretPosZ[0]    << '\t'
-		   << m_iTurretPosX[1]    << '\t'
-		   << m_iTurretPosY[1]    << '\t'
-		   << m_iTurretPosZ[1]    << '\t'
-		   << m_iTurretPosX[2]    << '\t'
-		   << m_iTurretPosY[2]    << '\t'
-		   << m_iTurretPosZ[2]    << '\t'
-		   << m_iTurretPosX[3]    << '\t'
-		   << m_iTurretPosY[3]    << '\t'
-		   << m_iTurretPosZ[3]    << '\t'
-		   << m_iGuidedPosX[0]    << '\t'
-		   << m_iGuidedPosY[0]    << '\t'
-		   << m_iGuidedPosZ[0]    << '\t'
-		   << m_iGuidedPosX[1]    << '\t'
-		   << m_iGuidedPosY[1]    << '\t'
-		   << m_iGuidedPosZ[1]    << '\t'
-		   << m_iGuidedPosX[2]    << '\t'
-		   << m_iGuidedPosY[2]    << '\t'
-		   << m_iGuidedPosZ[2]    << '\t'
-		   << m_iGuidedPosX[3]    << '\t'
-		   << m_iGuidedPosY[3]    << '\t'
-		   << m_iGuidedPosZ[3]    << '\t'
-		   << m_iBeamPosX[0]      << '\t'
-		   << m_iBeamPosY[0]      << '\t'
-		   << m_iBeamPosZ[0]      << '\t'
-		   << m_iBeamPosX[1]      << '\t'
-		   << m_iBeamPosY[1]      << '\t'
-		   << m_iBeamPosZ[1]      << '\t'
-		   << m_iBeamPosX[2]      << '\t'
-		   << m_iBeamPosY[2]      << '\t'
-		   << m_iBeamPosZ[2]      << '\t'
-		   << m_iBeamPosX[3]      << '\t'
-		   << m_iBeamPosY[3]      << '\t'
-		   << m_iBeamPosZ[3]      << '\t'
-		   << m_iUpCompressX      << '\t'
-		   << m_iUpCompressY      << '\t'
-		   << m_iDownCompressX    << '\t'
-		   << m_iDownCompressY    << '\t';
+	output << m_iRotationFrames   << delim
+		   << m_iBaseImage        << delim
+		   << m_iBaseMask         << delim
+		   << m_iBaseSetCount     << delim
+		   << m_iBaseXSize        << delim
+		   << m_iBaseYSize        << delim
+		   << m_iBaseTransparency << delim
+		   << m_iAltImage         << delim
+		   << m_iAltMask          << delim
+		   << m_iAltSetCount      << delim
+		   << m_iAltXSize         << delim
+		   << m_iAltYSize         << delim
+		   << m_iGlowImage        << delim
+		   << m_iGlowMask         << delim
+		   << m_iGlowXSize        << delim
+		   << m_iGlowYSize        << delim
+		   << m_iLightsImage      << delim
+		   << m_iLightsMask       << delim
+		   << m_iLightsXSize      << delim
+		   << m_iLightsYSize      << delim
+		   << m_iWeaponImage      << delim
+		   << m_iWeaponMask       << delim
+		   << m_iWeaponXSize      << delim
+		   << m_iWeaponYSize      << delim
+		   << m_iShieldImage      << delim
+		   << m_iShieldMask       << delim
+		   << m_iShieldXSize      << delim
+		   << m_iShieldYSize      << delim
+		   << m_iAnimationDelay   << delim
+		   << m_iWeaponDecay      << delim
+		   << m_iBlinkMode        << delim
+		   << m_iBlinkValueA      << delim
+		   << m_iBlinkValueB      << delim
+		   << m_iBlinkValueC      << delim
+		   << m_iBlinkValueD      << delim
+		   << m_iGunPosX[0]       << delim
+		   << m_iGunPosY[0]       << delim
+		   << m_iGunPosZ[0]       << delim
+		   << m_iGunPosX[1]       << delim
+		   << m_iGunPosY[1]       << delim
+		   << m_iGunPosZ[1]       << delim
+		   << m_iGunPosX[2]       << delim
+		   << m_iGunPosY[2]       << delim
+		   << m_iGunPosZ[2]       << delim
+		   << m_iGunPosX[3]       << delim
+		   << m_iGunPosY[3]       << delim
+		   << m_iGunPosZ[3]       << delim
+		   << m_iTurretPosX[0]    << delim
+		   << m_iTurretPosY[0]    << delim
+		   << m_iTurretPosZ[0]    << delim
+		   << m_iTurretPosX[1]    << delim
+		   << m_iTurretPosY[1]    << delim
+		   << m_iTurretPosZ[1]    << delim
+		   << m_iTurretPosX[2]    << delim
+		   << m_iTurretPosY[2]    << delim
+		   << m_iTurretPosZ[2]    << delim
+		   << m_iTurretPosX[3]    << delim
+		   << m_iTurretPosY[3]    << delim
+		   << m_iTurretPosZ[3]    << delim
+		   << m_iGuidedPosX[0]    << delim
+		   << m_iGuidedPosY[0]    << delim
+		   << m_iGuidedPosZ[0]    << delim
+		   << m_iGuidedPosX[1]    << delim
+		   << m_iGuidedPosY[1]    << delim
+		   << m_iGuidedPosZ[1]    << delim
+		   << m_iGuidedPosX[2]    << delim
+		   << m_iGuidedPosY[2]    << delim
+		   << m_iGuidedPosZ[2]    << delim
+		   << m_iGuidedPosX[3]    << delim
+		   << m_iGuidedPosY[3]    << delim
+		   << m_iGuidedPosZ[3]    << delim
+		   << m_iBeamPosX[0]      << delim
+		   << m_iBeamPosY[0]      << delim
+		   << m_iBeamPosZ[0]      << delim
+		   << m_iBeamPosX[1]      << delim
+		   << m_iBeamPosY[1]      << delim
+		   << m_iBeamPosZ[1]      << delim
+		   << m_iBeamPosX[2]      << delim
+		   << m_iBeamPosY[2]      << delim
+		   << m_iBeamPosZ[2]      << delim
+		   << m_iBeamPosX[3]      << delim
+		   << m_iBeamPosY[3]      << delim
+		   << m_iBeamPosZ[3]      << delim
+		   << m_iUpCompressX      << delim
+		   << m_iUpCompressY      << delim
+		   << m_iDownCompressX    << delim
+		   << m_iDownCompressY    << delim;
 
-	PrintHex16Field(output, (char *)&m_iFlags, '\t');
+	PrintHex16Field(output, (char *)&m_iFlags, delim);
 
 	return 1;
 }
 
-int CShanResource::LoadFromText(std::istream & input)
+int CShanResource::LoadFromText(std::istream & input, char delim)
 {
-	input >> m_iRotationFrames
-		  >> m_iBaseImage
-		  >> m_iBaseMask
-		  >> m_iBaseSetCount
-		  >> m_iBaseXSize
-		  >> m_iBaseYSize
-		  >> m_iBaseTransparency
-		  >> m_iAltImage
-		  >> m_iAltMask
-		  >> m_iAltSetCount
-		  >> m_iAltXSize
-		  >> m_iAltYSize
-		  >> m_iGlowImage
-		  >> m_iGlowMask
-		  >> m_iGlowXSize
-		  >> m_iGlowYSize
-		  >> m_iLightsImage
-		  >> m_iLightsMask
-		  >> m_iLightsXSize
-		  >> m_iLightsYSize
-		  >> m_iWeaponImage
-		  >> m_iWeaponMask
-		  >> m_iWeaponXSize
-		  >> m_iWeaponYSize
-		  >> m_iShieldImage
-		  >> m_iShieldMask
-		  >> m_iShieldXSize
-		  >> m_iShieldYSize
-		  >> m_iAnimationDelay
-		  >> m_iWeaponDecay
-		  >> m_iBlinkMode
-		  >> m_iBlinkValueA
-		  >> m_iBlinkValueB
-		  >> m_iBlinkValueC
-		  >> m_iBlinkValueD
-		  >> m_iGunPosX[0]
-		  >> m_iGunPosY[0]
-		  >> m_iGunPosZ[0]
-		  >> m_iGunPosX[1]
-		  >> m_iGunPosY[1]
-		  >> m_iGunPosZ[1]
-		  >> m_iGunPosX[2]
-		  >> m_iGunPosY[2]
-		  >> m_iGunPosZ[2]
-		  >> m_iGunPosX[3]
-		  >> m_iGunPosY[3]
-		  >> m_iGunPosZ[3]
-		  >> m_iTurretPosX[0]
-		  >> m_iTurretPosY[0]
-		  >> m_iTurretPosZ[0]
-		  >> m_iTurretPosX[1]
-		  >> m_iTurretPosY[1]
-		  >> m_iTurretPosZ[1]
-		  >> m_iTurretPosX[2]
-		  >> m_iTurretPosY[2]
-		  >> m_iTurretPosZ[2]
-		  >> m_iTurretPosX[3]
-		  >> m_iTurretPosY[3]
-		  >> m_iTurretPosZ[3]
-		  >> m_iGuidedPosX[0]
-		  >> m_iGuidedPosY[0]
-		  >> m_iGuidedPosZ[0]
-		  >> m_iGuidedPosX[1]
-		  >> m_iGuidedPosY[1]
-		  >> m_iGuidedPosZ[1]
-		  >> m_iGuidedPosX[2]
-		  >> m_iGuidedPosY[2]
-		  >> m_iGuidedPosZ[2]
-		  >> m_iGuidedPosX[3]
-		  >> m_iGuidedPosY[3]
-		  >> m_iGuidedPosZ[3]
-		  >> m_iBeamPosX[0]
-		  >> m_iBeamPosY[0]
-		  >> m_iBeamPosZ[0]
-		  >> m_iBeamPosX[1]
-		  >> m_iBeamPosY[1]
-		  >> m_iBeamPosZ[1]
-		  >> m_iBeamPosX[2]
-		  >> m_iBeamPosY[2]
-		  >> m_iBeamPosZ[2]
-		  >> m_iBeamPosX[3]
-		  >> m_iBeamPosY[3]
-		  >> m_iBeamPosZ[3]
-		  >> m_iUpCompressX
-		  >> m_iUpCompressY
-		  >> m_iDownCompressX
-		  >> m_iDownCompressY;
+	m_iRotationFrames = ReadIntField(input, delim);
+	m_iBaseImage = ReadIntField(input, delim);
+	m_iBaseMask = ReadIntField(input, delim);
+	m_iBaseSetCount = ReadIntField(input, delim);
+	m_iBaseXSize = ReadIntField(input, delim);
+	m_iBaseYSize = ReadIntField(input, delim);
+	m_iBaseTransparency = ReadIntField(input, delim);
+	m_iAltImage = ReadIntField(input, delim);
+	m_iAltMask = ReadIntField(input, delim);
+	m_iAltSetCount = ReadIntField(input, delim);
+	m_iAltXSize = ReadIntField(input, delim);
+	m_iAltYSize = ReadIntField(input, delim);
+	m_iGlowImage = ReadIntField(input, delim);
+	m_iGlowMask = ReadIntField(input, delim);
+	m_iGlowXSize = ReadIntField(input, delim);
+	m_iGlowYSize = ReadIntField(input, delim);
+	m_iLightsImage = ReadIntField(input, delim);
+	m_iLightsMask = ReadIntField(input, delim);
+	m_iLightsXSize = ReadIntField(input, delim);
+	m_iLightsYSize = ReadIntField(input, delim);
+	m_iWeaponImage = ReadIntField(input, delim);
+	m_iWeaponMask = ReadIntField(input, delim);
+	m_iWeaponXSize = ReadIntField(input, delim);
+	m_iWeaponYSize = ReadIntField(input, delim);
+	m_iShieldImage = ReadIntField(input, delim);
+	m_iShieldMask = ReadIntField(input, delim);
+	m_iShieldXSize = ReadIntField(input, delim);
+	m_iShieldYSize = ReadIntField(input, delim);
+	m_iAnimationDelay = ReadIntField(input, delim);
+	m_iWeaponDecay = ReadIntField(input, delim);
+	m_iBlinkMode = ReadIntField(input, delim);
+	m_iBlinkValueA = ReadIntField(input, delim);
+	m_iBlinkValueB = ReadIntField(input, delim);
+	m_iBlinkValueC = ReadIntField(input, delim);
+	m_iBlinkValueD = ReadIntField(input, delim);
+	for (int i = 0; i < 4; i++)
+	{
+		m_iGunPosX[i] = ReadIntField(input, delim);
+		m_iGunPosY[i] = ReadIntField(input, delim);
+		m_iGunPosZ[i] = ReadIntField(input, delim);
+	}
+	for (int i = 0; i < 4; i++)
+	{
+		m_iTurretPosX[i] = ReadIntField(input, delim);
+		m_iTurretPosY[i] = ReadIntField(input, delim);
+		m_iTurretPosZ[i] = ReadIntField(input, delim);
+	}
+	for (int i = 0; i < 4; i++)
+	{
+		m_iGuidedPosX[i] = ReadIntField(input, delim);
+		m_iGuidedPosY[i] = ReadIntField(input, delim);
+		m_iGuidedPosZ[i] = ReadIntField(input, delim);
+	}
+	for (int i = 0; i < 4; i++)
+	{
+		m_iBeamPosX[i] = ReadIntField(input, delim);
+		m_iBeamPosY[i] = ReadIntField(input, delim);
+		m_iBeamPosZ[i] = ReadIntField(input, delim);
+	}
+	m_iUpCompressX = ReadIntField(input, delim);
+	m_iUpCompressY = ReadIntField(input, delim);
+	m_iDownCompressX = ReadIntField(input, delim);
+	m_iDownCompressY = ReadIntField(input, delim);
 
 	ReadHex16Field(input, (char *)&m_iFlags);
 

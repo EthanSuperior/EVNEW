@@ -223,6 +223,8 @@ int ToWinString(std::string & szStr);
 int PrintTextField(std::ostream & output, const char *pData, char cDelim);
 int ReadTextField(std::istream & input, char *pData, int iCount);
 
+int ReadIntField(std::istream& input, char delim);
+
 int PrintHex16Field(std::ostream & output, const char *pData, char cDelim);
 int ReadHex16Field(std::istream & input, char *pData);
 int PrintHex32Field(std::ostream & output, const char *pData, char cDelim);

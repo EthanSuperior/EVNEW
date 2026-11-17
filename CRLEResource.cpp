@@ -131,18 +131,18 @@ int CRLEResource::SwapEndians(void)
 	return 1;
 }
 
-int CRLEResource::SaveToTextEx(std::ostream & output, std::string & szFilePath, std::string & szFilename1, std::string & szFilename2, int iParam)
+int CRLEResource::SaveToTextEx(std::ostream & output, std::string & szFilePath, std::string & szFilename1, std::string & szFilename2, int iParam, char delim)
 {
 	if(m_vData2.size() == 0)
 		CompileImage();
 
-	output << m_iWidth     << '\t'
-		   << m_iHeight    << '\t'
-		   << m_iNumFrames << '\t'
-		   << iParam       << '\t';
+	output << m_iWidth     << delim
+		   << m_iHeight    << delim
+		   << m_iNumFrames << delim
+		   << iParam       << delim;
 
-	PrintTextField(output, szFilename1.c_str(), '\t');
-	PrintTextField(output, szFilename2.c_str(), '\t');
+	PrintTextField(output, szFilename1.c_str(), delim);
+	PrintTextField(output, szFilename2.c_str(), delim);
 
 	std::string szImageFilename, szMaskFilename;
 
@@ -158,19 +158,12 @@ int CRLEResource::SaveToTextEx(std::ostream & output, std::string & szFilePath, 
 	return 1;
 }
 
-int CRLEResource::LoadFromTextEx(std::istream & input, std::string & szFilePath)
+int CRLEResource::LoadFromTextEx(std::istream & input, std::string & szFilePath, char delim)
 {
-	int iWidth;
-	int iHeight;
-	int iNumFrames;
-	int iFramesPerRow;
-
-	input >> iWidth
-		  >> iHeight
-		  >> iNumFrames
-		  >> iFramesPerRow;
-
-	input.ignore(1);
+	int iWidth = ReadIntField(input, delim);
+	int iHeight = ReadIntField(input, delim);
+	int iNumFrames = ReadIntField(input, delim);
+	int iFramesPerRow = ReadIntField(input, delim);
 
 	int iFramesPerColumn = (iNumFrames + iFramesPerRow - 1) / iFramesPerRow;
 

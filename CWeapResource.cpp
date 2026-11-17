@@ -326,131 +326,129 @@ int CWeapResource::SwapEndians(void)
 	return 1;
 }
 
-int CWeapResource::SaveToText(std::ostream & output)
+int CWeapResource::SaveToText(std::ostream & output, char delim)
 {
-	output << m_iReload           << '\t'
-		   << m_iLifetime         << '\t'
-		   << m_iMassDamage       << '\t'
-		   << m_iEnergyDamage     << '\t'
-		   << m_iGuidance         << '\t'
-		   << m_iSpeed            << '\t'
-		   << m_iAmmoType         << '\t'
-		   << m_iGraphics         << '\t'
-		   << m_iInaccuracy       << '\t'
-		   << m_iSound            << '\t'
-		   << m_iImpact           << '\t'
-		   << m_iExplosionType    << '\t'
-		   << m_iProximityRadius  << '\t'
-		   << m_iBlastRadius      << '\t'
-		   << m_iSmokeSet         << '\t'
-		   << m_iDecay            << '\t'
-		   << m_iParticleCount    << '\t'
-		   << m_iParticleVelocity << '\t'
-		   << m_iParticleMinLife  << '\t'
-		   << m_iParticleMaxLife  << '\t';
+	output << m_iReload           << delim
+		   << m_iLifetime         << delim
+		   << m_iMassDamage       << delim
+		   << m_iEnergyDamage     << delim
+		   << m_iGuidance         << delim
+		   << m_iSpeed            << delim
+		   << m_iAmmoType         << delim
+		   << m_iGraphics         << delim
+		   << m_iInaccuracy       << delim
+		   << m_iSound            << delim
+		   << m_iImpact           << delim
+		   << m_iExplosionType    << delim
+		   << m_iProximityRadius  << delim
+		   << m_iBlastRadius      << delim
+		   << m_iSmokeSet         << delim
+		   << m_iDecay            << delim
+		   << m_iParticleCount    << delim
+		   << m_iParticleVelocity << delim
+		   << m_iParticleMinLife  << delim
+		   << m_iParticleMaxLife  << delim;
 
-	PrintHex32Field(output, (char *)&m_iParticleColor, '\t');
+	PrintHex32Field(output, (char *)&m_iParticleColor, delim);
 
-	output << m_iBeamLength  << '\t'
-		   << m_iBeamWidth   << '\t'
-		   << m_iBeamFalloff << '\t';
+	output << m_iBeamLength  << delim
+		   << m_iBeamWidth   << delim
+		   << m_iBeamFalloff << delim;
 
-	PrintHex32Field(output, (char *)&m_iBeamColor,   '\t');
-	PrintHex32Field(output, (char *)&m_iCoronaColor, '\t');
+	PrintHex32Field(output, (char *)&m_iBeamColor,   delim);
+	PrintHex32Field(output, (char *)&m_iCoronaColor, delim);
 
-	output << m_iSubmunitionsCount   << '\t'
-		   << m_iSubmunitionsType    << '\t'
-		   << m_iSubmunitionsAngle   << '\t'
-		   << m_iSubmunitionsLimit   << '\t'
-		   << m_iProximityDelay      << '\t'
-		   << m_iIonization          << '\t'
-		   << m_iHitParticleCount    << '\t'
-		   << m_iHitParticleLife     << '\t'
-		   << m_iHitParticleVelocity << '\t';
+	output << m_iSubmunitionsCount   << delim
+		   << m_iSubmunitionsType    << delim
+		   << m_iSubmunitionsAngle   << delim
+		   << m_iSubmunitionsLimit   << delim
+		   << m_iProximityDelay      << delim
+		   << m_iIonization          << delim
+		   << m_iHitParticleCount    << delim
+		   << m_iHitParticleLife     << delim
+		   << m_iHitParticleVelocity << delim;
 
-	PrintHex32Field(output, (char *)&m_iHitParticleColor, '\t');
+	PrintHex32Field(output, (char *)&m_iHitParticleColor, delim);
 
-	output << m_iExitType                << '\t'
-		   << m_iBurstCount              << '\t'
-		   << m_iBurstReload             << '\t'
-		   << m_iJammingVulnerability[0] << '\t'
-		   << m_iJammingVulnerability[1] << '\t'
-		   << m_iJammingVulnerability[2] << '\t'
-		   << m_iJammingVulnerability[3] << '\t'
-		   << m_iDurability              << '\t'
-		   << m_iGuidedTurnRate          << '\t'
-		   << m_iMaxAmmo                 << '\t'
-		   << m_iRecoil                  << '\t'
-		   << m_iLightningDensity        << '\t'
-		   << m_iLightningAmplitude      << '\t';
+	output << m_iExitType                << delim
+		   << m_iBurstCount              << delim
+		   << m_iBurstReload             << delim
+		   << m_iJammingVulnerability[0] << delim
+		   << m_iJammingVulnerability[1] << delim
+		   << m_iJammingVulnerability[2] << delim
+		   << m_iJammingVulnerability[3] << delim
+		   << m_iDurability              << delim
+		   << m_iGuidedTurnRate          << delim
+		   << m_iMaxAmmo                 << delim
+		   << m_iRecoil                  << delim
+		   << m_iLightningDensity        << delim
+		   << m_iLightningAmplitude      << delim;
 
-	PrintHex32Field(output, (char *)&m_iIonizationColor, '\t');
+	PrintHex32Field(output, (char *)&m_iIonizationColor, delim);
 
-	PrintHex16Field(output, (char *)&m_iFlags1,      '\t');
-	PrintHex16Field(output, (char *)&m_iFlags2,      '\t');
-	PrintHex16Field(output, (char *)&m_iFlags3,      '\t');
-	PrintHex16Field(output, (char *)&m_iSeekerFlags, '\t');
+	PrintHex16Field(output, (char *)&m_iFlags1,      delim);
+	PrintHex16Field(output, (char *)&m_iFlags2,      delim);
+	PrintHex16Field(output, (char *)&m_iFlags3,      delim);
+	PrintHex16Field(output, (char *)&m_iSeekerFlags, delim);
 
 	return 1;
 }
 
-int CWeapResource::LoadFromText(std::istream & input)
+int CWeapResource::LoadFromText(std::istream & input, char delim)
 {
-	input >> m_iReload
-		  >> m_iLifetime
-		  >> m_iMassDamage
-		  >> m_iEnergyDamage
-		  >> m_iGuidance
-		  >> m_iSpeed
-		  >> m_iAmmoType
-		  >> m_iGraphics
-		  >> m_iInaccuracy
-		  >> m_iSound
-		  >> m_iImpact
-		  >> m_iExplosionType
-		  >> m_iProximityRadius
-		  >> m_iBlastRadius
-		  >> m_iSmokeSet
-		  >> m_iDecay
-		  >> m_iParticleCount
-		  >> m_iParticleVelocity
-		  >> m_iParticleMinLife
-		  >> m_iParticleMaxLife;
+	m_iReload = ReadIntField(input, delim);
+	m_iLifetime = ReadIntField(input, delim);
+	m_iMassDamage = ReadIntField(input, delim);
+	m_iEnergyDamage = ReadIntField(input, delim);
+	m_iGuidance = ReadIntField(input, delim);
+	m_iSpeed = ReadIntField(input, delim);
+	m_iAmmoType = ReadIntField(input, delim);
+	m_iGraphics = ReadIntField(input, delim);
+	m_iInaccuracy = ReadIntField(input, delim);
+	m_iSound = ReadIntField(input, delim);
+	m_iImpact = ReadIntField(input, delim);
+	m_iExplosionType = ReadIntField(input, delim);
+	m_iProximityRadius = ReadIntField(input, delim);
+	m_iBlastRadius = ReadIntField(input, delim);
+	m_iSmokeSet = ReadIntField(input, delim);
+	m_iDecay = ReadIntField(input, delim);
+	m_iParticleCount = ReadIntField(input, delim);
+	m_iParticleVelocity = ReadIntField(input, delim);
+	m_iParticleMinLife = ReadIntField(input, delim);
+	m_iParticleMaxLife = ReadIntField(input, delim);
 
 	ReadHex32Field(input, (char *)&m_iParticleColor);
 
-	input >> m_iBeamLength
-		  >> m_iBeamWidth
-		  >> m_iBeamFalloff;
+	m_iBeamLength = ReadIntField(input, delim);
+	m_iBeamWidth = ReadIntField(input, delim);
+	m_iBeamFalloff = ReadIntField(input, delim);
 
 	ReadHex32Field(input, (char *)&m_iBeamColor);
 	ReadHex32Field(input, (char *)&m_iCoronaColor);
 
-	input >> m_iSubmunitionsCount
-		  >> m_iSubmunitionsType
-		  >> m_iSubmunitionsAngle
-		  >> m_iSubmunitionsLimit
-		  >> m_iProximityDelay
-		  >> m_iIonization
-		  >> m_iHitParticleCount
-		  >> m_iHitParticleLife
-		  >> m_iHitParticleVelocity;
+	m_iSubmunitionsCount = ReadIntField(input, delim);
+	m_iSubmunitionsType = ReadIntField(input, delim);
+	m_iSubmunitionsAngle = ReadIntField(input, delim);
+	m_iSubmunitionsLimit = ReadIntField(input, delim);
+	m_iProximityDelay = ReadIntField(input, delim);
+	m_iIonization = ReadIntField(input, delim);
+	m_iHitParticleCount = ReadIntField(input, delim);
+	m_iHitParticleLife = ReadIntField(input, delim);
+	m_iHitParticleVelocity = ReadIntField(input, delim);
 
 	ReadHex32Field(input, (char *)&m_iHitParticleColor);
 
-	input >> m_iExitType
-		  >> m_iBurstCount
-		  >> m_iBurstReload
-		  >> m_iJammingVulnerability[0]
-		  >> m_iJammingVulnerability[1]
-		  >> m_iJammingVulnerability[2]
-		  >> m_iJammingVulnerability[3]
-		  >> m_iDurability
-		  >> m_iGuidedTurnRate
-		  >> m_iMaxAmmo
-		  >> m_iRecoil
-		  >> m_iLightningDensity
-		  >> m_iLightningAmplitude;
+	m_iExitType = ReadIntField(input, delim);
+	m_iBurstCount = ReadIntField(input, delim);
+	m_iBurstReload = ReadIntField(input, delim);
+	for (int i = 0; i < 4; i++)
+		m_iJammingVulnerability[i] = ReadIntField(input, delim);
+	m_iDurability = ReadIntField(input, delim);
+	m_iGuidedTurnRate = ReadIntField(input, delim);
+	m_iMaxAmmo = ReadIntField(input, delim);
+	m_iRecoil = ReadIntField(input, delim);
+	m_iLightningDensity = ReadIntField(input, delim);
+	m_iLightningAmplitude = ReadIntField(input, delim);
 
 	ReadHex32Field(input, (char *)&m_iIonizationColor);
 

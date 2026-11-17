@@ -103,14 +103,14 @@ int CStrResource::Load(char *pInput, int iSize)
 	return 1;
 }
 
-int CStrResource::SaveToText(std::ostream & output)
+int CStrResource::SaveToText(std::ostream & output, char delim)
 {
-	PrintTextField(output, m_szString, '\t');
+	PrintTextField(output, m_szString, delim);
 
 	return 1;
 }
 
-int CStrResource::LoadFromText(std::istream & input)
+int CStrResource::LoadFromText(std::istream & input, char delim)
 {
 	ReadTextField(input, m_szString, 256);
 

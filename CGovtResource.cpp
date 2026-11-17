@@ -265,90 +265,82 @@ int CGovtResource::SwapEndians(void)
 	return 1;
 }
 
-int CGovtResource::SaveToText(std::ostream & output)
+int CGovtResource::SaveToText(std::ostream & output, char delim)
 {
-	output << m_iVoiceType        << '\t'
-		   << m_iScanFine         << '\t'
-		   << m_iCrimeTolerance   << '\t'
-		   << m_iSmugglingPenalty << '\t'
-		   << m_iDisablingPenalty << '\t'
-		   << m_iBoardingPenalty  << '\t'
-		   << m_iKillingPenalty   << '\t'
-		   << m_iShootingPenalty  << '\t'
-		   << m_iInitialRecord    << '\t'
-		   << m_iMaxOdds          << '\t'
-		   << m_iClasses[0]       << '\t'
-		   << m_iClasses[1]       << '\t'
-		   << m_iClasses[2]       << '\t'
-		   << m_iClasses[3]       << '\t'
-		   << m_iAllies[0]        << '\t'
-		   << m_iAllies[1]        << '\t'
-		   << m_iAllies[2]        << '\t'
-		   << m_iAllies[3]        << '\t'
-		   << m_iEnemies[0]       << '\t'
-		   << m_iEnemies[1]       << '\t'
-		   << m_iEnemies[2]       << '\t'
-		   << m_iEnemies[3]       << '\t'
-		   << m_iInterface        << '\t'
-		   << m_iNewsPicture      << '\t'
-		   << m_iSkillMultiplier  << '\t';
+	output << m_iVoiceType        << delim
+		   << m_iScanFine         << delim
+		   << m_iCrimeTolerance   << delim
+		   << m_iSmugglingPenalty << delim
+		   << m_iDisablingPenalty << delim
+		   << m_iBoardingPenalty  << delim
+		   << m_iKillingPenalty   << delim
+		   << m_iShootingPenalty  << delim
+		   << m_iInitialRecord    << delim
+		   << m_iMaxOdds          << delim
+		   << m_iClasses[0]       << delim
+		   << m_iClasses[1]       << delim
+		   << m_iClasses[2]       << delim
+		   << m_iClasses[3]       << delim
+		   << m_iAllies[0]        << delim
+		   << m_iAllies[1]        << delim
+		   << m_iAllies[2]        << delim
+		   << m_iAllies[3]        << delim
+		   << m_iEnemies[0]       << delim
+		   << m_iEnemies[1]       << delim
+		   << m_iEnemies[2]       << delim
+		   << m_iEnemies[3]       << delim
+		   << m_iInterface        << delim
+		   << m_iNewsPicture      << delim
+		   << m_iSkillMultiplier  << delim;
 
 	char c = m_cScanMask[0]; m_cScanMask[0] = m_cScanMask[1]; m_cScanMask[1] = c;
 
-	PrintHex16Field(output, m_cScanMask, '\t');
+	PrintHex16Field(output, m_cScanMask, delim);
 
 	c = m_cScanMask[0]; m_cScanMask[0] = m_cScanMask[1]; m_cScanMask[1] = c;
 
-	PrintHex64Field(output, m_cRequire,  '\t');
+	PrintHex64Field(output, m_cRequire,  delim);
 
-	output << m_iInherentJamming[0] << '\t'
-		   << m_iInherentJamming[1] << '\t'
-		   << m_iInherentJamming[2] << '\t'
-		   << m_iInherentJamming[3] << '\t';
+	output << m_iInherentJamming[0] << delim
+		   << m_iInherentJamming[1] << delim
+		   << m_iInherentJamming[2] << delim
+		   << m_iInherentJamming[3] << delim;
 
-	PrintTextField(output, m_szMediumName, '\t');
+	PrintTextField(output, m_szMediumName, delim);
 
-	PrintHex32Field(output, (char *)&m_iColor,     '\t');
-	PrintHex32Field(output, (char *)&m_iShipColor, '\t');
+	PrintHex32Field(output, (char *)&m_iColor,     delim);
+	PrintHex32Field(output, (char *)&m_iShipColor, delim);
 
-	PrintTextField(output, m_szCommName,   '\t');
-	PrintTextField(output, m_szTargetName, '\t');
+	PrintTextField(output, m_szCommName,   delim);
+	PrintTextField(output, m_szTargetName, delim);
 
-	PrintHex16Field(output, (char *)&m_iFlags1, '\t');
-	PrintHex16Field(output, (char *)&m_iFlags2, '\t');
+	PrintHex16Field(output, (char *)&m_iFlags1, delim);
+	PrintHex16Field(output, (char *)&m_iFlags2, delim);
 
 	return 1;
 }
 
-int CGovtResource::LoadFromText(std::istream & input)
+int CGovtResource::LoadFromText(std::istream & input, char delim)
 {
-	input >> m_iVoiceType
-		  >> m_iScanFine
-		  >> m_iCrimeTolerance
-		  >> m_iSmugglingPenalty
-		  >> m_iDisablingPenalty
-		  >> m_iBoardingPenalty
-		  >> m_iKillingPenalty
-		  >> m_iShootingPenalty
-		  >> m_iInitialRecord
-		  >> m_iMaxOdds
-		  >> m_iClasses[0]
-		  >> m_iClasses[1]
-		  >> m_iClasses[2]
-		  >> m_iClasses[3]
-		  >> m_iAllies[0]
-		  >> m_iAllies[1]
-		  >> m_iAllies[2]
-		  >> m_iAllies[3]
-		  >> m_iEnemies[0]
-		  >> m_iEnemies[1]
-		  >> m_iEnemies[2]
-		  >> m_iEnemies[3]
-		  >> m_iInterface
-		  >> m_iNewsPicture
-		  >> m_iSkillMultiplier;
-
-	input.ignore(1);
+	m_iVoiceType = ReadIntField(input, delim);
+	m_iScanFine = ReadIntField(input, delim);
+	m_iCrimeTolerance = ReadIntField(input, delim);
+	m_iSmugglingPenalty = ReadIntField(input, delim);
+	m_iDisablingPenalty = ReadIntField(input, delim);
+	m_iBoardingPenalty = ReadIntField(input, delim);
+	m_iKillingPenalty = ReadIntField(input, delim);
+	m_iShootingPenalty = ReadIntField(input, delim);
+	m_iInitialRecord = ReadIntField(input, delim);
+	m_iMaxOdds = ReadIntField(input, delim);
+	for (int i = 0; i < 4; i++)
+		m_iClasses[i] = ReadIntField(input, delim);
+	for (int i = 0; i < 4; i++)
+		m_iAllies[i] = ReadIntField(input, delim);
+	for (int i = 0; i < 4; i++)
+		m_iEnemies[i] = ReadIntField(input, delim);
+	m_iInterface = ReadIntField(input, delim);
+	m_iNewsPicture = ReadIntField(input, delim);
+	m_iSkillMultiplier = ReadIntField(input, delim);
 
 	ReadHex16Field(input, m_cScanMask);
 
@@ -356,12 +348,8 @@ int CGovtResource::LoadFromText(std::istream & input)
 
 	ReadHex64Field(input, m_cRequire);
 
-	input >> m_iInherentJamming[0]
-		  >> m_iInherentJamming[1]
-		  >> m_iInherentJamming[2]
-		  >> m_iInherentJamming[3];
-
-	input.ignore(1);
+	for (int i = 0; i < 4; i++)
+		m_iInherentJamming[i] = ReadIntField(input, delim);
 
 	ReadTextField(input, m_szMediumName, 64);
 

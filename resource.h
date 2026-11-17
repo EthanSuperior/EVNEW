@@ -1,5 +1,5 @@
 //{{NO_DEPENDENCIES}}
-// Microsoft Developer Studio generated include file.
+// Microsoft Visual C++ generated include file.
 // Used by Resources.rc
 //
 #define IDS_STRING1                     1
@@ -3007,6 +3007,8 @@
 #define IDM_RESOURCETYPEPOPUP_NEW       40082
 #define IDM_RESOURCEPOPUP_EDIT          40083
 #define IDA_EDITRESOURCE                40084
+#define ID_FILE_IMPORTFROMCSV           40085
+#define ID_FILE_EXPORTTOCSV             40086
 #define IDM_WINDOW_1                    40100
 #define IDM_WINDOW_MAX                  40163
 
@@ -3015,7 +3017,7 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        136
-#define _APS_NEXT_COMMAND_VALUE         40085
+#define _APS_NEXT_COMMAND_VALUE         40087
 #define _APS_NEXT_CONTROL_VALUE         2610
 #define _APS_NEXT_SYMED_VALUE           102
 #endif

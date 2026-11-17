@@ -279,67 +279,67 @@ int CColrResource::SwapEndians(void)
 	return 1;
 }
 
-int CColrResource::SaveToText(std::ostream & output)
+int CColrResource::SaveToText(std::ostream & output, char delim)
 {
-	PrintHex32Field(output, (char *)&m_iButtonUp,   '\t');
-	PrintHex32Field(output, (char *)&m_iButtonDown, '\t');
-	PrintHex32Field(output, (char *)&m_iButtonGrey, '\t');
+	PrintHex32Field(output, (char *)&m_iButtonUp,   delim);
+	PrintHex32Field(output, (char *)&m_iButtonDown, delim);
+	PrintHex32Field(output, (char *)&m_iButtonGrey, delim);
 
-	PrintTextField(output, m_szMenuFont, '\t');
+	PrintTextField(output, m_szMenuFont, delim);
 
-	output << m_iMenuFontSize << '\t';
+	output << m_iMenuFontSize << delim;
 
-	PrintHex32Field(output, (char *)&m_iMenuColor1, '\t');
-	PrintHex32Field(output, (char *)&m_iMenuColor2, '\t');
-	PrintHex32Field(output, (char *)&m_iGridBright, '\t');
-	PrintHex32Field(output, (char *)&m_iGridDim,    '\t');
+	PrintHex32Field(output, (char *)&m_iMenuColor1, delim);
+	PrintHex32Field(output, (char *)&m_iMenuColor2, delim);
+	PrintHex32Field(output, (char *)&m_iGridBright, delim);
+	PrintHex32Field(output, (char *)&m_iGridDim,    delim);
 
-	output << m_iProgressBarX1   << '\t'
-		   << m_iProgressBarY1   << '\t'
-		   << m_iProgressBarX2   << '\t'
-		   << m_iProgressBarY2   << '\t';
+	output << m_iProgressBarX1   << delim
+		   << m_iProgressBarY1   << delim
+		   << m_iProgressBarX2   << delim
+		   << m_iProgressBarY2   << delim;
 
-	PrintHex32Field(output, (char *)&m_iProgressBright,  '\t');
-	PrintHex32Field(output, (char *)&m_iProgressDim,     '\t');
-	PrintHex32Field(output, (char *)&m_iProgressOutline, '\t');
+	PrintHex32Field(output, (char *)&m_iProgressBright,  delim);
+	PrintHex32Field(output, (char *)&m_iProgressDim,     delim);
+	PrintHex32Field(output, (char *)&m_iProgressOutline, delim);
 
-	output << m_iButton1X        << '\t'
-		   << m_iButton1Y        << '\t'
-		   << m_iButton2X        << '\t'
-		   << m_iButton2Y        << '\t'
-		   << m_iButton3X        << '\t'
-		   << m_iButton3Y        << '\t'
-		   << m_iButton4X        << '\t'
-		   << m_iButton4Y        << '\t'
-		   << m_iButton5X        << '\t'
-		   << m_iButton5Y        << '\t'
-		   << m_iButton6X        << '\t'
-		   << m_iButton6Y        << '\t';
+	output << m_iButton1X        << delim
+		   << m_iButton1Y        << delim
+		   << m_iButton2X        << delim
+		   << m_iButton2Y        << delim
+		   << m_iButton3X        << delim
+		   << m_iButton3Y        << delim
+		   << m_iButton4X        << delim
+		   << m_iButton4Y        << delim
+		   << m_iButton5X        << delim
+		   << m_iButton5Y        << delim
+		   << m_iButton6X        << delim
+		   << m_iButton6Y        << delim;
 
-	PrintHex32Field(output, (char *)&m_iFloatingMap,     '\t');
-	PrintHex32Field(output, (char *)&m_iListText,        '\t');
-	PrintHex32Field(output, (char *)&m_iListBackground,  '\t');
-	PrintHex32Field(output, (char *)&m_iListHighlight,   '\t');
-	PrintHex32Field(output, (char *)&m_iEscortHighlight, '\t');
+	PrintHex32Field(output, (char *)&m_iFloatingMap,     delim);
+	PrintHex32Field(output, (char *)&m_iListText,        delim);
+	PrintHex32Field(output, (char *)&m_iListBackground,  delim);
+	PrintHex32Field(output, (char *)&m_iListHighlight,   delim);
+	PrintHex32Field(output, (char *)&m_iEscortHighlight, delim);
 
-	PrintTextField(output, m_szButtonFont, '\t');
+	PrintTextField(output, m_szButtonFont, delim);
 
-	output << m_iButtonFontSize  << '\t'
-		   << m_iLogoX           << '\t'
-		   << m_iLogoY           << '\t'
-		   << m_iRolloverX       << '\t'
-		   << m_iRolloverY       << '\t'
-		   << m_iSlide1X         << '\t'
-		   << m_iSlide1Y         << '\t'
-		   << m_iSlide2X         << '\t'
-		   << m_iSlide2Y         << '\t'
-		   << m_iSlide3X         << '\t'
-		   << m_iSlide3Y         << '\t';
+	output << m_iButtonFontSize  << delim
+		   << m_iLogoX           << delim
+		   << m_iLogoY           << delim
+		   << m_iRolloverX       << delim
+		   << m_iRolloverY       << delim
+		   << m_iSlide1X         << delim
+		   << m_iSlide1Y         << delim
+		   << m_iSlide2X         << delim
+		   << m_iSlide2Y         << delim
+		   << m_iSlide3X         << delim
+		   << m_iSlide3Y         << delim;
 
 	return 1;
 }
 
-int CColrResource::LoadFromText(std::istream & input)
+int CColrResource::LoadFromText(std::istream & input, char delim)
 {
 	ReadHex32Field(input, (char *)&m_iButtonUp);
 	ReadHex32Field(input, (char *)&m_iButtonDown);
@@ -347,34 +347,34 @@ int CColrResource::LoadFromText(std::istream & input)
 
 	ReadTextField(input, m_szMenuFont, 64);
 
-	input >> m_iMenuFontSize;
+	m_iMenuFontSize = ReadIntField(input, delim);
 
 	ReadHex32Field(input, (char *)&m_iMenuColor1);
 	ReadHex32Field(input, (char *)&m_iMenuColor2);
 	ReadHex32Field(input, (char *)&m_iGridBright);
 	ReadHex32Field(input, (char *)&m_iGridDim);
 
-	input >> m_iProgressBarX1
-		  >> m_iProgressBarY1
-		  >> m_iProgressBarX2
-		  >> m_iProgressBarY2;
+	m_iProgressBarX1 = ReadIntField(input, delim);
+	m_iProgressBarY1 = ReadIntField(input, delim);
+	m_iProgressBarX2 = ReadIntField(input, delim);
+	m_iProgressBarY2 = ReadIntField(input, delim);
 
 	ReadHex32Field(input, (char *)&m_iProgressBright);
 	ReadHex32Field(input, (char *)&m_iProgressDim);
 	ReadHex32Field(input, (char *)&m_iProgressOutline);
 
-	input >> m_iButton1X
-		  >> m_iButton1Y
-		  >> m_iButton2X
-		  >> m_iButton2Y
-		  >> m_iButton3X
-		  >> m_iButton3Y
-		  >> m_iButton4X
-		  >> m_iButton4Y
-		  >> m_iButton5X
-		  >> m_iButton5Y
-		  >> m_iButton6X
-		  >> m_iButton6Y;
+	m_iButton1X = ReadIntField(input, delim);
+	m_iButton1Y = ReadIntField(input, delim);
+	m_iButton2X = ReadIntField(input, delim);
+	m_iButton2Y = ReadIntField(input, delim);
+	m_iButton3X = ReadIntField(input, delim);
+	m_iButton3Y = ReadIntField(input, delim);
+	m_iButton4X = ReadIntField(input, delim);
+	m_iButton4Y = ReadIntField(input, delim);
+	m_iButton5X = ReadIntField(input, delim);
+	m_iButton5Y = ReadIntField(input, delim);
+	m_iButton6X = ReadIntField(input, delim);
+	m_iButton6Y = ReadIntField(input, delim);
 
 	ReadHex32Field(input, (char *)&m_iFloatingMap);
 	ReadHex32Field(input, (char *)&m_iListText);
@@ -384,19 +384,17 @@ int CColrResource::LoadFromText(std::istream & input)
 
 	ReadTextField(input, m_szButtonFont, 64);
 
-	input >> m_iButtonFontSize
-		  >> m_iLogoX
-		  >> m_iLogoY
-		  >> m_iRolloverX
-		  >> m_iRolloverY
-		  >> m_iSlide1X
-		  >> m_iSlide1Y
-		  >> m_iSlide2X
-		  >> m_iSlide2Y
-		  >> m_iSlide3X
-		  >> m_iSlide3Y;
-
-	input.ignore(1);
+	m_iButtonFontSize = ReadIntField(input, delim);
+	m_iLogoX = ReadIntField(input, delim);
+	m_iLogoY = ReadIntField(input, delim);
+	m_iRolloverX = ReadIntField(input, delim);
+	m_iRolloverY = ReadIntField(input, delim);
+	m_iSlide1X = ReadIntField(input, delim);
+	m_iSlide1Y = ReadIntField(input, delim);
+	m_iSlide2X = ReadIntField(input, delim);
+	m_iSlide2Y = ReadIntField(input, delim);
+	m_iSlide3X = ReadIntField(input, delim);
+	m_iSlide3Y = ReadIntField(input, delim);
 
 	return 1;
 }

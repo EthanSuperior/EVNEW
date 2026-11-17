@@ -163,56 +163,48 @@ int CFletResource::SwapEndians(void)
 	return 1;
 }
 
-int CFletResource::SaveToText(std::ostream & output)
+int CFletResource::SaveToText(std::ostream & output, char delim)
 {
-	output << m_iLeadShipType   << '\t'
-		   << m_iEscortTypes[0] << '\t'
-		   << m_iEscortTypes[1] << '\t'
-		   << m_iEscortTypes[2] << '\t'
-		   << m_iEscortTypes[3] << '\t'
-		   << m_iMinEscorts[0]  << '\t'
-		   << m_iMinEscorts[1]  << '\t'
-		   << m_iMinEscorts[2]  << '\t'
-		   << m_iMinEscorts[3]  << '\t'
-		   << m_iMaxEscorts[0]  << '\t'
-		   << m_iMaxEscorts[1]  << '\t'
-		   << m_iMaxEscorts[2]  << '\t'
-		   << m_iMaxEscorts[3]  << '\t'
-		   << m_iGovernment     << '\t'
-		   << m_iSystem         << '\t';
+	output << m_iLeadShipType   << delim
+		   << m_iEscortTypes[0] << delim
+		   << m_iEscortTypes[1] << delim
+		   << m_iEscortTypes[2] << delim
+		   << m_iEscortTypes[3] << delim
+		   << m_iMinEscorts[0]  << delim
+		   << m_iMinEscorts[1]  << delim
+		   << m_iMinEscorts[2]  << delim
+		   << m_iMinEscorts[3]  << delim
+		   << m_iMaxEscorts[0]  << delim
+		   << m_iMaxEscorts[1]  << delim
+		   << m_iMaxEscorts[2]  << delim
+		   << m_iMaxEscorts[3]  << delim
+		   << m_iGovernment     << delim
+		   << m_iSystem         << delim;
 
-	PrintTextField(output, m_szAppearOn, '\t');
+	PrintTextField(output, m_szAppearOn, delim);
 
-	output << m_iQuote << '\t';
+	output << m_iQuote << delim;
 
-	PrintHex16Field(output, (char *)&m_iFlags, '\t');
+	PrintHex16Field(output, (char *)&m_iFlags, delim);
 
 	return 1;
 }
 
-int CFletResource::LoadFromText(std::istream & input)
+int CFletResource::LoadFromText(std::istream & input, char delim)
 {
-	input >> m_iLeadShipType
-		  >> m_iEscortTypes[0]
-		  >> m_iEscortTypes[1]
-		  >> m_iEscortTypes[2]
-		  >> m_iEscortTypes[3]
-		  >> m_iMinEscorts[0]
-		  >> m_iMinEscorts[1]
-		  >> m_iMinEscorts[2]
-		  >> m_iMinEscorts[3]
-		  >> m_iMaxEscorts[0]
-		  >> m_iMaxEscorts[1]
-		  >> m_iMaxEscorts[2]
-		  >> m_iMaxEscorts[3]
-		  >> m_iGovernment
-		  >> m_iSystem;
-
-	input.ignore(1);
+	m_iLeadShipType = ReadIntField(input, delim);
+	for (int i = 0; i < 4; i++)
+		m_iEscortTypes[i] = ReadIntField(input, delim);
+	for (int i = 0; i < 4; i++)
+		m_iMinEscorts[i] = ReadIntField(input, delim);
+	for (int i = 0; i < 4; i++)
+		m_iMaxEscorts[i] = ReadIntField(input, delim);
+	m_iGovernment = ReadIntField(input, delim);
+	m_iSystem = ReadIntField(input, delim);
 
 	ReadTextField(input, m_szAppearOn, 256);
 
-	input >> m_iQuote;
+	m_iQuote = ReadIntField(input, delim);
 
 	ReadHex16Field(input, (char *)&m_iFlags);
 

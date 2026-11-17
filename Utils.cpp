@@ -331,7 +331,7 @@ int ReadTextField(std::istream & input, char *pData, int iCount)
 			else
 				pData[0] = c;
 		}
-		else if((c == '\t') || (c == '\n'))
+		else if((c == '\t') || (c == '\n') || (c == ','))
 		{
 			pData[0] = '\0';
 
@@ -347,7 +347,7 @@ int ReadTextField(std::istream & input, char *pData, int iCount)
 	{
 		c = input.get();
 
-		if((!iIsQuoted) && ((c == '\t') || (c == '\n')))
+		if((!iIsQuoted) && ((c == '\t') || (c == '\n') || (c == ',')))
 		{
 			pData[i] = '\0';
 
@@ -390,7 +390,7 @@ int ReadTextField(std::istream & input, char *pData, int iCount)
 		{
 			c = input.get();
 
-			if((iIsQuoted) && ((c == '\t') || (c == '\n')))
+			if((iIsQuoted) && ((c == '\t') || (c == '\n') || (c == ',')))
 				break;
 
 			if((iIsQuoted) && (c == '\"'))
@@ -411,6 +411,13 @@ int ReadTextField(std::istream & input, char *pData, int iCount)
 		return 0;
 
 	return 1;
+}
+
+int ReadIntField(std::istream& input, char delim) 
+{
+	char buffer[20];
+	input.getline(buffer, 20, delim);
+	return atoi(buffer);
 }
 
 int PrintHex16Field(std::ostream & output, const char *pData, char cDelim)
@@ -438,7 +445,7 @@ int ReadHex16Field(std::istream & input, char *pData)
 
 	c1 = input.peek();
 
-	while(((c1 == ' ') || (c1 == '\n') || (c1 == '\t')) && (!input.eof()))
+	while(((c1 == ' ') || (c1 == '\n') || (c1 == '\t') || (c1 == ',')) && (!input.eof()))
 	{
 		input.ignore(1);
 
@@ -519,7 +526,7 @@ int ReadHex32Field(std::istream & input, char *pData)
 
 	c1 = input.peek();
 
-	while(((c1 == ' ') || (c1 == '\n') || (c1 == '\t')) && (!input.eof()))
+	while(((c1 == ' ') || (c1 == '\n') || (c1 == '\t') || (c1 == ',')) && (!input.eof()))
 	{
 		input.ignore(1);
 

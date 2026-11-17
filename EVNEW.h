@@ -114,6 +114,8 @@ private:
 	int FileOpen(int iOpenDialog, char *szFilename);
 	int FileSave(void);
 	int FileSaveAs(void);
+	int FileImportCSV(int iOpenDialog, char *szFilename);
+	int FileExportCSV(void);
 //	int FileTestPlugIn(void);
 	int FileExit(void);
 

@@ -112,27 +112,25 @@ int CNebuResource::SwapEndians(void)
 	return 1;
 }
 
-int CNebuResource::SaveToText(std::ostream & output)
+int CNebuResource::SaveToText(std::ostream & output, char delim)
 {
-	output << m_iXPosition << '\t'
-		   << m_iYPosition << '\t'
-		   << m_iXSize     << '\t'
-		   << m_iYSize     << '\t';
+	output << m_iXPosition << delim
+		   << m_iYPosition << delim
+		   << m_iXSize     << delim
+		   << m_iYSize     << delim;
 
-	PrintTextField(output, m_szActiveOn,  '\t');
-	PrintTextField(output, m_szOnExplore, '\t');
+	PrintTextField(output, m_szActiveOn,  delim);
+	PrintTextField(output, m_szOnExplore, delim);
 
 	return 1;
 }
 
-int CNebuResource::LoadFromText(std::istream & input)
+int CNebuResource::LoadFromText(std::istream & input, char delim)
 {
-	input >> m_iXPosition
-		  >> m_iYPosition
-		  >> m_iXSize
-		  >> m_iYSize;
-
-	input.ignore(1);
+	m_iXPosition = ReadIntField(input, delim);
+	m_iYPosition = ReadIntField(input, delim);
+	m_iXSize = ReadIntField(input, delim);
+	m_iYSize = ReadIntField(input, delim);
 
 	ReadTextField(input, m_szActiveOn,  255);
 	ReadTextField(input, m_szOnExplore, 255);

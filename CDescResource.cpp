@@ -135,24 +135,24 @@ int CDescResource::SwapEndians(void)
 	return 1;
 }
 
-int CDescResource::SaveToText(std::ostream & output)
+int CDescResource::SaveToText(std::ostream & output, char delim)
 {
 	FixNewlines('\n', 0);
 
-	PrintTextField(output, m_szDescription.c_str(), '\t');
+	PrintTextField(output, m_szDescription.c_str(), delim);
 
 	FixNewlines('\n', 1);
 
-	output << m_iGraphics << '\t';
+	output << m_iGraphics << delim;
 
-	PrintTextField(output, m_szMovieFile, '\t');
+	PrintTextField(output, m_szMovieFile, delim);
 
-	PrintHex16Field(output, (char *)&m_iFlags, '\t');
+	PrintHex16Field(output, (char *)&m_iFlags, delim);
 
 	return 1;
 }
 
-int CDescResource::LoadFromText(std::istream & input)
+int CDescResource::LoadFromText(std::istream & input, char delim)
 {
 	static char s_szBuffer[8192];
 
@@ -162,9 +162,7 @@ int CDescResource::LoadFromText(std::istream & input)
 
 	FixNewlines('\n', 1);
 
-	input >> m_iGraphics;
-
-	input.ignore(1);
+	m_iGraphics = ReadIntField(input, delim);
 
 	ReadTextField(input, m_szMovieFile, 32);
 

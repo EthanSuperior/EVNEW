@@ -207,85 +207,57 @@ int CDudeResource::SwapEndians(void)
 	return 1;
 }
 
-int CDudeResource::SaveToText(std::ostream & output)
+int CDudeResource::SaveToText(std::ostream & output, char delim)
 {
-	output << m_iAIType                << '\t'
-		   << m_iGovernment            << '\t'
-		   << m_iShipTypes[0]          << '\t'
-		   << m_iShipTypes[1]          << '\t'
-		   << m_iShipTypes[2]          << '\t'
-		   << m_iShipTypes[3]          << '\t'
-		   << m_iShipTypes[4]          << '\t'
-		   << m_iShipTypes[5]          << '\t'
-		   << m_iShipTypes[6]          << '\t'
-		   << m_iShipTypes[7]          << '\t'
-		   << m_iShipTypes[8]          << '\t'
-		   << m_iShipTypes[9]          << '\t'
-		   << m_iShipTypes[10]         << '\t'
-		   << m_iShipTypes[11]         << '\t'
-		   << m_iShipTypes[12]         << '\t'
-		   << m_iShipTypes[13]         << '\t'
-		   << m_iShipTypes[14]         << '\t'
-		   << m_iShipTypes[15]         << '\t'
-		   << m_iShipProbabilities[0]  << '\t'
-		   << m_iShipProbabilities[1]  << '\t'
-		   << m_iShipProbabilities[2]  << '\t'
-		   << m_iShipProbabilities[3]  << '\t'
-		   << m_iShipProbabilities[4]  << '\t'
-		   << m_iShipProbabilities[5]  << '\t'
-		   << m_iShipProbabilities[6]  << '\t'
-		   << m_iShipProbabilities[7]  << '\t'
-		   << m_iShipProbabilities[8]  << '\t'
-		   << m_iShipProbabilities[9]  << '\t'
-		   << m_iShipProbabilities[10] << '\t'
-		   << m_iShipProbabilities[11] << '\t'
-		   << m_iShipProbabilities[12] << '\t'
-		   << m_iShipProbabilities[13] << '\t'
-		   << m_iShipProbabilities[14] << '\t'
-		   << m_iShipProbabilities[15] << '\t';
+	output << m_iAIType                << delim
+		   << m_iGovernment            << delim
+		   << m_iShipTypes[0]          << delim
+		   << m_iShipTypes[1]          << delim
+		   << m_iShipTypes[2]          << delim
+		   << m_iShipTypes[3]          << delim
+		   << m_iShipTypes[4]          << delim
+		   << m_iShipTypes[5]          << delim
+		   << m_iShipTypes[6]          << delim
+		   << m_iShipTypes[7]          << delim
+		   << m_iShipTypes[8]          << delim
+		   << m_iShipTypes[9]          << delim
+		   << m_iShipTypes[10]         << delim
+		   << m_iShipTypes[11]         << delim
+		   << m_iShipTypes[12]         << delim
+		   << m_iShipTypes[13]         << delim
+		   << m_iShipTypes[14]         << delim
+		   << m_iShipTypes[15]         << delim
+		   << m_iShipProbabilities[0]  << delim
+		   << m_iShipProbabilities[1]  << delim
+		   << m_iShipProbabilities[2]  << delim
+		   << m_iShipProbabilities[3]  << delim
+		   << m_iShipProbabilities[4]  << delim
+		   << m_iShipProbabilities[5]  << delim
+		   << m_iShipProbabilities[6]  << delim
+		   << m_iShipProbabilities[7]  << delim
+		   << m_iShipProbabilities[8]  << delim
+		   << m_iShipProbabilities[9]  << delim
+		   << m_iShipProbabilities[10] << delim
+		   << m_iShipProbabilities[11] << delim
+		   << m_iShipProbabilities[12] << delim
+		   << m_iShipProbabilities[13] << delim
+		   << m_iShipProbabilities[14] << delim
+		   << m_iShipProbabilities[15] << delim;
 
-	PrintHex16Field(output, (char *)&m_iFlags,     '\t');
-	PrintHex16Field(output, (char *)&m_iInfoTypes, '\t');
+	PrintHex16Field(output, (char *)&m_iFlags,     delim);
+	PrintHex16Field(output, (char *)&m_iInfoTypes, delim);
 
 	return 1;
 }
 
-int CDudeResource::LoadFromText(std::istream & input)
+int CDudeResource::LoadFromText(std::istream & input, char delim)
 {
-	input >> m_iAIType
-		  >> m_iGovernment
-		  >> m_iShipTypes[0]
-		  >> m_iShipTypes[1]
-		  >> m_iShipTypes[2]
-		  >> m_iShipTypes[3]
-		  >> m_iShipTypes[4]
-		  >> m_iShipTypes[5]
-		  >> m_iShipTypes[6]
-		  >> m_iShipTypes[7]
-		  >> m_iShipTypes[8]
-		  >> m_iShipTypes[9]
-		  >> m_iShipTypes[10]
-		  >> m_iShipTypes[11]
-		  >> m_iShipTypes[12]
-		  >> m_iShipTypes[13]
-		  >> m_iShipTypes[14]
-		  >> m_iShipTypes[15]
-		  >> m_iShipProbabilities[0]
-		  >> m_iShipProbabilities[1]
-		  >> m_iShipProbabilities[2]
-		  >> m_iShipProbabilities[3]
-		  >> m_iShipProbabilities[4]
-		  >> m_iShipProbabilities[5]
-		  >> m_iShipProbabilities[6]
-		  >> m_iShipProbabilities[7]
-		  >> m_iShipProbabilities[8]
-		  >> m_iShipProbabilities[9]
-		  >> m_iShipProbabilities[10]
-		  >> m_iShipProbabilities[11]
-		  >> m_iShipProbabilities[12]
-		  >> m_iShipProbabilities[13]
-		  >> m_iShipProbabilities[14]
-		  >> m_iShipProbabilities[15];
+	m_iAIType = ReadIntField(input, delim);
+	m_iGovernment = ReadIntField(input, delim);
+	for (int i = 0; i < 16; i++)
+		m_iShipTypes[i] = ReadIntField(input, delim);
+	for (int i = 0; i < 16; i++)
+		m_iShipProbabilities[i] = ReadIntField(input, delim);
 
 	ReadHex16Field(input, (char *)&m_iFlags);
 	ReadHex16Field(input, (char *)&m_iInfoTypes);

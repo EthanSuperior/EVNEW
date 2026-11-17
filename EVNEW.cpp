@@ -44,6 +44,8 @@
 
 #include <algorithm>
 
+#include <shlobj_core.h>
+
 namespace qt
 {
 #include <QTML.h>
@@ -889,6 +891,135 @@ int CEditor::FileSaveAs(void)
 		m_plugIn.SetFilename("");
 
 	return 1;
+}
+
+int CEditor::FileImportCSV(int iOpenDialog, char* szFilename) 
+{
+	char szFilename2[MAX_PATH];
+
+	if (iOpenDialog)
+	{
+		strcpy(szFilename2, "");
+
+		m_ofnLoadSave.hwndOwner = m_dialogMain.GetHWND();
+		m_ofnLoadSave.lpstrFile = szFilename2;
+		m_ofnLoadSave.lpstrTitle = "Open CSV";
+		m_ofnLoadSave.lpstrFilter = "Comma Separated Values File (*.csv)\0*.csv";
+		m_ofnLoadSave.nFilterIndex = 1;
+		m_ofnLoadSave.lpstrDefExt = "csv";
+		m_ofnLoadSave.Flags = OFN_HIDEREADONLY | OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST;
+
+		if (GetOpenFileName(&m_ofnLoadSave) == 0)
+			return 0;
+	}
+	else
+	{
+		strcpy(szFilename2, szFilename);
+	}
+
+	m_plugIn.AdditiveLoadCSV(szFilename2, &m_dialogMain);
+
+	UpdateResourceList();
+
+	return 0;
+}
+
+int CEditor::FileExportCSV(void)
+{
+	TCHAR szFilename[MAX_PATH];
+	BROWSEINFO bi = { 0 };
+	bi.hwndOwner = m_dialogMain.GetHWND();
+	bi.pidlRoot = NULL;
+	bi.pszDisplayName = szFilename;
+	bi.lpszTitle = "Choose an export destination";
+	bi.ulFlags = 0;
+	bi.lpfn = NULL;
+	bi.lParam = 0;
+
+	// get our Item ID list
+	// this GUI is ugly, but because we have to import windows.h for QT, we can't use CFolderPickerDialog from afxdlgs.h
+	// Someone with more experience in the win32 API than me could probably do this the "correct" way
+	PIDLIST_ABSOLUTE id = SHBrowseForFolder(&bi);
+	if (id != NULL)
+		SHGetPathFromIDList(id, szFilename);	// Combine with our display name to get a path
+	else
+		return 0;
+
+	// load our path into the magical variable
+	m_ofnLoadSave.lpstrFile = szFilename;
+
+	// prevent a memory leak
+	CoTaskMemFree(id);
+	
+	if (m_plugIn.m_vResources[CNR_TYPE_CICN].size() > 0)
+	{
+		AskForCicnExportFormat();
+
+		if (m_iCicnExportReturnValue == -1)
+			return 0;
+		else if (m_iCicnExportReturnValue == 0)
+			m_plugIn.SetCicnSaveOptions(0, m_szCicnExportSubdirectory, m_szCicnExportFilenamePrefix, m_szCicnExportMaskSubdirectory, m_szCicnExportMaskFilenamePrefix);
+		else
+			m_plugIn.SetCicnSaveOptions(1, m_szCicnExportSubdirectory, m_szCicnExportFilenamePrefix, m_szCicnExportMaskSubdirectory, m_szCicnExportMaskFilenamePrefix);
+	}
+
+	if (m_plugIn.m_vResources[CNR_TYPE_PICT].size() > 0)
+	{
+		AskForPictExportFormat();
+
+		if (m_iPictExportReturnValue == -1)
+			return 0;
+		else if (m_iPictExportReturnValue == 0)
+			m_plugIn.SetPictSaveOptions(0, m_szPictExportSubdirectory, m_szPictExportFilenamePrefix, m_iPictExportType);
+		else
+			m_plugIn.SetPictSaveOptions(1, m_szPictExportSubdirectory, m_szPictExportFilenamePrefix, m_iPictExportType);
+	}
+
+	if (m_plugIn.m_vResources[CNR_TYPE_RLE8].size() > 0)
+	{
+		AskForRle8ExportFormat();
+
+		if (m_iRleExportReturnValue == -1)
+			return 0;
+		else if (m_iRleExportReturnValue == 0)
+			m_plugIn.SetRle8SaveOptions(0, m_szRleExportSubdirectory, m_szRleExportFilenamePrefix, m_szRleExportMaskSubdirectory, m_szRleExportMaskFilenamePrefix, m_iRleExportImageFileType, m_iRleExportMaskFileType, m_iRleExportFramesPerRow);
+		else
+			m_plugIn.SetRle8SaveOptions(1, m_szRleExportSubdirectory, m_szRleExportFilenamePrefix, m_szRleExportMaskSubdirectory, m_szRleExportMaskFilenamePrefix, m_iRleExportImageFileType, m_iRleExportMaskFileType, m_iRleExportFramesPerRow);
+	}
+
+	if (m_plugIn.m_vResources[CNR_TYPE_RLED].size() > 0)
+	{
+		AskForRleDExportFormat();
+
+		if (m_iRleExportReturnValue == -1)
+			return 0;
+		else if (m_iRleExportReturnValue == 0)
+			m_plugIn.SetRleDSaveOptions(0, m_szRleExportSubdirectory, m_szRleExportFilenamePrefix, m_szRleExportMaskSubdirectory, m_szRleExportMaskFilenamePrefix, m_iRleExportImageFileType, m_iRleExportMaskFileType, m_iRleExportFramesPerRow);
+		else
+			m_plugIn.SetRleDSaveOptions(1, m_szRleExportSubdirectory, m_szRleExportFilenamePrefix, m_szRleExportMaskSubdirectory, m_szRleExportMaskFilenamePrefix, m_iRleExportImageFileType, m_iRleExportMaskFileType, m_iRleExportFramesPerRow);
+	}
+
+	if (m_plugIn.m_vResources[CNR_TYPE_SND].size() > 0)
+	{
+		AskForSndExportFormat();
+
+		if (m_iSndExportReturnValue == -1)
+			return 0;
+		else if (m_iSndExportReturnValue == 0)
+			m_plugIn.SetSndSaveOptions(0, m_szSndExportSubdirectory, m_szSndExportFilenamePrefix);
+		else
+			m_plugIn.SetSndSaveOptions(1, m_szSndExportSubdirectory, m_szSndExportFilenamePrefix);
+	}
+
+	// TODO NOT THIS
+	// Get our export folder
+
+	if (m_plugIn.ExportToCSV(szFilename, &m_dialogMain) == 0)
+	{
+		MessageBox(NULL, "Something went wrong exporting to CSV", "Error", MB_OK | MB_ICONEXCLAMATION);
+	}
+	
+	return 0;
 }
 
 /*int CEditor::FileTestPlugIn(void)
@@ -1822,6 +1953,14 @@ BOOL CEditor::MainDialogProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 			else if(iControlID == IDM_FILE_SAVEAS)
 			{
 				pEditor->FileSaveAs();
+			}
+			else if (iControlID == ID_FILE_IMPORTFROMCSV)
+			{
+				pEditor->FileImportCSV(1, NULL);
+			}
+			else if (iControlID == ID_FILE_EXPORTTOCSV)
+			{
+				pEditor->FileExportCSV();
 			}
 //			else if(iControlID == IDM_FILE_TESTPLUGIN)
 //			{

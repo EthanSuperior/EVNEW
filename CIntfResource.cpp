@@ -280,128 +280,124 @@ int CIntfResource::SwapEndians(void)
 	return 1;
 }
 
-int CIntfResource::SaveToText(std::ostream & output)
+int CIntfResource::SaveToText(std::ostream & output, char delim)
 {
-	PrintHex32Field(output, (char *)&m_iBrightText, '\t');
-	PrintHex32Field(output, (char *)&m_iDimText,    '\t');
+	PrintHex32Field(output, (char *)&m_iBrightText, delim);
+	PrintHex32Field(output, (char *)&m_iDimText,    delim);
 
-	output << m_iRadarX1          << '\t'
-		   << m_iRadarY1          << '\t'
-		   << m_iRadarX2          << '\t'
-		   << m_iRadarY2          << '\t';
+	output << m_iRadarX1          << delim
+		   << m_iRadarY1          << delim
+		   << m_iRadarX2          << delim
+		   << m_iRadarY2          << delim;
 
-	PrintHex32Field(output, (char *)&m_iBrightRadar, '\t');
-	PrintHex32Field(output, (char *)&m_iDimRadar,    '\t');
+	PrintHex32Field(output, (char *)&m_iBrightRadar, delim);
+	PrintHex32Field(output, (char *)&m_iDimRadar,    delim);
 
-	output << m_iShieldX1         << '\t'
-		   << m_iShieldY1         << '\t'
-		   << m_iShieldX2         << '\t'
-		   << m_iShieldY2         << '\t';
+	output << m_iShieldX1         << delim
+		   << m_iShieldY1         << delim
+		   << m_iShieldX2         << delim
+		   << m_iShieldY2         << delim;
 
-	PrintHex32Field(output, (char *)&m_iShieldColor, '\t');
+	PrintHex32Field(output, (char *)&m_iShieldColor, delim);
 
-	output << m_iArmorX1          << '\t'
-		   << m_iArmorY1          << '\t'
-		   << m_iArmorX2          << '\t'
-		   << m_iArmorY2          << '\t';
+	output << m_iArmorX1          << delim
+		   << m_iArmorY1          << delim
+		   << m_iArmorX2          << delim
+		   << m_iArmorY2          << delim;
 
-	PrintHex32Field(output, (char *)&m_iArmorColor, '\t');
+	PrintHex32Field(output, (char *)&m_iArmorColor, delim);
 
-	output << m_iFuelX1           << '\t'
-		   << m_iFuelY1           << '\t'
-		   << m_iFuelX2           << '\t'
-		   << m_iFuelY2           << '\t';
+	output << m_iFuelX1           << delim
+		   << m_iFuelY1           << delim
+		   << m_iFuelX2           << delim
+		   << m_iFuelY2           << delim;
 
-	PrintHex32Field(output, (char *)&m_iFuelFull,    '\t');
-	PrintHex32Field(output, (char *)&m_iFuelPartial, '\t');
+	PrintHex32Field(output, (char *)&m_iFuelFull,    delim);
+	PrintHex32Field(output, (char *)&m_iFuelPartial, delim);
 
-	output << m_iNavigationX1     << '\t'
-		   << m_iNavigationY1     << '\t'
-		   << m_iNavigationX2     << '\t'
-		   << m_iNavigationY2     << '\t'
-		   << m_iWeaponX1         << '\t'
-		   << m_iWeaponY1         << '\t'
-		   << m_iWeaponX2         << '\t'
-		   << m_iWeaponY2         << '\t'
-		   << m_iTargetX1         << '\t'
-		   << m_iTargetY1         << '\t'
-		   << m_iTargetX2         << '\t'
-		   << m_iTargetY2         << '\t'
-		   << m_iCargoX1          << '\t'
-		   << m_iCargoY1          << '\t'
-		   << m_iCargoX2          << '\t'
-		   << m_iCargoY2          << '\t';
+	output << m_iNavigationX1     << delim
+		   << m_iNavigationY1     << delim
+		   << m_iNavigationX2     << delim
+		   << m_iNavigationY2     << delim
+		   << m_iWeaponX1         << delim
+		   << m_iWeaponY1         << delim
+		   << m_iWeaponX2         << delim
+		   << m_iWeaponY2         << delim
+		   << m_iTargetX1         << delim
+		   << m_iTargetY1         << delim
+		   << m_iTargetX2         << delim
+		   << m_iTargetY2         << delim
+		   << m_iCargoX1          << delim
+		   << m_iCargoY1          << delim
+		   << m_iCargoX2          << delim
+		   << m_iCargoY2          << delim;
 
-	PrintTextField(output, m_szStatusFont, '\t');
+	PrintTextField(output, m_szStatusFont, delim);
 
-	output << m_iStatusFontSize   << '\t'
-		   << m_iSubtitleFontSize << '\t'
-		   << m_iBackground       << '\t';
+	output << m_iStatusFontSize   << delim
+		   << m_iSubtitleFontSize << delim
+		   << m_iBackground       << delim;
 
 	return 1;
 }
 
-int CIntfResource::LoadFromText(std::istream & input)
+int CIntfResource::LoadFromText(std::istream & input, char delim)
 {
 	ReadHex32Field(input, (char *)&m_iBrightText);
 	ReadHex32Field(input, (char *)&m_iDimText);
 
-	input >> m_iRadarX1
-		  >> m_iRadarY1
-		  >> m_iRadarX2
-		  >> m_iRadarY2;
+	m_iRadarX1 = ReadIntField(input, delim);
+	m_iRadarY1 = ReadIntField(input, delim);
+	m_iRadarX2 = ReadIntField(input, delim);
+	m_iRadarY2 = ReadIntField(input, delim);
 
 	ReadHex32Field(input, (char *)&m_iBrightRadar);
 	ReadHex32Field(input, (char *)&m_iDimRadar);
 
-	input >> m_iShieldX1
-		  >> m_iShieldY1
-		  >> m_iShieldX2
-		  >> m_iShieldY2;
+	m_iShieldX1 = ReadIntField(input, delim);
+	m_iShieldY1 = ReadIntField(input, delim);
+	m_iShieldX2 = ReadIntField(input, delim);
+	m_iShieldY2 = ReadIntField(input, delim);
 
 	ReadHex32Field(input, (char *)&m_iShieldColor);
 
-	input >> m_iArmorX1
-		  >> m_iArmorY1
-		  >> m_iArmorX2
-		  >> m_iArmorY2;
+	m_iArmorX1 = ReadIntField(input, delim);
+	m_iArmorY1 = ReadIntField(input, delim);
+	m_iArmorX2 = ReadIntField(input, delim);
+	m_iArmorY2 = ReadIntField(input, delim);
 
 	ReadHex32Field(input, (char *)&m_iArmorColor);
 
-	input >> m_iFuelX1
-		  >> m_iFuelY1
-		  >> m_iFuelX2
-		  >> m_iFuelY2;
+	m_iFuelX1 = ReadIntField(input, delim);
+	m_iFuelY1 = ReadIntField(input, delim);
+	m_iFuelX2 = ReadIntField(input, delim);
+	m_iFuelY2 = ReadIntField(input, delim);
 
 	ReadHex32Field(input, (char *)&m_iFuelFull);
 	ReadHex32Field(input, (char *)&m_iFuelPartial);
 
-	input >> m_iNavigationX1
-		  >> m_iNavigationY1
-		  >> m_iNavigationX2
-		  >> m_iNavigationY2
-		  >> m_iWeaponX1
-		  >> m_iWeaponY1
-		  >> m_iWeaponX2
-		  >> m_iWeaponY2
-		  >> m_iTargetX1
-		  >> m_iTargetY1
-		  >> m_iTargetX2
-		  >> m_iTargetY2
-		  >> m_iCargoX1
-		  >> m_iCargoY1
-		  >> m_iCargoX2
-		  >> m_iCargoY2;
-
-	input.ignore(1);
+	m_iNavigationX1 = ReadIntField(input, delim);
+	m_iNavigationY1 = ReadIntField(input, delim);
+	m_iNavigationX2 = ReadIntField(input, delim);
+	m_iNavigationY2 = ReadIntField(input, delim);
+	m_iWeaponX1 = ReadIntField(input, delim);
+	m_iWeaponY1 = ReadIntField(input, delim);
+	m_iWeaponX2 = ReadIntField(input, delim);
+	m_iWeaponY2 = ReadIntField(input, delim);
+	m_iTargetX1 = ReadIntField(input, delim);
+	m_iTargetY1 = ReadIntField(input, delim);
+	m_iTargetX2 = ReadIntField(input, delim);
+	m_iTargetY2 = ReadIntField(input, delim);
+	m_iCargoX1 = ReadIntField(input, delim);
+	m_iCargoY1 = ReadIntField(input, delim);
+	m_iCargoX2 = ReadIntField(input, delim);
+	m_iCargoY2 = ReadIntField(input, delim);
 
 	ReadTextField(input, m_szStatusFont, 64);
 
-	input >> m_iStatusFontSize
-		  >> m_iSubtitleFontSize
-		  >> m_iBackground;
-
-	input.ignore(1);
+	m_iStatusFontSize = ReadIntField(input, delim);
+	m_iSubtitleFontSize = ReadIntField(input, delim);
+	m_iBackground = ReadIntField(input, delim);
 
 	return 1;
 }
